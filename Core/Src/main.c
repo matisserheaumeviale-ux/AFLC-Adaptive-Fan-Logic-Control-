@@ -66,7 +66,6 @@ volatile uint32_t gulPeriod       = 0;
 volatile uint8_t  gucNewPer       = 0;
 volatile uint8_t  gucFirstCap     = 1;
 volatile uint32_t gulLastEdgeMs   = 0;
-
 volatile uint32_t gulRPM_inst     = 0;
 volatile uint32_t gulRPM_filt     = 0;
 
@@ -449,32 +448,6 @@ static void vSetFanDutyPerm(uint16_t usDutyPerm)
 
   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, ulCompare);
 }
-//********************************vRampe0a100_5s*******************************
-//    Nom de la fonction : vRampe0a100_5s
-//    Auteur : Matisse Rh�aume Viale		
-//    Date de cr�ation : 2026-04-02
-//    Date de la derni�re modification : 
-//    Description : 	Routine qui effectue une mont�e progressive du duty cycle
-//                    de 0% � 100% sur une dur�e de 5 secondes.
-//							
-//    Fonctions appel�es : vSetFanDutyPerm(), HAL_Delay()		
-//    Param�tres d'entr�e : Aucun		
-//    Param�tres de sortie : Aucun		
-//    Variables utilis�es : usDuty
-//    Equate : Aucun	
-//    #Define : Aucun	
-// 						
-//******************************************************************************
-static void vRampe0a100_5s(void)
-{
-  uint16_t usDuty;
-
-  for (usDuty = 0u; usDuty <= 1000u; usDuty += 50u)
-  {
-    vSetFanDutyPerm(usDuty);
-    HAL_Delay(250);
-  }
-}
 //*******************************vTraiterCommandeUART***************************
 //    Nom de la fonction : vTraiterCommandeUART
 //    Auteur : Matisse Rh�aume Viale		
@@ -530,25 +503,17 @@ static void vTraiterCommandeUART(void)
 }
   }
 }
-//********************************vPrintDuty***********************************
-//    Nom de la fonction : vPrintDuty
-//    Auteur : Matisse Rh�aume Viale		
-//    Date de cr�ation : 2026-04-02
-//    Date de la derni�re modification : 
-//    Description : 	Routine pour afficher le duty cycle actuel du ventilateur
-//                    en pourcentage via UART.
-//							
-//    Fonctions appel�es : printf()		
-//    Param�tres d'entr�e : Aucun		
-//    Param�tres de sortie : Aucun		
-//    Variables utilis�es : gusDuty_perm
-//    Equate : Aucun	
-//    #Define : Aucun	
-// 						
-//******************************************************************************
+
 //********************************vCalculRPM************************************
 static void vCalculRPM(void)
 {
+  if ((HAL_GetTick() - gulLastEdgeMs) > TACH_TIMEOUT_MS)
+  {
+    gulRPM_inst = 0;
+    gulRPM_filt = 0;
+    return;
+  }
+
   if (gucNewPer != 0u)
   {
     gucNewPer = 0u;
@@ -556,20 +521,11 @@ static void vCalculRPM(void)
     if (gulPeriod > 0u)
     {
       gulRPM_inst = ((TIM2_TICK_HZ * 60u) / gulPeriod) / FAN_PPR;
-      gulRPM_filt = gulRPM_inst;   // simple pour commencer
+      gulRPM_filt = gulRPM_inst;
     }
   }
 }
-//********************************vPrintRPM*************************************
-static void vPrintRPM(void)
-{
-  if ((HAL_GetTick() - gulLastEdgeMs) > TACH_TIMEOUT_MS)
-{
-  gulRPM_inst = 0u;
-  gulRPM_filt = 0u;
-}
-  printf("RPM = %lu\r\n", gulRPM_filt);
-}
+
 /* USER CODE END 4 */
 
 /**
