@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
   30:Core/Src/tachometer.c ****     for (index = 0U; index < TACHOMETER_CHANNEL_COUNT; index++) {
   31:Core/Src/tachometer.c ****         g_tach[index].first_capture = 1U;
   32:Core/Src/tachometer.c ****         g_tach[index].pending_period = 0U;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 2
 
 
   33:Core/Src/tachometer.c ****         Tachometer_ResetSamples(&g_tach[index]);
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
   87:Core/Src/tachometer.c **** {
   88:Core/Src/tachometer.c ****     uint8_t index;
   89:Core/Src/tachometer.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 3
 
 
   90:Core/Src/tachometer.c ****     for (index = 0U; index < TACHOMETER_CHANNEL_COUNT; index++) {
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  144:Core/Src/tachometer.c ****         snapshot->fans[index] = g_tach[index].reading;
  145:Core/Src/tachometer.c ****     }
  146:Core/Src/tachometer.c **** }
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 4
 
 
  147:Core/Src/tachometer.c **** 
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
   66              	.L5:
  150:Core/Src/tachometer.c ****         case HAL_TIM_ACTIVE_CHANNEL_1:
   67              		.loc 1 150 5 view .LVU11
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 5
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 5
 
 
   68 0020 0020     		movs	r0, #0
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  171:Core/Src/tachometer.c ****     for (sample = 0U; sample < TACH_FILTER_SAMPLES; sample++) {
  111              		.loc 1 171 5 is_stmt 1 view .LVU23
  112              	.LVL13:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 6
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 6
 
 
  113              		.loc 1 171 5 is_stmt 0 view .LVU24
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  156 0000 90F816C0 		ldrb	ip, [r0, #22]	@ zero_extendqisi2
  157              		.loc 1 181 8 view .LVU36
  158 0004 BCF1000F 		cmp	ip, #0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 7
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 7
 
 
  159 0008 0FD0     		beq	.L15
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  199              		.cfi_endproc
  200              	.LFE72:
  202              		.section	.text.Tachometer_Init,"ax",%progbits
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 8
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 8
 
 
  203              		.align	1
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  246              		.loc 1 34 43 is_stmt 0 view .LVU61
  247 001a 4FF00003 		mov	r3, #0	@ movhi
  248 001e 2683     		strh	r6, [r4, #24]	@ movhi
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 9
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 9
 
 
   35:Core/Src/tachometer.c ****         g_tach[index].reading.signal_present = false;
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
   43:Core/Src/tachometer.c ****     TachometerChannel_t *channel;
  293              		.loc 1 43 5 view .LVU74
   44:Core/Src/tachometer.c ****     uint32_t now_capture;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 10
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 10
 
 
  294              		.loc 1 44 5 view .LVU75
@@ -598,7 +598,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  333              		.loc 1 58 5 is_stmt 1 view .LVU90
  334              	.LVL36:
   59:Core/Src/tachometer.c ****     now_capture = HAL_TIM_ReadCapturedValue(htim, tim_channel);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 11
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 11
 
 
  335              		.loc 1 59 5 view .LVU91
@@ -658,7 +658,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
   77:Core/Src/tachometer.c ****     channel->last_edge_ms = HAL_GetTick();
  374              		.loc 1 77 27 is_stmt 0 view .LVU107
  375 003e 124A     		ldr	r2, .L33
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 12
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 12
 
 
  376 0040 6B01     		lsls	r3, r5, #5
@@ -718,7 +718,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
   65:Core/Src/tachometer.c ****         channel->reading.signal_present = true;
  414              		.loc 1 65 32 is_stmt 0 view .LVU124
  415 006a 0023     		movs	r3, #0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 13
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 13
 
 
  416 006c 2373     		strb	r3, [r4, #12]
@@ -778,7 +778,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  461              		.thumb_func
  463              	Tachometer_Task:
  464              	.LVL51:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 14
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 14
 
 
  465              	.LFB67:
@@ -838,7 +838,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  504              		.loc 1 98 13 is_stmt 1 view .LVU149
   98:Core/Src/tachometer.c ****             Tachometer_ResetSamples(channel);
  505              		.loc 1 98 37 is_stmt 0 view .LVU150
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 15
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 15
 
 
  506 0018 4273     		strb	r2, [r0, #13]
@@ -898,7 +898,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  546              	.L36:
   90:Core/Src/tachometer.c ****         TachometerChannel_t *channel = &g_tach[index];
  547              		.loc 1 90 28 is_stmt 1 discriminator 1 view .LVU165
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 16
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 16
 
 
  548 0038 032C     		cmp	r4, #3
@@ -958,7 +958,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  107:Core/Src/tachometer.c ****             if (rpm > 65535UL) {
  587              		.loc 1 107 13 is_stmt 1 view .LVU181
  107:Core/Src/tachometer.c ****             if (rpm > 65535UL) {
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 17
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 17
 
 
  588              		.loc 1 107 55 is_stmt 0 view .LVU182
@@ -1018,7 +1018,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  115:Core/Src/tachometer.c ****                 channel->sample_count++;
  627              		.loc 1 115 16 view .LVU198
  628 00a2 032B     		cmp	r3, #3
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 18
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 18
 
 
  629 00a4 BCD8     		bhi	.L40
@@ -1078,7 +1078,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  132:Core/Src/tachometer.c **** }
  675              		.loc 1 132 12 view .LVU209
  676 0006 1830     		adds	r0, r0, #24
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 19
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 19
 
 
  677 0008 024B     		ldr	r3, .L51
@@ -1138,7 +1138,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  724              	.LVL74:
  725              	.L56:
  144:Core/Src/tachometer.c ****     }
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 20
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 20
 
 
  726              		.loc 1 144 9 is_stmt 1 view .LVU219
@@ -1198,7 +1198,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  772              	.Letext0:
  773              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
  774              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 21
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 21
 
 
  775              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
@@ -1207,34 +1207,34 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 1
  778              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
  779              		.file 8 "Core/Inc/tachometer.h"
  780              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s 			page 22
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s 			page 22
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 tachometer.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:19     .text.Tachometer_ChannelFromHal:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:24     .text.Tachometer_ChannelFromHal:00000000 Tachometer_ChannelFromHal
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:90     .text.Tachometer_ResetSamples:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:95     .text.Tachometer_ResetSamples:00000000 Tachometer_ResetSamples
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:139    .text.Tachometer_ComputeAverage:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:144    .text.Tachometer_ComputeAverage:00000000 Tachometer_ComputeAverage
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:203    .text.Tachometer_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:209    .text.Tachometer_Init:00000000 Tachometer_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:275    .text.Tachometer_Init:00000030 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:769    .bss.g_tach:00000000 g_tach
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:280    .text.Tachometer_OnCapture:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:286    .text.Tachometer_OnCapture:00000000 Tachometer_OnCapture
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:452    .text.Tachometer_OnCapture:00000088 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:457    .text.Tachometer_Task:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:463    .text.Tachometer_Task:00000000 Tachometer_Task
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:647    .text.Tachometer_Task:000000b0 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:653    .text.Tachometer_GetReading:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:659    .text.Tachometer_GetReading:00000000 Tachometer_GetReading
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:690    .text.Tachometer_GetReading:00000014 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:695    .text.Tachometer_GetSnapshot:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:701    .text.Tachometer_GetSnapshot:00000000 Tachometer_GetSnapshot
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:761    .text.Tachometer_GetSnapshot:00000034 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccQFpIcJ.s:766    .bss.g_tach:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:19     .text.Tachometer_ChannelFromHal:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:24     .text.Tachometer_ChannelFromHal:00000000 Tachometer_ChannelFromHal
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:90     .text.Tachometer_ResetSamples:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:95     .text.Tachometer_ResetSamples:00000000 Tachometer_ResetSamples
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:139    .text.Tachometer_ComputeAverage:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:144    .text.Tachometer_ComputeAverage:00000000 Tachometer_ComputeAverage
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:203    .text.Tachometer_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:209    .text.Tachometer_Init:00000000 Tachometer_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:275    .text.Tachometer_Init:00000030 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:769    .bss.g_tach:00000000 g_tach
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:280    .text.Tachometer_OnCapture:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:286    .text.Tachometer_OnCapture:00000000 Tachometer_OnCapture
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:452    .text.Tachometer_OnCapture:00000088 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:457    .text.Tachometer_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:463    .text.Tachometer_Task:00000000 Tachometer_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:647    .text.Tachometer_Task:000000b0 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:653    .text.Tachometer_GetReading:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:659    .text.Tachometer_GetReading:00000000 Tachometer_GetReading
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:690    .text.Tachometer_GetReading:00000014 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:695    .text.Tachometer_GetSnapshot:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:701    .text.Tachometer_GetSnapshot:00000000 Tachometer_GetSnapshot
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:761    .text.Tachometer_GetSnapshot:00000034 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccclOyYj.s:766    .bss.g_tach:00000000 $d
 
 UNDEFINED SYMBOLS
 HAL_TIM_ReadCapturedValue

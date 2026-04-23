@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
   31:Core/Src/ui_lcd.c ****     const AFLCalcul_Output_t *targets;
   32:Core/Src/ui_lcd.c ****     const FanStatus_t *fans;
   33:Core/Src/ui_lcd.c ****     char cache[4][21];
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 2
 
 
   34:Core/Src/ui_lcd.c **** } UI_LCD_Context_t;
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
   88:Core/Src/ui_lcd.c **** void UI_LCD_ShowWaitConfirm(const Profil_Result_t *profiles)
   89:Core/Src/ui_lcd.c **** {
   90:Core/Src/ui_lcd.c ****     if (g_ui.screen != UI_SCREEN_WAIT_CONFIRM) {
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 3
 
 
   91:Core/Src/ui_lcd.c ****         g_ui.page_started_ms = HAL_GetTick();
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  145:Core/Src/ui_lcd.c **** 
  146:Core/Src/ui_lcd.c ****     if ((row > 3U) || (text == NULL)) {
  147:Core/Src/ui_lcd.c ****         return;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 4
 
 
  148:Core/Src/ui_lcd.c ****     }
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  202:Core/Src/ui_lcd.c ****     uint8_t first_index = (uint8_t)(page * 2U);
  203:Core/Src/ui_lcd.c ****     uint8_t row;
  204:Core/Src/ui_lcd.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 5
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 5
 
 
  205:Core/Src/ui_lcd.c ****     UI_LCD_WriteLine(0U, header);
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  259:Core/Src/ui_lcd.c ****              ((g_ui.fail_mask & (1U << 2U)) != 0U) ? 'F' : (((g_ui.passed_mask & (1U << 2U)) != 0U)
  260:Core/Src/ui_lcd.c ****              ((g_ui.fail_mask & (1U << 3U)) != 0U) ? 'F' : (((g_ui.passed_mask & (1U << 3U)) != 0U)
  261:Core/Src/ui_lcd.c ****     UI_LCD_WriteLine(3U, summary);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 6
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 6
 
 
  262:Core/Src/ui_lcd.c **** }
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
   44              		.align	1
   45              		.syntax unified
   46              		.thumb
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 7
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 7
 
 
   47              		.thumb_func
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
   90              		.loc 1 139 1 is_stmt 0 view .LVU14
   91 0028 7047     		bx	lr
   92              	.L8:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 8
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 8
 
 
   93 002a 00BF     		.align	2
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  140 001a 0393     		str	r3, [sp, #12]
  141 001c 0493     		str	r3, [sp, #16]
  151:Core/Src/ui_lcd.c ****     len = strlen(text);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 9
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 9
 
 
  142              		.loc 1 151 5 view .LVU24
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  183              		.loc 1 162 1 view .LVU37
  184 0052 07B0     		add	sp, sp, #28
  185              	.LCFI2:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 10
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 10
 
 
  186              		.cfi_remember_state
@@ -598,7 +598,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  235      7200
  236 000e 0000     		.align	2
  237              	.LC1:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 11
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 11
 
 
  238 0010 46257520 		.ascii	"F%u ----\000"
@@ -658,7 +658,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  202:Core/Src/ui_lcd.c ****     uint8_t row;
  279              		.loc 1 202 13 is_stmt 0 view .LVU47
  280 000e 4600     		lsls	r6, r0, #1
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 12
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 12
 
 
  281 0010 F6B2     		uxtb	r6, r6
@@ -718,7 +718,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  323 0038 1ED8     		bhi	.L31
  324              	.LBB3:
  208:Core/Src/ui_lcd.c ****         uint8_t fan_index = (uint8_t)(first_index + row);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 13
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 13
 
 
  325              		.loc 1 208 9 view .LVU60
@@ -778,7 +778,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  367              	.LVL28:
  368              	.L31:
  212:Core/Src/ui_lcd.c ****                      sizeof(line),
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 14
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 14
 
 
  369              		.loc 1 212 13 view .LVU73
@@ -838,7 +838,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  414 00a6 F7E7     		b	.L23
  415              	.L34:
  416              		.align	2
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 15
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 15
 
 
  417              	.L33:
@@ -898,7 +898,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  459              		.cfi_def_cfa_offset 72
  236:Core/Src/ui_lcd.c ****     char summary[21];
  460              		.loc 1 236 5 view .LVU84
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 16
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 16
 
 
  237:Core/Src/ui_lcd.c **** 
@@ -958,7 +958,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  501 0024 244A     		ldr	r2, .L51+12
  502 0026 1521     		movs	r1, #21
  503 0028 2846     		mov	r0, r5
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 17
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 17
 
 
  504 002a FFF7FEFF 		bl	snprintf
@@ -1018,7 +1018,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  542 004e 13F0010F 		tst	r3, #1
  543 0052 01D1     		bne	.L44
  244:Core/Src/ui_lcd.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 18
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 18
 
 
  544              		.loc 1 244 14 view .LVU115
@@ -1078,7 +1078,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  585 0086 02E0     		b	.L41
  586              	.L46:
  587 0088 2D23     		movs	r3, #45
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 19
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 19
 
 
  588 008a F3E7     		b	.L40
@@ -1138,7 +1138,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  636      25732025 
  636      752F2575 
  636      00
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 20
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 20
 
 
  637 000d 000000   		.align	2
@@ -1198,7 +1198,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  679              		.loc 1 270 5 view .LVU144
  680 0010 01E0     		b	.L54
  681              	.LVL52:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 21
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 21
 
 
  682              	.L55:
@@ -1258,7 +1258,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  274:Core/Src/ui_lcd.c ****             snprintf(line,
  722              		.loc 1 274 87 discriminator 3 view .LVU159
  723 003a 002A     		cmp	r2, #0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 22
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 22
 
 
  724 003c E9D0     		beq	.L55
@@ -1318,7 +1318,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  284:Core/Src/ui_lcd.c ****                      sizeof(line),
  767              		.loc 1 284 13 view .LVU171
  288:Core/Src/ui_lcd.c ****                      (unsigned int)g_ui.fans[fan_index].percent);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 23
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 23
 
 
  768              		.loc 1 288 40 is_stmt 0 view .LVU172
@@ -1378,7 +1378,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  811              	.L59:
  812 00c0 00000000 		.word	g_ui
  813 00c4 00000000 		.word	.LC8
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 24
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 24
 
 
  814 00c8 10000000 		.word	.LC9
@@ -1438,7 +1438,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  845              		.syntax unified
  846              		.thumb
  847              		.thumb_func
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 25
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 25
 
 
  849              	UI_LCD_Render:
@@ -1498,7 +1498,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  894              		.loc 1 185 17 view .LVU192
  895 0034 6946     		mov	r1, sp
  896 0036 0220     		movs	r0, #2
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 26
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 26
 
 
  897 0038 FFF7FEFF 		bl	UI_LCD_WriteLine
@@ -1558,7 +1558,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  941              	.L67:
  177:Core/Src/ui_lcd.c ****             break;
  942              		.loc 1 177 13 view .LVU203
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 27
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 27
 
 
  943 0066 FFF7FEFF 		bl	UI_LCD_RenderRuntime
@@ -1618,7 +1618,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  991              		.thumb_func
  993              	UI_LCD_Init:
  994              	.LFB68:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 28
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 28
 
 
   47:Core/Src/ui_lcd.c ****     LCD_Init();
@@ -1678,7 +1678,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
   55:Core/Src/ui_lcd.c **** }
  1035              		.loc 1 55 5 is_stmt 1 view .LVU225
   55:Core/Src/ui_lcd.c **** }
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 29
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 29
 
 
  1036              		.loc 1 55 16 is_stmt 0 view .LVU226
@@ -1738,7 +1738,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1082              		.loc 1 64 14 is_stmt 0 view .LVU236
  1083 0010 104B     		ldr	r3, .L86
  1084 0012 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 30
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 30
 
 
   64:Core/Src/ui_lcd.c ****         if ((now_ms - g_ui.page_started_ms) >= UI_LCD_PROFILE_PAGE_MS) {
@@ -1798,7 +1798,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
   66:Core/Src/ui_lcd.c ****             g_ui.page_index ^= 1U;
  1124              		.loc 1 66 34 is_stmt 0 view .LVU252
  1125 003e 054B     		ldr	r3, .L86
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 31
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 31
 
 
  1126 0040 9860     		str	r0, [r3, #8]
@@ -1858,7 +1858,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1173              		.loc 1 79 5 is_stmt 1 view .LVU261
   79:Core/Src/ui_lcd.c ****         g_ui.page_started_ms = HAL_GetTick();
  1174              		.loc 1 79 13 is_stmt 0 view .LVU262
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 32
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 32
 
 
  1175 0004 084B     		ldr	r3, .L92
@@ -1918,7 +1918,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1217              		.align	1
  1218              		.global	UI_LCD_ShowWaitConfirm
  1219              		.syntax unified
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 33
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 33
 
 
  1220              		.thumb
@@ -1978,7 +1978,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1262              		.loc 1 91 9 is_stmt 1 view .LVU288
   91:Core/Src/ui_lcd.c ****         g_ui.page_index = 0U;
  1263              		.loc 1 91 32 is_stmt 0 view .LVU289
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 34
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 34
 
 
  1264 001a FFF7FEFF 		bl	HAL_GetTick
@@ -2038,7 +2038,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1308              		.loc 1 104 19 is_stmt 0 view .LVU301
  1309 000e 1A74     		strb	r2, [r3, #16]
  105:Core/Src/ui_lcd.c **** }
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 35
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 35
 
 
  1310              		.loc 1 105 5 is_stmt 1 view .LVU302
@@ -2098,7 +2098,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1358 000c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
  113:Core/Src/ui_lcd.c ****         g_ui.page_started_ms = HAL_GetTick();
  1359              		.loc 1 113 8 view .LVU311
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 36
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 36
 
 
  1360 000e 042B     		cmp	r3, #4
@@ -2158,7 +2158,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  115:Core/Src/ui_lcd.c ****     }
  1397              		.loc 1 115 25 is_stmt 0 view .LVU329
  1398 002e 0022     		movs	r2, #0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 37
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 37
 
 
  1399 0030 1A73     		strb	r2, [r3, #12]
@@ -2218,7 +2218,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1449      00000000 
  1449      00000000 
  1449      00000000 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 38
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 38
 
 
  1449      00000000 
@@ -2236,59 +2236,59 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 1
  1461              		.file 11 "Core/Inc/LCD.h"
  1462              		.file 12 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
  1463              		.file 13 "<built-in>"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 39
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 39
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 ui_lcd.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:19     .text.UI_LCD_GetProfilePage:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:24     .text.UI_LCD_GetProfilePage:00000000 UI_LCD_GetProfilePage
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:39     .text.UI_LCD_GetProfilePage:00000008 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1448   .bss.g_ui:00000000 g_ui
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:44     .text.UI_LCD_ClearCache:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:49     .text.UI_LCD_ClearCache:00000000 UI_LCD_ClearCache
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:95     .text.UI_LCD_ClearCache:0000002c $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:100    .text.UI_LCD_WriteLine:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:105    .text.UI_LCD_WriteLine:00000000 UI_LCD_WriteLine
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:228    .text.UI_LCD_WriteLine:00000094 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:233    .rodata.UI_LCD_RenderProfileScreen.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:246    .text.UI_LCD_RenderProfileScreen:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:251    .text.UI_LCD_RenderProfileScreen:00000000 UI_LCD_RenderProfileScreen
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:418    .text.UI_LCD_RenderProfileScreen:000000a8 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:427    .rodata.UI_LCD_RenderStartupTest.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:440    .text.UI_LCD_RenderStartupTest:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:445    .text.UI_LCD_RenderStartupTest:00000000 UI_LCD_RenderStartupTest
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:625    .text.UI_LCD_RenderStartupTest:000000ac $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:634    .rodata.UI_LCD_RenderRuntime.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:641    .text.UI_LCD_RenderRuntime:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:646    .text.UI_LCD_RenderRuntime:00000000 UI_LCD_RenderRuntime
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:812    .text.UI_LCD_RenderRuntime:000000c0 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:819    .rodata.UI_LCD_Render.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:844    .text.UI_LCD_Render:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:849    .text.UI_LCD_Render:00000000 UI_LCD_Render
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:974    .text.UI_LCD_Render:00000090 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:987    .text.UI_LCD_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:993    .text.UI_LCD_Init:00000000 UI_LCD_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1044   .text.UI_LCD_Init:00000028 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1049   .text.UI_LCD_Task:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1055   .text.UI_LCD_Task:00000000 UI_LCD_Task
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1148   .text.UI_LCD_Task:00000054 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1153   .text.UI_LCD_ShowProfilesReady:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1159   .text.UI_LCD_ShowProfilesReady:00000000 UI_LCD_ShowProfilesReady
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1212   .text.UI_LCD_ShowProfilesReady:00000028 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1217   .text.UI_LCD_ShowWaitConfirm:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1223   .text.UI_LCD_ShowWaitConfirm:00000000 UI_LCD_ShowWaitConfirm
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1277   .text.UI_LCD_ShowWaitConfirm:00000028 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1282   .text.UI_LCD_ShowStartupTest:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1288   .text.UI_LCD_ShowStartupTest:00000000 UI_LCD_ShowStartupTest
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1321   .text.UI_LCD_ShowStartupTest:00000018 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1326   .text.UI_LCD_ShowRuntime:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1332   .text.UI_LCD_ShowRuntime:00000000 UI_LCD_ShowRuntime
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1404   .text.UI_LCD_ShowRuntime:00000034 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1409   .text.UI_LCD_ShowSafeState:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1415   .text.UI_LCD_ShowSafeState:00000000 UI_LCD_ShowSafeState
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1440   .text.UI_LCD_ShowSafeState:00000010 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s:1445   .bss.g_ui:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:19     .text.UI_LCD_GetProfilePage:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:24     .text.UI_LCD_GetProfilePage:00000000 UI_LCD_GetProfilePage
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:39     .text.UI_LCD_GetProfilePage:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1448   .bss.g_ui:00000000 g_ui
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:44     .text.UI_LCD_ClearCache:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:49     .text.UI_LCD_ClearCache:00000000 UI_LCD_ClearCache
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:95     .text.UI_LCD_ClearCache:0000002c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:100    .text.UI_LCD_WriteLine:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:105    .text.UI_LCD_WriteLine:00000000 UI_LCD_WriteLine
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:228    .text.UI_LCD_WriteLine:00000094 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:233    .rodata.UI_LCD_RenderProfileScreen.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:246    .text.UI_LCD_RenderProfileScreen:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:251    .text.UI_LCD_RenderProfileScreen:00000000 UI_LCD_RenderProfileScreen
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:418    .text.UI_LCD_RenderProfileScreen:000000a8 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:427    .rodata.UI_LCD_RenderStartupTest.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:440    .text.UI_LCD_RenderStartupTest:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:445    .text.UI_LCD_RenderStartupTest:00000000 UI_LCD_RenderStartupTest
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:625    .text.UI_LCD_RenderStartupTest:000000ac $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:634    .rodata.UI_LCD_RenderRuntime.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:641    .text.UI_LCD_RenderRuntime:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:646    .text.UI_LCD_RenderRuntime:00000000 UI_LCD_RenderRuntime
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:812    .text.UI_LCD_RenderRuntime:000000c0 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:819    .rodata.UI_LCD_Render.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:844    .text.UI_LCD_Render:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:849    .text.UI_LCD_Render:00000000 UI_LCD_Render
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:974    .text.UI_LCD_Render:00000090 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:987    .text.UI_LCD_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:993    .text.UI_LCD_Init:00000000 UI_LCD_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1044   .text.UI_LCD_Init:00000028 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1049   .text.UI_LCD_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1055   .text.UI_LCD_Task:00000000 UI_LCD_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1148   .text.UI_LCD_Task:00000054 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1153   .text.UI_LCD_ShowProfilesReady:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1159   .text.UI_LCD_ShowProfilesReady:00000000 UI_LCD_ShowProfilesReady
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1212   .text.UI_LCD_ShowProfilesReady:00000028 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1217   .text.UI_LCD_ShowWaitConfirm:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1223   .text.UI_LCD_ShowWaitConfirm:00000000 UI_LCD_ShowWaitConfirm
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1277   .text.UI_LCD_ShowWaitConfirm:00000028 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1282   .text.UI_LCD_ShowStartupTest:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1288   .text.UI_LCD_ShowStartupTest:00000000 UI_LCD_ShowStartupTest
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1321   .text.UI_LCD_ShowStartupTest:00000018 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1326   .text.UI_LCD_ShowRuntime:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1332   .text.UI_LCD_ShowRuntime:00000000 UI_LCD_ShowRuntime
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1404   .text.UI_LCD_ShowRuntime:00000034 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1409   .text.UI_LCD_ShowSafeState:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1415   .text.UI_LCD_ShowSafeState:00000000 UI_LCD_ShowSafeState
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1440   .text.UI_LCD_ShowSafeState:00000010 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s:1445   .bss.g_ui:00000000 $d
 
 UNDEFINED SYMBOLS
 strlen
@@ -2296,7 +2296,7 @@ memcpy
 strncmp
 LCD_WriteAt
 snprintf
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccY7gAp0.s 			page 40
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc5YyMlF.s 			page 40
 
 
 Profil_GetName

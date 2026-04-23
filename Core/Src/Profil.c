@@ -11,7 +11,7 @@ typedef struct {
 
 static const Profil_Default_t g_profile_defaults[PROFIL_FAN_COUNT] = {
     {PROFIL_PROFILE_SILENT,      700U, 1200U, 1800U, 24U, 48U},
-    {PROFIL_PROFILE_BALANCED,    900U, 1500U, 2200U, 26U, 55U},
+    {PROFIL_PROFILE_NORMAL,    900U, 1500U, 2200U, 26U, 55U},
     {PROFIL_PROFILE_PERFORMANCE, 1100U, 1900U, 2600U, 28U, 60U},
     {PROFIL_PROFILE_BOOST,       1300U, 2200U, 3000U, 30U, 65U}
 };
@@ -57,8 +57,8 @@ const char *Profil_GetName(Profil_ProfileId_t id)
     switch (id) {
         case PROFIL_PROFILE_SILENT:
             return "SILENT";
-        case PROFIL_PROFILE_BALANCED:
-            return "BAL";
+        case PROFIL_PROFILE_NORMAL:
+            return "NORMAL";
         case PROFIL_PROFILE_PERFORMANCE:
             return "PERF";
         case PROFIL_PROFILE_BOOST:

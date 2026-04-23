@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
   33              		.loc 1 23 20 is_stmt 0 view .LVU2
   34 0000 024B     		ldr	r3, .L2
   35 0002 0022     		movs	r2, #0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 2
 
 
   36 0004 1A70     		strb	r2, [r3]
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
   32:Core/Src/Profil.c ****         const Profil_Default_t *source = &g_profile_defaults[index];
   33:Core/Src/Profil.c ****         Profil_Params_t *dest = &g_result.fans[index];
   34:Core/Src/Profil.c ****         uint16_t temp_span = (uint16_t)(source->temp_max_c - source->temp_min_c);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 3
 
 
   35:Core/Src/Profil.c **** 
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
   36:Core/Src/Profil.c ****         dest->min_rpm = source->min_rpm;
  118              		.loc 1 36 9 is_stmt 1 view .LVU23
   36:Core/Src/Profil.c ****         dest->min_rpm = source->min_rpm;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 4
 
 
  119              		.loc 1 36 34 is_stmt 0 view .LVU24
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
  156              		.loc 1 43 24 discriminator 2 view .LVU44
  157 0060 0120     		movs	r0, #1
  158              	.LVL8:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 5
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 5
 
 
  159              		.loc 1 43 24 discriminator 2 view .LVU45
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
  204              		.section	.text.Profil_GetResult,"ax",%progbits
  205              		.align	1
  206              		.global	Profil_GetResult
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 6
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 6
 
 
  207              		.syntax unified
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
   55:Core/Src/Profil.c **** const char *Profil_GetName(Profil_ProfileId_t id)
   56:Core/Src/Profil.c **** {
  255              		.loc 1 56 1 is_stmt 1 view -0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 7
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 7
 
 
  256              		.cfi_startproc
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
  296              	.LVL21:
  297              	.L25:
   66:Core/Src/Profil.c ****         default:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 8
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 8
 
 
   67:Core/Src/Profil.c ****             return "UNK";
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
  350 001a 280A     		.short	2600
  351 001c 1C       		.byte	28
  352 001d 3C       		.byte	60
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 9
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 9
 
 
  353 001e 03       		.byte	3
@@ -493,27 +493,27 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
  362              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
  363              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
  364              		.file 4 "Core/Inc/Profil.h"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 10
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s 			page 10
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 Profil.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:19     .text.Profil_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:25     .text.Profil_Init:00000000 Profil_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:45     .text.Profil_Init:0000000c $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:325    .bss.g_result:00000000 g_result
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:50     .text.Profil_CalculateAll:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:56     .text.Profil_CalculateAll:00000000 Profil_CalculateAll
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:199    .text.Profil_CalculateAll:00000078 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:331    .rodata.g_profile_defaults:00000000 g_profile_defaults
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:205    .text.Profil_GetResult:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:211    .text.Profil_GetResult:00000000 Profil_GetResult
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:225    .text.Profil_GetResult:00000004 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:230    .rodata.Profil_GetName.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:246    .text.Profil_GetName:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:252    .text.Profil_GetName:00000000 Profil_GetName
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:313    .text.Profil_GetName:00000028 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:322    .bss.g_result:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:328    .rodata.g_profile_defaults:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:19     .text.Profil_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:25     .text.Profil_Init:00000000 Profil_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:45     .text.Profil_Init:0000000c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:325    .bss.g_result:00000000 g_result
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:50     .text.Profil_CalculateAll:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:56     .text.Profil_CalculateAll:00000000 Profil_CalculateAll
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:199    .text.Profil_CalculateAll:00000078 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:331    .rodata.g_profile_defaults:00000000 g_profile_defaults
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:205    .text.Profil_GetResult:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:211    .text.Profil_GetResult:00000000 Profil_GetResult
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:225    .text.Profil_GetResult:00000004 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:230    .rodata.Profil_GetName.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:246    .text.Profil_GetName:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:252    .text.Profil_GetName:00000000 Profil_GetName
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:313    .text.Profil_GetName:00000028 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:322    .bss.g_result:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccOPdU8H.s:328    .rodata.g_profile_defaults:00000000 $d
 
 NO UNDEFINED SYMBOLS

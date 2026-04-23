@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
   30:Core/Src/led_status.c **** }
   31:Core/Src/led_status.c **** 
   32:Core/Src/led_status.c **** void LedStatus_SetMode(LedStatus_Mode_t mode)
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 2
 
 
   33:Core/Src/led_status.c **** {
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
   27              		.loc 1 86 1 view -0
   28              		.cfi_startproc
   29              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 3
 
 
   30              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
   23:Core/Src/led_status.c ****     g_leds.mode = LED_STATUS_MODE_BOOT;
   77              		.loc 1 23 25 is_stmt 0 view .LVU11
   78 000e 1C72     		strb	r4, [r3, #8]
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 4
 
 
   24:Core/Src/led_status.c **** 
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
   33:Core/Src/led_status.c ****     g_leds.mode = mode;
  128              		.loc 1 33 1 is_stmt 1 view -0
  129              		.cfi_startproc
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 5
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 5
 
 
  130              		@ args = 0, pretend = 0, frame = 0
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
  176 0002 324B     		ldr	r3, .L22
  177 0004 1B68     		ldr	r3, [r3]
   43:Core/Src/led_status.c ****         g_leds.heartbeat_ms = now_ms;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 6
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 6
 
 
  178              		.loc 1 43 17 view .LVU30
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
  217              		.loc 1 40 10 view .LVU45
  218 0036 1E46     		mov	r6, r3
   65:Core/Src/led_status.c ****         case LED_STATUS_MODE_FAULT:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 7
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 7
 
 
  219              		.loc 1 65 13 view .LVU46
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
   72:Core/Src/led_status.c ****                     LED_USB_Pin,
  261              		.loc 1 72 5 is_stmt 1 view .LVU59
   74:Core/Src/led_status.c ****     LedStatus_Write(LED_STATUS_GPIO_Port, LED_STATUS_Pin, led_status_on);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 8
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 8
 
 
  262              		.loc 1 74 37 is_stmt 0 view .LVU60
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
  306 00a8 1F46     		mov	r7, r3
  307              	.LVL20:
   62:Core/Src/led_status.c ****         case LED_STATUS_MODE_RUNTIME:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 9
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 9
 
 
  308              		.loc 1 62 13 is_stmt 1 view .LVU71
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
  356              		@ args = 0, pretend = 0, frame = 0
  357              		@ frame_needed = 0, uses_anonymous_args = 0
  358              		@ link register save eliminated.
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 10
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 10
 
 
   82:Core/Src/led_status.c **** }
@@ -570,27 +570,27 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
  383              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
  384              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
  385              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 11
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 led_status.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:19     .text.LedStatus_Write:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:24     .text.LedStatus_Write:00000000 LedStatus_Write
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:46     .text.LedStatus_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:52     .text.LedStatus_Init:00000000 LedStatus_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:112    .text.LedStatus_Init:00000048 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:376    .bss.g_leds:00000000 g_leds
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:119    .text.LedStatus_SetMode:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:125    .text.LedStatus_SetMode:00000000 LedStatus_SetMode
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:142    .text.LedStatus_SetMode:00000008 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:147    .text.LedStatus_Task:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:153    .text.LedStatus_Task:00000000 LedStatus_Task
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:338    .text.LedStatus_Task:000000cc $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:345    .text.LedStatus_NotifyCommActivity:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:351    .text.LedStatus_NotifyCommActivity:00000000 LedStatus_NotifyCommActivity
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:368    .text.LedStatus_NotifyCommActivity:00000008 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:373    .bss.g_leds:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:19     .text.LedStatus_Write:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:24     .text.LedStatus_Write:00000000 LedStatus_Write
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:46     .text.LedStatus_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:52     .text.LedStatus_Init:00000000 LedStatus_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:112    .text.LedStatus_Init:00000048 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:376    .bss.g_leds:00000000 g_leds
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:119    .text.LedStatus_SetMode:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:125    .text.LedStatus_SetMode:00000000 LedStatus_SetMode
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:142    .text.LedStatus_SetMode:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:147    .text.LedStatus_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:153    .text.LedStatus_Task:00000000 LedStatus_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:338    .text.LedStatus_Task:000000cc $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:345    .text.LedStatus_NotifyCommActivity:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:351    .text.LedStatus_NotifyCommActivity:00000000 LedStatus_NotifyCommActivity
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:368    .text.LedStatus_NotifyCommActivity:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccHFQray.s:373    .bss.g_leds:00000000 $d
 
 UNDEFINED SYMBOLS
 HAL_GPIO_WritePin

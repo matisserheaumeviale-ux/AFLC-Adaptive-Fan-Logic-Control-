@@ -208,5 +208,9 @@ clean:
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
+$(BIN): $(ELF)
+	arm-none-eabi-objcopy -O binary $< $@
+flash:
+	st-flash write build/Sans_titre.bin 0x8000000
 
-# *** EOF ***
+flash-all: clean all flash
