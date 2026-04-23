@@ -1,0 +1,519 @@
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"Profil.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/Profil.c"
+  18              		.section	.text.Profil_Init,"ax",%progbits
+  19              		.align	1
+  20              		.global	Profil_Init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	Profil_Init:
+  26              	.LFB0:
+   1:Core/Src/Profil.c **** #include "Profil.h"
+   2:Core/Src/Profil.c **** 
+   3:Core/Src/Profil.c **** typedef struct {
+   4:Core/Src/Profil.c ****     Profil_ProfileId_t profile_id;
+   5:Core/Src/Profil.c ****     uint16_t min_rpm;
+   6:Core/Src/Profil.c ****     uint16_t nominal_rpm;
+   7:Core/Src/Profil.c ****     uint16_t max_rpm;
+   8:Core/Src/Profil.c ****     uint8_t temp_min_c;
+   9:Core/Src/Profil.c ****     uint8_t temp_max_c;
+  10:Core/Src/Profil.c **** } Profil_Default_t;
+  11:Core/Src/Profil.c **** 
+  12:Core/Src/Profil.c **** static const Profil_Default_t g_profile_defaults[PROFIL_FAN_COUNT] = {
+  13:Core/Src/Profil.c ****     {PROFIL_PROFILE_SILENT,      700U, 1200U, 1800U, 24U, 48U},
+  14:Core/Src/Profil.c ****     {PROFIL_PROFILE_BALANCED,    900U, 1500U, 2200U, 26U, 55U},
+  15:Core/Src/Profil.c ****     {PROFIL_PROFILE_PERFORMANCE, 1100U, 1900U, 2600U, 28U, 60U},
+  16:Core/Src/Profil.c ****     {PROFIL_PROFILE_BOOST,       1300U, 2200U, 3000U, 30U, 65U}
+  17:Core/Src/Profil.c **** };
+  18:Core/Src/Profil.c **** 
+  19:Core/Src/Profil.c **** static Profil_Result_t g_result;
+  20:Core/Src/Profil.c **** 
+  21:Core/Src/Profil.c **** void Profil_Init(void)
+  22:Core/Src/Profil.c **** {
+  27              		.loc 1 22 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  23:Core/Src/Profil.c ****     g_result.ready = false;
+  32              		.loc 1 23 5 view .LVU1
+  33              		.loc 1 23 20 is_stmt 0 view .LVU2
+  34 0000 024B     		ldr	r3, .L2
+  35 0002 0022     		movs	r2, #0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 2
+
+
+  36 0004 1A70     		strb	r2, [r3]
+  24:Core/Src/Profil.c ****     g_result.valid = false;
+  37              		.loc 1 24 5 is_stmt 1 view .LVU3
+  38              		.loc 1 24 20 is_stmt 0 view .LVU4
+  39 0006 5A70     		strb	r2, [r3, #1]
+  25:Core/Src/Profil.c **** }
+  40              		.loc 1 25 1 view .LVU5
+  41 0008 7047     		bx	lr
+  42              	.L3:
+  43 000a 00BF     		.align	2
+  44              	.L2:
+  45 000c 00000000 		.word	g_result
+  46              		.cfi_endproc
+  47              	.LFE0:
+  49              		.section	.text.Profil_CalculateAll,"ax",%progbits
+  50              		.align	1
+  51              		.global	Profil_CalculateAll
+  52              		.syntax unified
+  53              		.thumb
+  54              		.thumb_func
+  56              	Profil_CalculateAll:
+  57              	.LFB1:
+  26:Core/Src/Profil.c **** 
+  27:Core/Src/Profil.c **** void Profil_CalculateAll(void)
+  28:Core/Src/Profil.c **** {
+  58              		.loc 1 28 1 is_stmt 1 view -0
+  59              		.cfi_startproc
+  60              		@ args = 0, pretend = 0, frame = 0
+  61              		@ frame_needed = 0, uses_anonymous_args = 0
+  29:Core/Src/Profil.c ****     uint8_t index;
+  62              		.loc 1 29 5 view .LVU7
+  30:Core/Src/Profil.c **** 
+  31:Core/Src/Profil.c ****     for (index = 0U; index < PROFIL_FAN_COUNT; index++) {
+  63              		.loc 1 31 5 view .LVU8
+  64              	.LVL0:
+  65              		.loc 1 31 16 is_stmt 0 view .LVU9
+  66 0000 0023     		movs	r3, #0
+  67              	.LVL1:
+  68              		.loc 1 31 28 is_stmt 1 discriminator 1 view .LVU10
+  69 0002 032B     		cmp	r3, #3
+  70 0004 33D8     		bhi	.L13
+  28:Core/Src/Profil.c ****     uint8_t index;
+  71              		.loc 1 28 1 is_stmt 0 view .LVU11
+  72 0006 70B5     		push	{r4, r5, r6, lr}
+  73              	.LCFI0:
+  74              		.cfi_def_cfa_offset 16
+  75              		.cfi_offset 4, -16
+  76              		.cfi_offset 5, -12
+  77              		.cfi_offset 6, -8
+  78              		.cfi_offset 14, -4
+  79 0008 09E0     		b	.L7
+  80              	.LVL2:
+  81              	.L6:
+  82              	.LBB2:
+  32:Core/Src/Profil.c ****         const Profil_Default_t *source = &g_profile_defaults[index];
+  33:Core/Src/Profil.c ****         Profil_Params_t *dest = &g_result.fans[index];
+  34:Core/Src/Profil.c ****         uint16_t temp_span = (uint16_t)(source->temp_max_c - source->temp_min_c);
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 3
+
+
+  35:Core/Src/Profil.c **** 
+  36:Core/Src/Profil.c ****         dest->profile_id = source->profile_id;
+  37:Core/Src/Profil.c ****         dest->min_rpm = source->min_rpm;
+  38:Core/Src/Profil.c ****         dest->nominal_rpm = source->nominal_rpm;
+  39:Core/Src/Profil.c ****         dest->max_rpm = source->max_rpm;
+  40:Core/Src/Profil.c ****         dest->temp_min_c = source->temp_min_c;
+  41:Core/Src/Profil.c ****         dest->temp_max_c = source->temp_max_c;
+  42:Core/Src/Profil.c ****         dest->gain_num = (uint16_t)(source->max_rpm - source->min_rpm);
+  43:Core/Src/Profil.c ****         dest->gain_den = (temp_span == 0U) ? 1U : temp_span;
+  83              		.loc 1 43 24 discriminator 4 view .LVU12
+  84 000a CCEBCC0C 		rsb	ip, ip, ip, lsl #3
+  85 000e 1A4A     		ldr	r2, .L15
+  86 0010 02EB4C02 		add	r2, r2, ip, lsl #1
+  87 0014 D081     		strh	r0, [r2, #14]	@ movhi
+  88              	.LBE2:
+  31:Core/Src/Profil.c ****         const Profil_Default_t *source = &g_profile_defaults[index];
+  89              		.loc 1 31 53 is_stmt 1 discriminator 2 view .LVU13
+  90 0016 0133     		adds	r3, r3, #1
+  91              	.LVL3:
+  31:Core/Src/Profil.c ****         const Profil_Default_t *source = &g_profile_defaults[index];
+  92              		.loc 1 31 53 is_stmt 0 discriminator 2 view .LVU14
+  93 0018 DBB2     		uxtb	r3, r3
+  94              	.LVL4:
+  31:Core/Src/Profil.c ****         const Profil_Default_t *source = &g_profile_defaults[index];
+  95              		.loc 1 31 28 is_stmt 1 discriminator 1 view .LVU15
+  96 001a 032B     		cmp	r3, #3
+  97 001c 22D8     		bhi	.L14
+  98              	.LVL5:
+  99              	.L7:
+ 100              	.LBB3:
+  32:Core/Src/Profil.c ****         const Profil_Default_t *source = &g_profile_defaults[index];
+ 101              		.loc 1 32 9 view .LVU16
+  32:Core/Src/Profil.c ****         const Profil_Default_t *source = &g_profile_defaults[index];
+ 102              		.loc 1 32 61 is_stmt 0 view .LVU17
+ 103 001e 9C46     		mov	ip, r3
+ 104              	.LVL6:
+  33:Core/Src/Profil.c ****         uint16_t temp_span = (uint16_t)(source->temp_max_c - source->temp_min_c);
+ 105              		.loc 1 33 9 is_stmt 1 view .LVU18
+  34:Core/Src/Profil.c **** 
+ 106              		.loc 1 34 9 view .LVU19
+  34:Core/Src/Profil.c **** 
+ 107              		.loc 1 34 47 is_stmt 0 view .LVU20
+ 108 0020 164A     		ldr	r2, .L15+4
+ 109 0022 03EB830E 		add	lr, r3, r3, lsl #2
+ 110 0026 02EB4E01 		add	r1, r2, lr, lsl #1
+ 111 002a 4C7A     		ldrb	r4, [r1, #9]	@ zero_extendqisi2
+  34:Core/Src/Profil.c **** 
+ 112              		.loc 1 34 68 view .LVU21
+ 113 002c 0D7A     		ldrb	r5, [r1, #8]	@ zero_extendqisi2
+  34:Core/Src/Profil.c **** 
+ 114              		.loc 1 34 18 view .LVU22
+ 115 002e 601B     		subs	r0, r4, r5
+ 116 0030 80B2     		uxth	r0, r0
+ 117              	.LVL7:
+  36:Core/Src/Profil.c ****         dest->min_rpm = source->min_rpm;
+ 118              		.loc 1 36 9 is_stmt 1 view .LVU23
+  36:Core/Src/Profil.c ****         dest->min_rpm = source->min_rpm;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 4
+
+
+ 119              		.loc 1 36 34 is_stmt 0 view .LVU24
+ 120 0032 12F81E60 		ldrb	r6, [r2, lr, lsl #1]	@ zero_extendqisi2
+  36:Core/Src/Profil.c ****         dest->min_rpm = source->min_rpm;
+ 121              		.loc 1 36 26 view .LVU25
+ 122 0036 C3EBC30E 		rsb	lr, r3, r3, lsl #3
+ 123 003a 0F4A     		ldr	r2, .L15
+ 124 003c 02EB4E02 		add	r2, r2, lr, lsl #1
+ 125 0040 9670     		strb	r6, [r2, #2]
+  37:Core/Src/Profil.c ****         dest->nominal_rpm = source->nominal_rpm;
+ 126              		.loc 1 37 9 is_stmt 1 view .LVU26
+  37:Core/Src/Profil.c ****         dest->nominal_rpm = source->nominal_rpm;
+ 127              		.loc 1 37 31 is_stmt 0 view .LVU27
+ 128 0042 B1F802E0 		ldrh	lr, [r1, #2]
+  37:Core/Src/Profil.c ****         dest->nominal_rpm = source->nominal_rpm;
+ 129              		.loc 1 37 23 view .LVU28
+ 130 0046 A2F804E0 		strh	lr, [r2, #4]	@ movhi
+  38:Core/Src/Profil.c ****         dest->max_rpm = source->max_rpm;
+ 131              		.loc 1 38 9 is_stmt 1 view .LVU29
+  38:Core/Src/Profil.c ****         dest->max_rpm = source->max_rpm;
+ 132              		.loc 1 38 35 is_stmt 0 view .LVU30
+ 133 004a 8E88     		ldrh	r6, [r1, #4]
+  38:Core/Src/Profil.c ****         dest->max_rpm = source->max_rpm;
+ 134              		.loc 1 38 27 view .LVU31
+ 135 004c D680     		strh	r6, [r2, #6]	@ movhi
+  39:Core/Src/Profil.c ****         dest->temp_min_c = source->temp_min_c;
+ 136              		.loc 1 39 9 is_stmt 1 view .LVU32
+  39:Core/Src/Profil.c ****         dest->temp_min_c = source->temp_min_c;
+ 137              		.loc 1 39 31 is_stmt 0 view .LVU33
+ 138 004e C988     		ldrh	r1, [r1, #6]
+  39:Core/Src/Profil.c ****         dest->temp_min_c = source->temp_min_c;
+ 139              		.loc 1 39 23 view .LVU34
+ 140 0050 1181     		strh	r1, [r2, #8]	@ movhi
+  40:Core/Src/Profil.c ****         dest->temp_max_c = source->temp_max_c;
+ 141              		.loc 1 40 9 is_stmt 1 view .LVU35
+  40:Core/Src/Profil.c ****         dest->temp_max_c = source->temp_max_c;
+ 142              		.loc 1 40 26 is_stmt 0 view .LVU36
+ 143 0052 9572     		strb	r5, [r2, #10]
+  41:Core/Src/Profil.c ****         dest->gain_num = (uint16_t)(source->max_rpm - source->min_rpm);
+ 144              		.loc 1 41 9 is_stmt 1 view .LVU37
+  41:Core/Src/Profil.c ****         dest->gain_num = (uint16_t)(source->max_rpm - source->min_rpm);
+ 145              		.loc 1 41 26 is_stmt 0 view .LVU38
+ 146 0054 D472     		strb	r4, [r2, #11]
+  42:Core/Src/Profil.c ****         dest->gain_den = (temp_span == 0U) ? 1U : temp_span;
+ 147              		.loc 1 42 9 is_stmt 1 view .LVU39
+  42:Core/Src/Profil.c ****         dest->gain_den = (temp_span == 0U) ? 1U : temp_span;
+ 148              		.loc 1 42 26 is_stmt 0 view .LVU40
+ 149 0056 A1EB0E01 		sub	r1, r1, lr
+  42:Core/Src/Profil.c ****         dest->gain_den = (temp_span == 0U) ? 1U : temp_span;
+ 150              		.loc 1 42 24 view .LVU41
+ 151 005a 9181     		strh	r1, [r2, #12]	@ movhi
+ 152              		.loc 1 43 9 is_stmt 1 view .LVU42
+ 153              		.loc 1 43 24 is_stmt 0 view .LVU43
+ 154 005c 0028     		cmp	r0, #0
+ 155 005e D4D1     		bne	.L6
+ 156              		.loc 1 43 24 discriminator 2 view .LVU44
+ 157 0060 0120     		movs	r0, #1
+ 158              	.LVL8:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 5
+
+
+ 159              		.loc 1 43 24 discriminator 2 view .LVU45
+ 160 0062 D2E7     		b	.L6
+ 161              	.LVL9:
+ 162              	.L14:
+ 163              		.loc 1 43 24 discriminator 2 view .LVU46
+ 164              	.LBE3:
+  44:Core/Src/Profil.c ****     }
+  45:Core/Src/Profil.c **** 
+  46:Core/Src/Profil.c ****     g_result.ready = true;
+ 165              		.loc 1 46 5 is_stmt 1 view .LVU47
+ 166              		.loc 1 46 20 is_stmt 0 view .LVU48
+ 167 0064 044B     		ldr	r3, .L15
+ 168              	.LVL10:
+ 169              		.loc 1 46 20 view .LVU49
+ 170 0066 0122     		movs	r2, #1
+ 171 0068 1A70     		strb	r2, [r3]
+  47:Core/Src/Profil.c ****     g_result.valid = true;
+ 172              		.loc 1 47 5 is_stmt 1 view .LVU50
+ 173              		.loc 1 47 20 is_stmt 0 view .LVU51
+ 174 006a 5A70     		strb	r2, [r3, #1]
+  48:Core/Src/Profil.c **** }
+ 175              		.loc 1 48 1 view .LVU52
+ 176 006c 70BD     		pop	{r4, r5, r6, pc}
+ 177              	.LVL11:
+ 178              	.L13:
+ 179              	.LCFI1:
+ 180              		.cfi_def_cfa_offset 0
+ 181              		.cfi_restore 4
+ 182              		.cfi_restore 5
+ 183              		.cfi_restore 6
+ 184              		.cfi_restore 14
+  46:Core/Src/Profil.c ****     g_result.valid = true;
+ 185              		.loc 1 46 5 is_stmt 1 view .LVU53
+  46:Core/Src/Profil.c ****     g_result.valid = true;
+ 186              		.loc 1 46 20 is_stmt 0 view .LVU54
+ 187 006e 024B     		ldr	r3, .L15
+ 188              	.LVL12:
+  46:Core/Src/Profil.c ****     g_result.valid = true;
+ 189              		.loc 1 46 20 view .LVU55
+ 190 0070 0122     		movs	r2, #1
+ 191 0072 1A70     		strb	r2, [r3]
+  47:Core/Src/Profil.c ****     g_result.valid = true;
+ 192              		.loc 1 47 5 is_stmt 1 view .LVU56
+  47:Core/Src/Profil.c ****     g_result.valid = true;
+ 193              		.loc 1 47 20 is_stmt 0 view .LVU57
+ 194 0074 5A70     		strb	r2, [r3, #1]
+ 195 0076 7047     		bx	lr
+ 196              	.L16:
+ 197              		.align	2
+ 198              	.L15:
+ 199 0078 00000000 		.word	g_result
+ 200 007c 00000000 		.word	g_profile_defaults
+ 201              		.cfi_endproc
+ 202              	.LFE1:
+ 204              		.section	.text.Profil_GetResult,"ax",%progbits
+ 205              		.align	1
+ 206              		.global	Profil_GetResult
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 6
+
+
+ 207              		.syntax unified
+ 208              		.thumb
+ 209              		.thumb_func
+ 211              	Profil_GetResult:
+ 212              	.LFB2:
+  49:Core/Src/Profil.c **** 
+  50:Core/Src/Profil.c **** const Profil_Result_t *Profil_GetResult(void)
+  51:Core/Src/Profil.c **** {
+ 213              		.loc 1 51 1 is_stmt 1 view -0
+ 214              		.cfi_startproc
+ 215              		@ args = 0, pretend = 0, frame = 0
+ 216              		@ frame_needed = 0, uses_anonymous_args = 0
+ 217              		@ link register save eliminated.
+  52:Core/Src/Profil.c ****     return &g_result;
+ 218              		.loc 1 52 5 view .LVU59
+  53:Core/Src/Profil.c **** }
+ 219              		.loc 1 53 1 is_stmt 0 view .LVU60
+ 220 0000 0048     		ldr	r0, .L18
+ 221 0002 7047     		bx	lr
+ 222              	.L19:
+ 223              		.align	2
+ 224              	.L18:
+ 225 0004 00000000 		.word	g_result
+ 226              		.cfi_endproc
+ 227              	.LFE2:
+ 229              		.section	.rodata.Profil_GetName.str1.4,"aMS",%progbits,1
+ 230              		.align	2
+ 231              	.LC0:
+ 232 0000 53494C45 		.ascii	"SILENT\000"
+ 232      4E5400
+ 233 0007 00       		.align	2
+ 234              	.LC1:
+ 235 0008 42414C00 		.ascii	"BAL\000"
+ 236              		.align	2
+ 237              	.LC2:
+ 238 000c 50455246 		.ascii	"PERF\000"
+ 238      00
+ 239 0011 000000   		.align	2
+ 240              	.LC3:
+ 241 0014 424F4F53 		.ascii	"BOOST\000"
+ 241      5400
+ 242 001a 0000     		.align	2
+ 243              	.LC4:
+ 244 001c 554E4B00 		.ascii	"UNK\000"
+ 245              		.section	.text.Profil_GetName,"ax",%progbits
+ 246              		.align	1
+ 247              		.global	Profil_GetName
+ 248              		.syntax unified
+ 249              		.thumb
+ 250              		.thumb_func
+ 252              	Profil_GetName:
+ 253              	.LVL13:
+ 254              	.LFB3:
+  54:Core/Src/Profil.c **** 
+  55:Core/Src/Profil.c **** const char *Profil_GetName(Profil_ProfileId_t id)
+  56:Core/Src/Profil.c **** {
+ 255              		.loc 1 56 1 is_stmt 1 view -0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 7
+
+
+ 256              		.cfi_startproc
+ 257              		@ args = 0, pretend = 0, frame = 0
+ 258              		@ frame_needed = 0, uses_anonymous_args = 0
+ 259              		@ link register save eliminated.
+  57:Core/Src/Profil.c ****     switch (id) {
+ 260              		.loc 1 57 5 view .LVU62
+ 261 0000 0228     		cmp	r0, #2
+ 262 0002 09D0     		beq	.L23
+ 263 0004 04D8     		bhi	.L22
+ 264 0006 48B1     		cbz	r0, .L24
+ 265 0008 0128     		cmp	r0, #1
+ 266 000a 09D1     		bne	.L25
+  58:Core/Src/Profil.c ****         case PROFIL_PROFILE_SILENT:
+  59:Core/Src/Profil.c ****             return "SILENT";
+  60:Core/Src/Profil.c ****         case PROFIL_PROFILE_BALANCED:
+  61:Core/Src/Profil.c ****             return "BAL";
+ 267              		.loc 1 61 20 is_stmt 0 view .LVU63
+ 268 000c 0648     		ldr	r0, .L27
+ 269              	.LVL14:
+ 270              		.loc 1 61 20 view .LVU64
+ 271 000e 7047     		bx	lr
+ 272              	.LVL15:
+ 273              	.L22:
+  57:Core/Src/Profil.c ****     switch (id) {
+ 274              		.loc 1 57 5 view .LVU65
+ 275 0010 0328     		cmp	r0, #3
+ 276 0012 07D1     		bne	.L26
+  62:Core/Src/Profil.c ****         case PROFIL_PROFILE_PERFORMANCE:
+  63:Core/Src/Profil.c ****             return "PERF";
+  64:Core/Src/Profil.c ****         case PROFIL_PROFILE_BOOST:
+  65:Core/Src/Profil.c ****             return "BOOST";
+ 277              		.loc 1 65 20 view .LVU66
+ 278 0014 0548     		ldr	r0, .L27+4
+ 279              	.LVL16:
+ 280              		.loc 1 65 20 view .LVU67
+ 281 0016 7047     		bx	lr
+ 282              	.LVL17:
+ 283              	.L23:
+  63:Core/Src/Profil.c ****         case PROFIL_PROFILE_BOOST:
+ 284              		.loc 1 63 20 view .LVU68
+ 285 0018 0548     		ldr	r0, .L27+8
+ 286              	.LVL18:
+  63:Core/Src/Profil.c ****         case PROFIL_PROFILE_BOOST:
+ 287              		.loc 1 63 20 view .LVU69
+ 288 001a 7047     		bx	lr
+ 289              	.LVL19:
+ 290              	.L24:
+  57:Core/Src/Profil.c ****         case PROFIL_PROFILE_SILENT:
+ 291              		.loc 1 57 5 view .LVU70
+ 292 001c 0548     		ldr	r0, .L27+12
+ 293              	.LVL20:
+  57:Core/Src/Profil.c ****         case PROFIL_PROFILE_SILENT:
+ 294              		.loc 1 57 5 view .LVU71
+ 295 001e 7047     		bx	lr
+ 296              	.LVL21:
+ 297              	.L25:
+  66:Core/Src/Profil.c ****         default:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 8
+
+
+  67:Core/Src/Profil.c ****             return "UNK";
+ 298              		.loc 1 67 20 view .LVU72
+ 299 0020 0548     		ldr	r0, .L27+16
+ 300              	.LVL22:
+ 301              		.loc 1 67 20 view .LVU73
+ 302 0022 7047     		bx	lr
+ 303              	.LVL23:
+ 304              	.L26:
+ 305              		.loc 1 67 20 view .LVU74
+ 306 0024 0448     		ldr	r0, .L27+16
+ 307              	.LVL24:
+  68:Core/Src/Profil.c ****     }
+  69:Core/Src/Profil.c **** }
+ 308              		.loc 1 69 1 view .LVU75
+ 309 0026 7047     		bx	lr
+ 310              	.L28:
+ 311              		.align	2
+ 312              	.L27:
+ 313 0028 08000000 		.word	.LC1
+ 314 002c 14000000 		.word	.LC3
+ 315 0030 0C000000 		.word	.LC2
+ 316 0034 00000000 		.word	.LC0
+ 317 0038 1C000000 		.word	.LC4
+ 318              		.cfi_endproc
+ 319              	.LFE3:
+ 321              		.section	.bss.g_result,"aw",%nobits
+ 322              		.align	2
+ 325              	g_result:
+ 326 0000 00000000 		.space	58
+ 326      00000000 
+ 326      00000000 
+ 326      00000000 
+ 326      00000000 
+ 327              		.section	.rodata.g_profile_defaults,"a"
+ 328              		.align	2
+ 331              	g_profile_defaults:
+ 332 0000 00       		.byte	0
+ 333 0001 00       		.space	1
+ 334 0002 BC02     		.short	700
+ 335 0004 B004     		.short	1200
+ 336 0006 0807     		.short	1800
+ 337 0008 18       		.byte	24
+ 338 0009 30       		.byte	48
+ 339 000a 01       		.byte	1
+ 340 000b 00       		.space	1
+ 341 000c 8403     		.short	900
+ 342 000e DC05     		.short	1500
+ 343 0010 9808     		.short	2200
+ 344 0012 1A       		.byte	26
+ 345 0013 37       		.byte	55
+ 346 0014 02       		.byte	2
+ 347 0015 00       		.space	1
+ 348 0016 4C04     		.short	1100
+ 349 0018 6C07     		.short	1900
+ 350 001a 280A     		.short	2600
+ 351 001c 1C       		.byte	28
+ 352 001d 3C       		.byte	60
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 9
+
+
+ 353 001e 03       		.byte	3
+ 354 001f 00       		.space	1
+ 355 0020 1405     		.short	1300
+ 356 0022 9808     		.short	2200
+ 357 0024 B80B     		.short	3000
+ 358 0026 1E       		.byte	30
+ 359 0027 41       		.byte	65
+ 360              		.text
+ 361              	.Letext0:
+ 362              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
+ 363              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
+ 364              		.file 4 "Core/Inc/Profil.h"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 Profil.c
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:19     .text.Profil_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:25     .text.Profil_Init:00000000 Profil_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:45     .text.Profil_Init:0000000c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:325    .bss.g_result:00000000 g_result
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:50     .text.Profil_CalculateAll:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:56     .text.Profil_CalculateAll:00000000 Profil_CalculateAll
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:199    .text.Profil_CalculateAll:00000078 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:331    .rodata.g_profile_defaults:00000000 g_profile_defaults
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:205    .text.Profil_GetResult:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:211    .text.Profil_GetResult:00000000 Profil_GetResult
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:225    .text.Profil_GetResult:00000004 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:230    .rodata.Profil_GetName.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:246    .text.Profil_GetName:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:252    .text.Profil_GetName:00000000 Profil_GetName
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:313    .text.Profil_GetName:00000028 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:322    .bss.g_result:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccMLlnxa.s:328    .rodata.g_profile_defaults:00000000 $d
+
+NO UNDEFINED SYMBOLS

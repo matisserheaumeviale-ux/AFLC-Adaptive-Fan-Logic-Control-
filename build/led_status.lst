@@ -1,0 +1,597 @@
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"led_status.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/led_status.c"
+  18              		.section	.text.LedStatus_Write,"ax",%progbits
+  19              		.align	1
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	LedStatus_Write:
+  25              	.LVL0:
+  26              	.LFB69:
+   1:Core/Src/led_status.c **** #include "led_status.h"
+   2:Core/Src/led_status.c **** 
+   3:Core/Src/led_status.c **** #include "main.h"
+   4:Core/Src/led_status.c **** 
+   5:Core/Src/led_status.c **** #define LED_HEARTBEAT_PERIOD_MS 500UL
+   6:Core/Src/led_status.c **** #define LED_ACTIVITY_HOLD_MS    100UL
+   7:Core/Src/led_status.c **** 
+   8:Core/Src/led_status.c **** typedef struct {
+   9:Core/Src/led_status.c ****     uint32_t heartbeat_ms;
+  10:Core/Src/led_status.c ****     uint32_t comm_activity_ms;
+  11:Core/Src/led_status.c ****     bool heartbeat_on;
+  12:Core/Src/led_status.c ****     LedStatus_Mode_t mode;
+  13:Core/Src/led_status.c **** } LedStatusRuntime_t;
+  14:Core/Src/led_status.c **** 
+  15:Core/Src/led_status.c **** static LedStatusRuntime_t g_leds;
+  16:Core/Src/led_status.c **** 
+  17:Core/Src/led_status.c **** static void LedStatus_Write(GPIO_TypeDef *port, uint16_t pin, bool is_on);
+  18:Core/Src/led_status.c **** 
+  19:Core/Src/led_status.c **** void LedStatus_Init(void)
+  20:Core/Src/led_status.c **** {
+  21:Core/Src/led_status.c ****     g_leds.heartbeat_ms = HAL_GetTick();
+  22:Core/Src/led_status.c ****     g_leds.comm_activity_ms = 0UL;
+  23:Core/Src/led_status.c ****     g_leds.heartbeat_on = false;
+  24:Core/Src/led_status.c ****     g_leds.mode = LED_STATUS_MODE_BOOT;
+  25:Core/Src/led_status.c **** 
+  26:Core/Src/led_status.c ****     LedStatus_Write(LED_STATUS_GPIO_Port, LED_STATUS_Pin, false);
+  27:Core/Src/led_status.c ****     LedStatus_Write(LED_USB_GPIO_Port, LED_USB_Pin, false);
+  28:Core/Src/led_status.c ****     LedStatus_Write(LED_ERROR_GPIO_Port, LED_ERROR_Pin, false);
+  29:Core/Src/led_status.c ****     LedStatus_Write(LED_EXTRA1_GPIO_Port, LED_EXTRA1_Pin, false);
+  30:Core/Src/led_status.c **** }
+  31:Core/Src/led_status.c **** 
+  32:Core/Src/led_status.c **** void LedStatus_SetMode(LedStatus_Mode_t mode)
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 2
+
+
+  33:Core/Src/led_status.c **** {
+  34:Core/Src/led_status.c ****     g_leds.mode = mode;
+  35:Core/Src/led_status.c **** }
+  36:Core/Src/led_status.c **** 
+  37:Core/Src/led_status.c **** void LedStatus_Task(uint32_t now_ms)
+  38:Core/Src/led_status.c **** {
+  39:Core/Src/led_status.c ****     bool led_status_on = false;
+  40:Core/Src/led_status.c ****     bool led_error_on = false;
+  41:Core/Src/led_status.c ****     bool led_extra_on = false;
+  42:Core/Src/led_status.c **** 
+  43:Core/Src/led_status.c ****     if ((now_ms - g_leds.heartbeat_ms) >= LED_HEARTBEAT_PERIOD_MS) {
+  44:Core/Src/led_status.c ****         g_leds.heartbeat_ms = now_ms;
+  45:Core/Src/led_status.c ****         g_leds.heartbeat_on = !g_leds.heartbeat_on;
+  46:Core/Src/led_status.c ****     }
+  47:Core/Src/led_status.c **** 
+  48:Core/Src/led_status.c ****     switch (g_leds.mode) {
+  49:Core/Src/led_status.c ****         case LED_STATUS_MODE_BOOT:
+  50:Core/Src/led_status.c ****             led_status_on = true;
+  51:Core/Src/led_status.c ****             break;
+  52:Core/Src/led_status.c ****         case LED_STATUS_MODE_PROFILES_READY:
+  53:Core/Src/led_status.c ****             led_status_on = true;
+  54:Core/Src/led_status.c ****             led_extra_on = true;
+  55:Core/Src/led_status.c ****             break;
+  56:Core/Src/led_status.c ****         case LED_STATUS_MODE_WAIT_CONFIRM:
+  57:Core/Src/led_status.c ****             led_status_on = g_leds.heartbeat_on;
+  58:Core/Src/led_status.c ****             break;
+  59:Core/Src/led_status.c ****         case LED_STATUS_MODE_STARTUP_TEST:
+  60:Core/Src/led_status.c ****             led_status_on = true;
+  61:Core/Src/led_status.c ****             led_extra_on = g_leds.heartbeat_on;
+  62:Core/Src/led_status.c ****             break;
+  63:Core/Src/led_status.c ****         case LED_STATUS_MODE_RUNTIME:
+  64:Core/Src/led_status.c ****             led_status_on = g_leds.heartbeat_on;
+  65:Core/Src/led_status.c ****             break;
+  66:Core/Src/led_status.c ****         case LED_STATUS_MODE_FAULT:
+  67:Core/Src/led_status.c ****         default:
+  68:Core/Src/led_status.c ****             led_error_on = true;
+  69:Core/Src/led_status.c ****             break;
+  70:Core/Src/led_status.c ****     }
+  71:Core/Src/led_status.c **** 
+  72:Core/Src/led_status.c ****     LedStatus_Write(LED_USB_GPIO_Port,
+  73:Core/Src/led_status.c ****                     LED_USB_Pin,
+  74:Core/Src/led_status.c ****                     (now_ms - g_leds.comm_activity_ms) <= LED_ACTIVITY_HOLD_MS);
+  75:Core/Src/led_status.c ****     LedStatus_Write(LED_STATUS_GPIO_Port, LED_STATUS_Pin, led_status_on);
+  76:Core/Src/led_status.c ****     LedStatus_Write(LED_ERROR_GPIO_Port, LED_ERROR_Pin, led_error_on);
+  77:Core/Src/led_status.c ****     LedStatus_Write(LED_EXTRA1_GPIO_Port, LED_EXTRA1_Pin, led_extra_on);
+  78:Core/Src/led_status.c **** }
+  79:Core/Src/led_status.c **** 
+  80:Core/Src/led_status.c **** void LedStatus_NotifyCommActivity(uint32_t now_ms)
+  81:Core/Src/led_status.c **** {
+  82:Core/Src/led_status.c ****     g_leds.comm_activity_ms = now_ms;
+  83:Core/Src/led_status.c **** }
+  84:Core/Src/led_status.c **** 
+  85:Core/Src/led_status.c **** static void LedStatus_Write(GPIO_TypeDef *port, uint16_t pin, bool is_on)
+  86:Core/Src/led_status.c **** {
+  27              		.loc 1 86 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 3
+
+
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		.loc 1 86 1 is_stmt 0 view .LVU1
+  32 0000 08B5     		push	{r3, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  87:Core/Src/led_status.c ****     HAL_GPIO_WritePin(port, pin, is_on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+  37              		.loc 1 87 5 is_stmt 1 view .LVU2
+  38 0002 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  39              	.LVL1:
+  88:Core/Src/led_status.c **** }
+  40              		.loc 1 88 1 is_stmt 0 view .LVU3
+  41 0006 08BD     		pop	{r3, pc}
+  42              		.cfi_endproc
+  43              	.LFE69:
+  45              		.section	.text.LedStatus_Init,"ax",%progbits
+  46              		.align	1
+  47              		.global	LedStatus_Init
+  48              		.syntax unified
+  49              		.thumb
+  50              		.thumb_func
+  52              	LedStatus_Init:
+  53              	.LFB65:
+  20:Core/Src/led_status.c ****     g_leds.heartbeat_ms = HAL_GetTick();
+  54              		.loc 1 20 1 is_stmt 1 view -0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58 0000 38B5     		push	{r3, r4, r5, lr}
+  59              	.LCFI1:
+  60              		.cfi_def_cfa_offset 16
+  61              		.cfi_offset 3, -16
+  62              		.cfi_offset 4, -12
+  63              		.cfi_offset 5, -8
+  64              		.cfi_offset 14, -4
+  21:Core/Src/led_status.c ****     g_leds.comm_activity_ms = 0UL;
+  65              		.loc 1 21 5 view .LVU5
+  21:Core/Src/led_status.c ****     g_leds.comm_activity_ms = 0UL;
+  66              		.loc 1 21 27 is_stmt 0 view .LVU6
+  67 0002 FFF7FEFF 		bl	HAL_GetTick
+  68              	.LVL2:
+  21:Core/Src/led_status.c ****     g_leds.comm_activity_ms = 0UL;
+  69              		.loc 1 21 25 discriminator 1 view .LVU7
+  70 0006 104B     		ldr	r3, .L5
+  71 0008 1860     		str	r0, [r3]
+  22:Core/Src/led_status.c ****     g_leds.heartbeat_on = false;
+  72              		.loc 1 22 5 is_stmt 1 view .LVU8
+  22:Core/Src/led_status.c ****     g_leds.heartbeat_on = false;
+  73              		.loc 1 22 29 is_stmt 0 view .LVU9
+  74 000a 0024     		movs	r4, #0
+  75 000c 5C60     		str	r4, [r3, #4]
+  23:Core/Src/led_status.c ****     g_leds.mode = LED_STATUS_MODE_BOOT;
+  76              		.loc 1 23 5 is_stmt 1 view .LVU10
+  23:Core/Src/led_status.c ****     g_leds.mode = LED_STATUS_MODE_BOOT;
+  77              		.loc 1 23 25 is_stmt 0 view .LVU11
+  78 000e 1C72     		strb	r4, [r3, #8]
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 4
+
+
+  24:Core/Src/led_status.c **** 
+  79              		.loc 1 24 5 is_stmt 1 view .LVU12
+  24:Core/Src/led_status.c **** 
+  80              		.loc 1 24 17 is_stmt 0 view .LVU13
+  81 0010 5C72     		strb	r4, [r3, #9]
+  26:Core/Src/led_status.c ****     LedStatus_Write(LED_USB_GPIO_Port, LED_USB_Pin, false);
+  82              		.loc 1 26 5 is_stmt 1 view .LVU14
+  83 0012 0E4D     		ldr	r5, .L5+4
+  84 0014 2246     		mov	r2, r4
+  85 0016 4FF40051 		mov	r1, #8192
+  86 001a 2846     		mov	r0, r5
+  87 001c FFF7FEFF 		bl	LedStatus_Write
+  88              	.LVL3:
+  27:Core/Src/led_status.c ****     LedStatus_Write(LED_ERROR_GPIO_Port, LED_ERROR_Pin, false);
+  89              		.loc 1 27 5 view .LVU15
+  90 0020 2246     		mov	r2, r4
+  91 0022 4FF48041 		mov	r1, #16384
+  92 0026 2846     		mov	r0, r5
+  93 0028 FFF7FEFF 		bl	LedStatus_Write
+  94              	.LVL4:
+  28:Core/Src/led_status.c ****     LedStatus_Write(LED_EXTRA1_GPIO_Port, LED_EXTRA1_Pin, false);
+  95              		.loc 1 28 5 view .LVU16
+  96 002c 2246     		mov	r2, r4
+  97 002e 4FF40041 		mov	r1, #32768
+  98 0032 2846     		mov	r0, r5
+  99 0034 FFF7FEFF 		bl	LedStatus_Write
+ 100              	.LVL5:
+  29:Core/Src/led_status.c **** }
+ 101              		.loc 1 29 5 view .LVU17
+ 102 0038 2246     		mov	r2, r4
+ 103 003a 4FF48071 		mov	r1, #256
+ 104 003e 0448     		ldr	r0, .L5+8
+ 105 0040 FFF7FEFF 		bl	LedStatus_Write
+ 106              	.LVL6:
+  30:Core/Src/led_status.c **** 
+ 107              		.loc 1 30 1 is_stmt 0 view .LVU18
+ 108 0044 38BD     		pop	{r3, r4, r5, pc}
+ 109              	.L6:
+ 110 0046 00BF     		.align	2
+ 111              	.L5:
+ 112 0048 00000000 		.word	g_leds
+ 113 004c 00100140 		.word	1073811456
+ 114 0050 00080140 		.word	1073809408
+ 115              		.cfi_endproc
+ 116              	.LFE65:
+ 118              		.section	.text.LedStatus_SetMode,"ax",%progbits
+ 119              		.align	1
+ 120              		.global	LedStatus_SetMode
+ 121              		.syntax unified
+ 122              		.thumb
+ 123              		.thumb_func
+ 125              	LedStatus_SetMode:
+ 126              	.LVL7:
+ 127              	.LFB66:
+  33:Core/Src/led_status.c ****     g_leds.mode = mode;
+ 128              		.loc 1 33 1 is_stmt 1 view -0
+ 129              		.cfi_startproc
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 5
+
+
+ 130              		@ args = 0, pretend = 0, frame = 0
+ 131              		@ frame_needed = 0, uses_anonymous_args = 0
+ 132              		@ link register save eliminated.
+  34:Core/Src/led_status.c **** }
+ 133              		.loc 1 34 5 view .LVU20
+  34:Core/Src/led_status.c **** }
+ 134              		.loc 1 34 17 is_stmt 0 view .LVU21
+ 135 0000 014B     		ldr	r3, .L8
+ 136 0002 5872     		strb	r0, [r3, #9]
+  35:Core/Src/led_status.c **** 
+ 137              		.loc 1 35 1 view .LVU22
+ 138 0004 7047     		bx	lr
+ 139              	.L9:
+ 140 0006 00BF     		.align	2
+ 141              	.L8:
+ 142 0008 00000000 		.word	g_leds
+ 143              		.cfi_endproc
+ 144              	.LFE66:
+ 146              		.section	.text.LedStatus_Task,"ax",%progbits
+ 147              		.align	1
+ 148              		.global	LedStatus_Task
+ 149              		.syntax unified
+ 150              		.thumb
+ 151              		.thumb_func
+ 153              	LedStatus_Task:
+ 154              	.LVL8:
+ 155              	.LFB67:
+  38:Core/Src/led_status.c ****     bool led_status_on = false;
+ 156              		.loc 1 38 1 is_stmt 1 view -0
+ 157              		.cfi_startproc
+ 158              		@ args = 0, pretend = 0, frame = 0
+ 159              		@ frame_needed = 0, uses_anonymous_args = 0
+  38:Core/Src/led_status.c ****     bool led_status_on = false;
+ 160              		.loc 1 38 1 is_stmt 0 view .LVU24
+ 161 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 162              	.LCFI2:
+ 163              		.cfi_def_cfa_offset 24
+ 164              		.cfi_offset 3, -24
+ 165              		.cfi_offset 4, -20
+ 166              		.cfi_offset 5, -16
+ 167              		.cfi_offset 6, -12
+ 168              		.cfi_offset 7, -8
+ 169              		.cfi_offset 14, -4
+  39:Core/Src/led_status.c ****     bool led_error_on = false;
+ 170              		.loc 1 39 5 is_stmt 1 view .LVU25
+ 171              	.LVL9:
+  40:Core/Src/led_status.c ****     bool led_extra_on = false;
+ 172              		.loc 1 40 5 view .LVU26
+  41:Core/Src/led_status.c **** 
+ 173              		.loc 1 41 5 view .LVU27
+  43:Core/Src/led_status.c ****         g_leds.heartbeat_ms = now_ms;
+ 174              		.loc 1 43 5 view .LVU28
+  43:Core/Src/led_status.c ****         g_leds.heartbeat_ms = now_ms;
+ 175              		.loc 1 43 25 is_stmt 0 view .LVU29
+ 176 0002 324B     		ldr	r3, .L22
+ 177 0004 1B68     		ldr	r3, [r3]
+  43:Core/Src/led_status.c ****         g_leds.heartbeat_ms = now_ms;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 6
+
+
+ 178              		.loc 1 43 17 view .LVU30
+ 179 0006 C31A     		subs	r3, r0, r3
+  43:Core/Src/led_status.c ****         g_leds.heartbeat_ms = now_ms;
+ 180              		.loc 1 43 8 view .LVU31
+ 181 0008 B3F5FA7F 		cmp	r3, #500
+ 182 000c 05D3     		bcc	.L11
+  44:Core/Src/led_status.c ****         g_leds.heartbeat_on = !g_leds.heartbeat_on;
+ 183              		.loc 1 44 9 is_stmt 1 view .LVU32
+  44:Core/Src/led_status.c ****         g_leds.heartbeat_on = !g_leds.heartbeat_on;
+ 184              		.loc 1 44 29 is_stmt 0 view .LVU33
+ 185 000e 2F4B     		ldr	r3, .L22
+ 186 0010 1860     		str	r0, [r3]
+  45:Core/Src/led_status.c ****     }
+ 187              		.loc 1 45 9 is_stmt 1 view .LVU34
+  45:Core/Src/led_status.c ****     }
+ 188              		.loc 1 45 38 is_stmt 0 view .LVU35
+ 189 0012 1A7A     		ldrb	r2, [r3, #8]	@ zero_extendqisi2
+  45:Core/Src/led_status.c ****     }
+ 190              		.loc 1 45 9 view .LVU36
+ 191 0014 82F00102 		eor	r2, r2, #1
+  45:Core/Src/led_status.c ****     }
+ 192              		.loc 1 45 29 view .LVU37
+ 193 0018 1A72     		strb	r2, [r3, #8]
+ 194              	.L11:
+  48:Core/Src/led_status.c ****         case LED_STATUS_MODE_BOOT:
+ 195              		.loc 1 48 5 is_stmt 1 view .LVU38
+  48:Core/Src/led_status.c ****         case LED_STATUS_MODE_BOOT:
+ 196              		.loc 1 48 19 is_stmt 0 view .LVU39
+ 197 001a 2C4B     		ldr	r3, .L22
+ 198 001c 5B7A     		ldrb	r3, [r3, #9]	@ zero_extendqisi2
+  48:Core/Src/led_status.c ****         case LED_STATUS_MODE_BOOT:
+ 199              		.loc 1 48 5 view .LVU40
+ 200 001e 022B     		cmp	r3, #2
+ 201 0020 1AD0     		beq	.L12
+ 202 0022 0AD9     		bls	.L20
+ 203 0024 032B     		cmp	r3, #3
+ 204 0026 3DD0     		beq	.L15
+ 205 0028 042B     		cmp	r3, #4
+ 206 002a 0FD1     		bne	.L21
+  64:Core/Src/led_status.c ****             break;
+ 207              		.loc 1 64 13 is_stmt 1 view .LVU41
+  64:Core/Src/led_status.c ****             break;
+ 208              		.loc 1 64 27 is_stmt 0 view .LVU42
+ 209 002c 274B     		ldr	r3, .L22
+ 210 002e 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 211 0030 1D46     		mov	r5, r3
+ 212              	.LVL10:
+  65:Core/Src/led_status.c ****         case LED_STATUS_MODE_FAULT:
+ 213              		.loc 1 65 13 is_stmt 1 view .LVU43
+  41:Core/Src/led_status.c **** 
+ 214              		.loc 1 41 10 is_stmt 0 view .LVU44
+ 215 0032 0023     		movs	r3, #0
+ 216 0034 1F46     		mov	r7, r3
+  40:Core/Src/led_status.c ****     bool led_extra_on = false;
+ 217              		.loc 1 40 10 view .LVU45
+ 218 0036 1E46     		mov	r6, r3
+  65:Core/Src/led_status.c ****         case LED_STATUS_MODE_FAULT:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 7
+
+
+ 219              		.loc 1 65 13 view .LVU46
+ 220 0038 14E0     		b	.L14
+ 221              	.LVL11:
+ 222              	.L20:
+  48:Core/Src/led_status.c ****         case LED_STATUS_MODE_BOOT:
+ 223              		.loc 1 48 5 view .LVU47
+ 224 003a 002B     		cmp	r3, #0
+ 225 003c 3AD0     		beq	.L17
+ 226 003e 012B     		cmp	r3, #1
+ 227 0040 3DD1     		bne	.L18
+  54:Core/Src/led_status.c ****             break;
+ 228              		.loc 1 54 26 view .LVU48
+ 229 0042 1F46     		mov	r7, r3
+  40:Core/Src/led_status.c ****     bool led_extra_on = false;
+ 230              		.loc 1 40 10 view .LVU49
+ 231 0044 0022     		movs	r2, #0
+ 232 0046 1646     		mov	r6, r2
+  53:Core/Src/led_status.c ****             led_extra_on = true;
+ 233              		.loc 1 53 27 view .LVU50
+ 234 0048 1D46     		mov	r5, r3
+ 235 004a 0BE0     		b	.L14
+ 236              	.L21:
+  41:Core/Src/led_status.c **** 
+ 237              		.loc 1 41 10 view .LVU51
+ 238 004c 0023     		movs	r3, #0
+ 239 004e 1F46     		mov	r7, r3
+  68:Core/Src/led_status.c ****             break;
+ 240              		.loc 1 68 26 view .LVU52
+ 241 0050 0122     		movs	r2, #1
+ 242 0052 1646     		mov	r6, r2
+  39:Core/Src/led_status.c ****     bool led_error_on = false;
+ 243              		.loc 1 39 10 view .LVU53
+ 244 0054 1D46     		mov	r5, r3
+ 245 0056 05E0     		b	.L14
+ 246              	.L12:
+  57:Core/Src/led_status.c ****             break;
+ 247              		.loc 1 57 13 is_stmt 1 view .LVU54
+  57:Core/Src/led_status.c ****             break;
+ 248              		.loc 1 57 27 is_stmt 0 view .LVU55
+ 249 0058 1C4B     		ldr	r3, .L22
+ 250 005a 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 251 005c 1D46     		mov	r5, r3
+ 252              	.LVL12:
+  58:Core/Src/led_status.c ****         case LED_STATUS_MODE_STARTUP_TEST:
+ 253              		.loc 1 58 13 is_stmt 1 view .LVU56
+  41:Core/Src/led_status.c **** 
+ 254              		.loc 1 41 10 is_stmt 0 view .LVU57
+ 255 005e 0023     		movs	r3, #0
+ 256 0060 1F46     		mov	r7, r3
+  40:Core/Src/led_status.c ****     bool led_extra_on = false;
+ 257              		.loc 1 40 10 view .LVU58
+ 258 0062 1E46     		mov	r6, r3
+ 259              	.LVL13:
+ 260              	.L14:
+  72:Core/Src/led_status.c ****                     LED_USB_Pin,
+ 261              		.loc 1 72 5 is_stmt 1 view .LVU59
+  74:Core/Src/led_status.c ****     LedStatus_Write(LED_STATUS_GPIO_Port, LED_STATUS_Pin, led_status_on);
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 8
+
+
+ 262              		.loc 1 74 37 is_stmt 0 view .LVU60
+ 263 0064 194B     		ldr	r3, .L22
+ 264 0066 5A68     		ldr	r2, [r3, #4]
+  74:Core/Src/led_status.c ****     LedStatus_Write(LED_STATUS_GPIO_Port, LED_STATUS_Pin, led_status_on);
+ 265              		.loc 1 74 29 view .LVU61
+ 266 0068 821A     		subs	r2, r0, r2
+  72:Core/Src/led_status.c ****                     LED_USB_Pin,
+ 267              		.loc 1 72 5 view .LVU62
+ 268 006a 194C     		ldr	r4, .L22+4
+ 269 006c 642A     		cmp	r2, #100
+ 270 006e 8CBF     		ite	hi
+ 271 0070 0022     		movhi	r2, #0
+ 272 0072 0122     		movls	r2, #1
+ 273 0074 4FF48041 		mov	r1, #16384
+ 274 0078 2046     		mov	r0, r4
+ 275              	.LVL14:
+  72:Core/Src/led_status.c ****                     LED_USB_Pin,
+ 276              		.loc 1 72 5 view .LVU63
+ 277 007a FFF7FEFF 		bl	LedStatus_Write
+ 278              	.LVL15:
+  75:Core/Src/led_status.c ****     LedStatus_Write(LED_ERROR_GPIO_Port, LED_ERROR_Pin, led_error_on);
+ 279              		.loc 1 75 5 is_stmt 1 view .LVU64
+ 280 007e 2A46     		mov	r2, r5
+ 281 0080 4FF40051 		mov	r1, #8192
+ 282 0084 2046     		mov	r0, r4
+ 283 0086 FFF7FEFF 		bl	LedStatus_Write
+ 284              	.LVL16:
+  76:Core/Src/led_status.c ****     LedStatus_Write(LED_EXTRA1_GPIO_Port, LED_EXTRA1_Pin, led_extra_on);
+ 285              		.loc 1 76 5 view .LVU65
+ 286 008a 3246     		mov	r2, r6
+ 287 008c 4FF40041 		mov	r1, #32768
+ 288 0090 2046     		mov	r0, r4
+ 289 0092 FFF7FEFF 		bl	LedStatus_Write
+ 290              	.LVL17:
+  77:Core/Src/led_status.c **** }
+ 291              		.loc 1 77 5 view .LVU66
+ 292 0096 3A46     		mov	r2, r7
+ 293 0098 4FF48071 		mov	r1, #256
+ 294 009c 0D48     		ldr	r0, .L22+8
+ 295 009e FFF7FEFF 		bl	LedStatus_Write
+ 296              	.LVL18:
+  78:Core/Src/led_status.c **** 
+ 297              		.loc 1 78 1 is_stmt 0 view .LVU67
+ 298 00a2 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 299              	.LVL19:
+ 300              	.L15:
+  60:Core/Src/led_status.c ****             led_extra_on = g_leds.heartbeat_on;
+ 301              		.loc 1 60 13 is_stmt 1 view .LVU68
+  61:Core/Src/led_status.c ****             break;
+ 302              		.loc 1 61 13 view .LVU69
+  61:Core/Src/led_status.c ****             break;
+ 303              		.loc 1 61 26 is_stmt 0 view .LVU70
+ 304 00a4 094B     		ldr	r3, .L22
+ 305 00a6 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 306 00a8 1F46     		mov	r7, r3
+ 307              	.LVL20:
+  62:Core/Src/led_status.c ****         case LED_STATUS_MODE_RUNTIME:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 9
+
+
+ 308              		.loc 1 62 13 is_stmt 1 view .LVU71
+  40:Core/Src/led_status.c ****     bool led_extra_on = false;
+ 309              		.loc 1 40 10 is_stmt 0 view .LVU72
+ 310 00aa 0023     		movs	r3, #0
+ 311 00ac 1E46     		mov	r6, r3
+  60:Core/Src/led_status.c ****             led_extra_on = g_leds.heartbeat_on;
+ 312              		.loc 1 60 27 view .LVU73
+ 313 00ae 0123     		movs	r3, #1
+ 314 00b0 1D46     		mov	r5, r3
+  62:Core/Src/led_status.c ****         case LED_STATUS_MODE_RUNTIME:
+ 315              		.loc 1 62 13 view .LVU74
+ 316 00b2 D7E7     		b	.L14
+ 317              	.LVL21:
+ 318              	.L17:
+  48:Core/Src/led_status.c ****         case LED_STATUS_MODE_BOOT:
+ 319              		.loc 1 48 5 view .LVU75
+ 320 00b4 1F46     		mov	r7, r3
+ 321 00b6 1E46     		mov	r6, r3
+ 322 00b8 0123     		movs	r3, #1
+ 323 00ba 1D46     		mov	r5, r3
+ 324 00bc D2E7     		b	.L14
+ 325              	.L18:
+  41:Core/Src/led_status.c **** 
+ 326              		.loc 1 41 10 view .LVU76
+ 327 00be 0023     		movs	r3, #0
+ 328 00c0 1F46     		mov	r7, r3
+  68:Core/Src/led_status.c ****             break;
+ 329              		.loc 1 68 26 view .LVU77
+ 330 00c2 0122     		movs	r2, #1
+ 331 00c4 1646     		mov	r6, r2
+  39:Core/Src/led_status.c ****     bool led_error_on = false;
+ 332              		.loc 1 39 10 view .LVU78
+ 333 00c6 1D46     		mov	r5, r3
+ 334 00c8 CCE7     		b	.L14
+ 335              	.L23:
+ 336 00ca 00BF     		.align	2
+ 337              	.L22:
+ 338 00cc 00000000 		.word	g_leds
+ 339 00d0 00100140 		.word	1073811456
+ 340 00d4 00080140 		.word	1073809408
+ 341              		.cfi_endproc
+ 342              	.LFE67:
+ 344              		.section	.text.LedStatus_NotifyCommActivity,"ax",%progbits
+ 345              		.align	1
+ 346              		.global	LedStatus_NotifyCommActivity
+ 347              		.syntax unified
+ 348              		.thumb
+ 349              		.thumb_func
+ 351              	LedStatus_NotifyCommActivity:
+ 352              	.LVL22:
+ 353              	.LFB68:
+  81:Core/Src/led_status.c ****     g_leds.comm_activity_ms = now_ms;
+ 354              		.loc 1 81 1 is_stmt 1 view -0
+ 355              		.cfi_startproc
+ 356              		@ args = 0, pretend = 0, frame = 0
+ 357              		@ frame_needed = 0, uses_anonymous_args = 0
+ 358              		@ link register save eliminated.
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 10
+
+
+  82:Core/Src/led_status.c **** }
+ 359              		.loc 1 82 5 view .LVU80
+  82:Core/Src/led_status.c **** }
+ 360              		.loc 1 82 29 is_stmt 0 view .LVU81
+ 361 0000 014B     		ldr	r3, .L25
+ 362 0002 5860     		str	r0, [r3, #4]
+  83:Core/Src/led_status.c **** 
+ 363              		.loc 1 83 1 view .LVU82
+ 364 0004 7047     		bx	lr
+ 365              	.L26:
+ 366 0006 00BF     		.align	2
+ 367              	.L25:
+ 368 0008 00000000 		.word	g_leds
+ 369              		.cfi_endproc
+ 370              	.LFE68:
+ 372              		.section	.bss.g_leds,"aw",%nobits
+ 373              		.align	2
+ 376              	g_leds:
+ 377 0000 00000000 		.space	12
+ 377      00000000 
+ 377      00000000 
+ 378              		.text
+ 379              	.Letext0:
+ 380              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
+ 381              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
+ 382              		.file 4 "Core/Inc/led_status.h"
+ 383              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 384              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h"
+ 385              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 led_status.c
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:19     .text.LedStatus_Write:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:24     .text.LedStatus_Write:00000000 LedStatus_Write
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:46     .text.LedStatus_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:52     .text.LedStatus_Init:00000000 LedStatus_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:112    .text.LedStatus_Init:00000048 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:376    .bss.g_leds:00000000 g_leds
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:119    .text.LedStatus_SetMode:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:125    .text.LedStatus_SetMode:00000000 LedStatus_SetMode
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:142    .text.LedStatus_SetMode:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:147    .text.LedStatus_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:153    .text.LedStatus_Task:00000000 LedStatus_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:338    .text.LedStatus_Task:000000cc $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:345    .text.LedStatus_NotifyCommActivity:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:351    .text.LedStatus_NotifyCommActivity:00000000 LedStatus_NotifyCommActivity
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:368    .text.LedStatus_NotifyCommActivity:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc71gM24.s:373    .bss.g_leds:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+HAL_GetTick

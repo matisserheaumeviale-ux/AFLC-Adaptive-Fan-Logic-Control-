@@ -1,0 +1,200 @@
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"button.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/button.c"
+  18              		.section	.text.Button_Init,"ax",%progbits
+  19              		.align	1
+  20              		.global	Button_Init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	Button_Init:
+  26              	.LFB0:
+   1:Core/Src/button.c **** #include "button.h"
+   2:Core/Src/button.c **** 
+   3:Core/Src/button.c **** static bool g_confirm_latched;
+   4:Core/Src/button.c **** 
+   5:Core/Src/button.c **** void Button_Init(void)
+   6:Core/Src/button.c **** {
+  27              		.loc 1 6 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+   7:Core/Src/button.c ****     g_confirm_latched = false;
+  32              		.loc 1 7 5 view .LVU1
+  33              		.loc 1 7 23 is_stmt 0 view .LVU2
+  34 0000 014B     		ldr	r3, .L2
+  35 0002 0022     		movs	r2, #0
+  36 0004 1A70     		strb	r2, [r3]
+   8:Core/Src/button.c **** }
+  37              		.loc 1 8 1 view .LVU3
+  38 0006 7047     		bx	lr
+  39              	.L3:
+  40              		.align	2
+  41              	.L2:
+  42 0008 00000000 		.word	g_confirm_latched
+  43              		.cfi_endproc
+  44              	.LFE0:
+  46              		.section	.text.Button_Task,"ax",%progbits
+  47              		.align	1
+  48              		.global	Button_Task
+  49              		.syntax unified
+  50              		.thumb
+  51              		.thumb_func
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s 			page 2
+
+
+  53              	Button_Task:
+  54              	.LFB1:
+   9:Core/Src/button.c **** 
+  10:Core/Src/button.c **** void Button_Task(void)
+  11:Core/Src/button.c **** {
+  55              		.loc 1 11 1 is_stmt 1 view -0
+  56              		.cfi_startproc
+  57              		@ args = 0, pretend = 0, frame = 0
+  58              		@ frame_needed = 0, uses_anonymous_args = 0
+  59              		@ link register save eliminated.
+  12:Core/Src/button.c **** }
+  60              		.loc 1 12 1 view .LVU5
+  61 0000 7047     		bx	lr
+  62              		.cfi_endproc
+  63              	.LFE1:
+  65              		.section	.text.Button_IsConfirmPressed,"ax",%progbits
+  66              		.align	1
+  67              		.global	Button_IsConfirmPressed
+  68              		.syntax unified
+  69              		.thumb
+  70              		.thumb_func
+  72              	Button_IsConfirmPressed:
+  73              	.LFB2:
+  13:Core/Src/button.c **** 
+  14:Core/Src/button.c **** bool Button_IsConfirmPressed(void)
+  15:Core/Src/button.c **** {
+  74              		.loc 1 15 1 view -0
+  75              		.cfi_startproc
+  76              		@ args = 0, pretend = 0, frame = 0
+  77              		@ frame_needed = 0, uses_anonymous_args = 0
+  78              		@ link register save eliminated.
+  16:Core/Src/button.c ****     return g_confirm_latched;
+  79              		.loc 1 16 5 view .LVU7
+  17:Core/Src/button.c **** }
+  80              		.loc 1 17 1 is_stmt 0 view .LVU8
+  81 0000 014B     		ldr	r3, .L6
+  82 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+  83 0004 7047     		bx	lr
+  84              	.L7:
+  85 0006 00BF     		.align	2
+  86              	.L6:
+  87 0008 00000000 		.word	g_confirm_latched
+  88              		.cfi_endproc
+  89              	.LFE2:
+  91              		.section	.text.Button_ClearConfirm,"ax",%progbits
+  92              		.align	1
+  93              		.global	Button_ClearConfirm
+  94              		.syntax unified
+  95              		.thumb
+  96              		.thumb_func
+  98              	Button_ClearConfirm:
+  99              	.LFB3:
+  18:Core/Src/button.c **** 
+  19:Core/Src/button.c **** void Button_ClearConfirm(void)
+  20:Core/Src/button.c **** {
+ 100              		.loc 1 20 1 is_stmt 1 view -0
+ 101              		.cfi_startproc
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s 			page 3
+
+
+ 102              		@ args = 0, pretend = 0, frame = 0
+ 103              		@ frame_needed = 0, uses_anonymous_args = 0
+ 104              		@ link register save eliminated.
+  21:Core/Src/button.c ****     g_confirm_latched = false;
+ 105              		.loc 1 21 5 view .LVU10
+ 106              		.loc 1 21 23 is_stmt 0 view .LVU11
+ 107 0000 014B     		ldr	r3, .L9
+ 108 0002 0022     		movs	r2, #0
+ 109 0004 1A70     		strb	r2, [r3]
+  22:Core/Src/button.c **** }
+ 110              		.loc 1 22 1 view .LVU12
+ 111 0006 7047     		bx	lr
+ 112              	.L10:
+ 113              		.align	2
+ 114              	.L9:
+ 115 0008 00000000 		.word	g_confirm_latched
+ 116              		.cfi_endproc
+ 117              	.LFE3:
+ 119              		.section	.text.Button_NotifyConfirmCommand,"ax",%progbits
+ 120              		.align	1
+ 121              		.global	Button_NotifyConfirmCommand
+ 122              		.syntax unified
+ 123              		.thumb
+ 124              		.thumb_func
+ 126              	Button_NotifyConfirmCommand:
+ 127              	.LFB4:
+  23:Core/Src/button.c **** 
+  24:Core/Src/button.c **** void Button_NotifyConfirmCommand(void)
+  25:Core/Src/button.c **** {
+ 128              		.loc 1 25 1 is_stmt 1 view -0
+ 129              		.cfi_startproc
+ 130              		@ args = 0, pretend = 0, frame = 0
+ 131              		@ frame_needed = 0, uses_anonymous_args = 0
+ 132              		@ link register save eliminated.
+  26:Core/Src/button.c ****     g_confirm_latched = true;
+ 133              		.loc 1 26 5 view .LVU14
+ 134              		.loc 1 26 23 is_stmt 0 view .LVU15
+ 135 0000 014B     		ldr	r3, .L12
+ 136 0002 0122     		movs	r2, #1
+ 137 0004 1A70     		strb	r2, [r3]
+  27:Core/Src/button.c **** }
+ 138              		.loc 1 27 1 view .LVU16
+ 139 0006 7047     		bx	lr
+ 140              	.L13:
+ 141              		.align	2
+ 142              	.L12:
+ 143 0008 00000000 		.word	g_confirm_latched
+ 144              		.cfi_endproc
+ 145              	.LFE4:
+ 147              		.section	.bss.g_confirm_latched,"aw",%nobits
+ 150              	g_confirm_latched:
+ 151 0000 00       		.space	1
+ 152              		.text
+ 153              	.Letext0:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 button.c
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:19     .text.Button_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:25     .text.Button_Init:00000000 Button_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:42     .text.Button_Init:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:150    .bss.g_confirm_latched:00000000 g_confirm_latched
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:47     .text.Button_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:53     .text.Button_Task:00000000 Button_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:66     .text.Button_IsConfirmPressed:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:72     .text.Button_IsConfirmPressed:00000000 Button_IsConfirmPressed
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:87     .text.Button_IsConfirmPressed:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:92     .text.Button_ClearConfirm:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:98     .text.Button_ClearConfirm:00000000 Button_ClearConfirm
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:115    .text.Button_ClearConfirm:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:120    .text.Button_NotifyConfirmCommand:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:126    .text.Button_NotifyConfirmCommand:00000000 Button_NotifyConfirmCommand
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:143    .text.Button_NotifyConfirmCommand:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cctbPIUI.s:151    .bss.g_confirm_latched:00000000 $d
+
+NO UNDEFINED SYMBOLS

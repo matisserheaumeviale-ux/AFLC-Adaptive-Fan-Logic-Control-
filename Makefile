@@ -58,8 +58,18 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 Core/Src/system_stm32f1xx.c \
 Core/Src/sysmem.c \
-Core/Src/syscalls.c  
-
+Core/Src/syscalls.c  \
+Core/Src/LCD.c \
+Core/Src/LCD_UI.c \
+Core/Src/tachometer.c \
+Core/Src/fan_control.c \
+Core/Src/led_status.c \
+Core/Src/ui_lcd.c \
+Core/Src/uart_cmd.c \
+Core/Src/Profil.c \
+Core/Src/AFLCalcul.c \
+Core/Src/button.c \
+Core/Src/temperature_stub.c \
 # ASM sources
 ASM_SOURCES =  \
 startup_stm32f103xb.s

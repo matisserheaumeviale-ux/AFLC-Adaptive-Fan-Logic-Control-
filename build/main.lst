@@ -1,0 +1,2430 @@
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/main.c"
+  18              		.section	.text.AFLC_BuildMaxRpmArray,"ax",%progbits
+  19              		.align	1
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	AFLC_BuildMaxRpmArray:
+  25              	.LVL0:
+  26              	.LFB73:
+   1:Core/Src/main.c **** /* USER CODE BEGIN Header */
+   2:Core/Src/main.c **** /**
+   3:Core/Src/main.c ****   ******************************************************************************
+   4:Core/Src/main.c ****   * @file           : main.c
+   5:Core/Src/main.c ****   * @brief          : Main program body
+   6:Core/Src/main.c ****   ******************************************************************************
+   7:Core/Src/main.c ****   * @attention
+   8:Core/Src/main.c ****   *
+   9:Core/Src/main.c ****   * Copyright (c) 2026 STMicroelectronics.
+  10:Core/Src/main.c ****   * All rights reserved.
+  11:Core/Src/main.c ****   *
+  12:Core/Src/main.c ****   * This software is licensed under terms that can be found in the LICENSE file
+  13:Core/Src/main.c ****   * in the root directory of this software component.
+  14:Core/Src/main.c ****   * If no LICENSE file comes with this software, it is provided AS-IS.
+  15:Core/Src/main.c ****   *
+  16:Core/Src/main.c ****   ******************************************************************************
+  17:Core/Src/main.c ****   */
+  18:Core/Src/main.c **** /* USER CODE END Header */
+  19:Core/Src/main.c **** /* Includes ------------------------------------------------------------------*/
+  20:Core/Src/main.c **** #include "main.h"
+  21:Core/Src/main.c **** #include "tim.h"
+  22:Core/Src/main.c **** #include "usart.h"
+  23:Core/Src/main.c **** #include "gpio.h"
+  24:Core/Src/main.c **** 
+  25:Core/Src/main.c **** /* Private includes ----------------------------------------------------------*/
+  26:Core/Src/main.c **** /* USER CODE BEGIN Includes */
+  27:Core/Src/main.c **** #include "AFLCalcul.h"
+  28:Core/Src/main.c **** #include "Profil.h"
+  29:Core/Src/main.c **** #include "button.h"
+  30:Core/Src/main.c **** #include "fan_control.h"
+  31:Core/Src/main.c **** #include "led_status.h"
+  32:Core/Src/main.c **** #include "tachometer.h"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 2
+
+
+  33:Core/Src/main.c **** #include "temperature_stub.h"
+  34:Core/Src/main.c **** #include "uart_cmd.h"
+  35:Core/Src/main.c **** #include "ui_lcd.h"
+  36:Core/Src/main.c **** /* USER CODE END Includes */
+  37:Core/Src/main.c **** 
+  38:Core/Src/main.c **** /* Private typedef -----------------------------------------------------------*/
+  39:Core/Src/main.c **** /* USER CODE BEGIN PTD */
+  40:Core/Src/main.c **** typedef enum {
+  41:Core/Src/main.c ****   AFLC_APP_BOOT = 0,
+  42:Core/Src/main.c ****   AFLC_APP_PROFILES_CALCULATING,
+  43:Core/Src/main.c ****   AFLC_APP_PROFILES_READY,
+  44:Core/Src/main.c ****   AFLC_APP_WAIT_CONFIRM,
+  45:Core/Src/main.c ****   AFLC_APP_STARTUP_TEST_INIT,
+  46:Core/Src/main.c ****   AFLC_APP_STARTUP_TEST_RUN,
+  47:Core/Src/main.c ****   AFLC_APP_STARTUP_TEST_EVAL,
+  48:Core/Src/main.c ****   AFLC_APP_RUNTIME_CONTROL,
+  49:Core/Src/main.c ****   AFLC_APP_SAFE_STATE
+  50:Core/Src/main.c **** } AflcAppState_t;
+  51:Core/Src/main.c **** 
+  52:Core/Src/main.c **** typedef struct {
+  53:Core/Src/main.c ****   AflcAppState_t state;
+  54:Core/Src/main.c ****   uint32_t state_entered_ms;
+  55:Core/Src/main.c ****   const Profil_Result_t *profiles;
+  56:Core/Src/main.c ****   TachometerSnapshot_t tach_snapshot;
+  57:Core/Src/main.c ****   AFLCalcul_Output_t control_output;
+  58:Core/Src/main.c ****   const TemperatureSnapshot_t *temperatures;
+  59:Core/Src/main.c ****   uint8_t startup_passed_mask;
+  60:Core/Src/main.c ****   uint8_t startup_fail_mask;
+  61:Core/Src/main.c **** } AflcAppContext_t;
+  62:Core/Src/main.c **** /* USER CODE END PTD */
+  63:Core/Src/main.c **** 
+  64:Core/Src/main.c **** /* Private define ------------------------------------------------------------*/
+  65:Core/Src/main.c **** /* USER CODE BEGIN PD */
+  66:Core/Src/main.c **** #define TASK_BUTTON_PERIOD_MS         20UL
+  67:Core/Src/main.c **** #define TASK_TACH_PERIOD_MS           50UL
+  68:Core/Src/main.c **** #define TASK_FAN_PERIOD_MS            100UL
+  69:Core/Src/main.c **** #define TASK_CONTROL_PERIOD_MS        250UL
+  70:Core/Src/main.c **** #define TASK_LED_PERIOD_MS            50UL
+  71:Core/Src/main.c **** #define TASK_TEMPERATURE_PERIOD_MS    250UL
+  72:Core/Src/main.c **** #define PROFILES_READY_SHOW_MS        1500UL
+  73:Core/Src/main.c **** #define STARTUP_TEST_DUTY_PERMILLE    250U
+  74:Core/Src/main.c **** #define STARTUP_TEST_TIMEOUT_MS       3000UL
+  75:Core/Src/main.c **** #define STARTUP_TEST_PASS_RPM         200U
+  76:Core/Src/main.c **** /* USER CODE END PD */
+  77:Core/Src/main.c **** 
+  78:Core/Src/main.c **** /* Private macro -------------------------------------------------------------*/
+  79:Core/Src/main.c **** /* USER CODE BEGIN PM */
+  80:Core/Src/main.c **** 
+  81:Core/Src/main.c **** /* USER CODE END PM */
+  82:Core/Src/main.c **** 
+  83:Core/Src/main.c **** /* Private variables ---------------------------------------------------------*/
+  84:Core/Src/main.c **** 
+  85:Core/Src/main.c **** /* USER CODE BEGIN PV */
+  86:Core/Src/main.c **** static uint32_t g_next_button_task_ms;
+  87:Core/Src/main.c **** static uint32_t g_next_tach_task_ms;
+  88:Core/Src/main.c **** static uint32_t g_next_fan_task_ms;
+  89:Core/Src/main.c **** static uint32_t g_next_control_task_ms;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 3
+
+
+  90:Core/Src/main.c **** static uint32_t g_next_led_task_ms;
+  91:Core/Src/main.c **** static uint32_t g_next_temperature_task_ms;
+  92:Core/Src/main.c **** static AflcAppContext_t g_app;
+  93:Core/Src/main.c **** /* USER CODE END PV */
+  94:Core/Src/main.c **** 
+  95:Core/Src/main.c **** /* Private function prototypes -----------------------------------------------*/
+  96:Core/Src/main.c **** void SystemClock_Config(void);
+  97:Core/Src/main.c **** /* USER CODE BEGIN PFP */
+  98:Core/Src/main.c **** static void MX_AFLC_StartPeripherals(void);
+  99:Core/Src/main.c **** static void AFLC_AppTask(uint32_t now_ms);
+ 100:Core/Src/main.c **** static void AFLC_AppEnterState(AflcAppState_t next_state, uint32_t now_ms);
+ 101:Core/Src/main.c **** static void AFLC_RuntimeStep(void);
+ 102:Core/Src/main.c **** static void AFLC_UpdateStartupPassMask(void);
+ 103:Core/Src/main.c **** static void AFLC_BuildMaxRpmArray(uint16_t max_rpm[PROFIL_FAN_COUNT]);
+ 104:Core/Src/main.c **** /* USER CODE END PFP */
+ 105:Core/Src/main.c **** 
+ 106:Core/Src/main.c **** /* Private user code ---------------------------------------------------------*/
+ 107:Core/Src/main.c **** /* USER CODE BEGIN 0 */
+ 108:Core/Src/main.c **** 
+ 109:Core/Src/main.c **** /* USER CODE END 0 */
+ 110:Core/Src/main.c **** 
+ 111:Core/Src/main.c **** /**
+ 112:Core/Src/main.c ****   * @brief  The application entry point.
+ 113:Core/Src/main.c ****   * @retval int
+ 114:Core/Src/main.c ****   */
+ 115:Core/Src/main.c **** int main(void)
+ 116:Core/Src/main.c **** {
+ 117:Core/Src/main.c ****   /* USER CODE BEGIN 1 */
+ 118:Core/Src/main.c **** 
+ 119:Core/Src/main.c ****   /* USER CODE END 1 */
+ 120:Core/Src/main.c **** 
+ 121:Core/Src/main.c ****   /* MCU Configuration--------------------------------------------------------*/
+ 122:Core/Src/main.c **** 
+ 123:Core/Src/main.c ****   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+ 124:Core/Src/main.c ****   HAL_Init();
+ 125:Core/Src/main.c **** 
+ 126:Core/Src/main.c ****   /* USER CODE BEGIN Init */
+ 127:Core/Src/main.c **** 
+ 128:Core/Src/main.c ****   /* USER CODE END Init */
+ 129:Core/Src/main.c **** 
+ 130:Core/Src/main.c ****   /* Configure the system clock */
+ 131:Core/Src/main.c ****   SystemClock_Config();
+ 132:Core/Src/main.c **** 
+ 133:Core/Src/main.c ****   /* USER CODE BEGIN SysInit */
+ 134:Core/Src/main.c **** 
+ 135:Core/Src/main.c ****   /* USER CODE END SysInit */
+ 136:Core/Src/main.c **** 
+ 137:Core/Src/main.c ****   /* Initialize all configured peripherals */
+ 138:Core/Src/main.c ****   MX_GPIO_Init();
+ 139:Core/Src/main.c ****   MX_USART1_UART_Init();
+ 140:Core/Src/main.c ****   MX_TIM2_Init();
+ 141:Core/Src/main.c ****   MX_TIM3_Init();
+ 142:Core/Src/main.c ****   /* USER CODE BEGIN 2 */
+ 143:Core/Src/main.c ****   MX_AFLC_StartPeripherals();
+ 144:Core/Src/main.c ****   Tachometer_Init();
+ 145:Core/Src/main.c ****   FanControl_Init(&htim3);
+ 146:Core/Src/main.c ****   LedStatus_Init();
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 4
+
+
+ 147:Core/Src/main.c ****   Button_Init();
+ 148:Core/Src/main.c ****   TemperatureStub_Init();
+ 149:Core/Src/main.c ****   Profil_Init();
+ 150:Core/Src/main.c ****   UI_LCD_Init();
+ 151:Core/Src/main.c ****   UART_Cmd_Init();
+ 152:Core/Src/main.c **** 
+ 153:Core/Src/main.c ****   g_app.temperatures = TemperatureStub_GetSnapshot();
+ 154:Core/Src/main.c ****   g_app.profiles = NULL;
+ 155:Core/Src/main.c ****   g_app.startup_passed_mask = 0U;
+ 156:Core/Src/main.c ****   g_app.startup_fail_mask = 0U;
+ 157:Core/Src/main.c **** 
+ 158:Core/Src/main.c ****   g_next_button_task_ms = HAL_GetTick();
+ 159:Core/Src/main.c ****   g_next_tach_task_ms = HAL_GetTick();
+ 160:Core/Src/main.c ****   g_next_fan_task_ms = HAL_GetTick();
+ 161:Core/Src/main.c ****   g_next_control_task_ms = HAL_GetTick();
+ 162:Core/Src/main.c ****   g_next_led_task_ms = HAL_GetTick();
+ 163:Core/Src/main.c ****   g_next_temperature_task_ms = HAL_GetTick();
+ 164:Core/Src/main.c **** 
+ 165:Core/Src/main.c ****   AFLC_AppEnterState(AFLC_APP_BOOT, HAL_GetTick());
+ 166:Core/Src/main.c ****   /* USER CODE END 2 */
+ 167:Core/Src/main.c **** 
+ 168:Core/Src/main.c ****   /* Infinite loop */
+ 169:Core/Src/main.c ****   /* USER CODE BEGIN WHILE */
+ 170:Core/Src/main.c ****   while (1)
+ 171:Core/Src/main.c ****   {
+ 172:Core/Src/main.c ****     uint32_t now_ms = HAL_GetTick();
+ 173:Core/Src/main.c **** 
+ 174:Core/Src/main.c ****     UART_Cmd_Task();
+ 175:Core/Src/main.c **** 
+ 176:Core/Src/main.c ****     if (now_ms >= g_next_button_task_ms)
+ 177:Core/Src/main.c ****     {
+ 178:Core/Src/main.c ****       g_next_button_task_ms = now_ms + TASK_BUTTON_PERIOD_MS;
+ 179:Core/Src/main.c ****       Button_Task();
+ 180:Core/Src/main.c ****     }
+ 181:Core/Src/main.c **** 
+ 182:Core/Src/main.c ****     if (now_ms >= g_next_tach_task_ms)
+ 183:Core/Src/main.c ****     {
+ 184:Core/Src/main.c ****       g_next_tach_task_ms = now_ms + TASK_TACH_PERIOD_MS;
+ 185:Core/Src/main.c ****       Tachometer_Task(now_ms);
+ 186:Core/Src/main.c ****     }
+ 187:Core/Src/main.c **** 
+ 188:Core/Src/main.c ****     if (now_ms >= g_next_fan_task_ms)
+ 189:Core/Src/main.c ****     {
+ 190:Core/Src/main.c ****       g_next_fan_task_ms = now_ms + TASK_FAN_PERIOD_MS;
+ 191:Core/Src/main.c ****       FanControl_Task(now_ms);
+ 192:Core/Src/main.c ****     }
+ 193:Core/Src/main.c **** 
+ 194:Core/Src/main.c ****     if (now_ms >= g_next_temperature_task_ms)
+ 195:Core/Src/main.c ****     {
+ 196:Core/Src/main.c ****       g_next_temperature_task_ms = now_ms + TASK_TEMPERATURE_PERIOD_MS;
+ 197:Core/Src/main.c ****       TemperatureStub_Task(now_ms);
+ 198:Core/Src/main.c ****       g_app.temperatures = TemperatureStub_GetSnapshot();
+ 199:Core/Src/main.c ****     }
+ 200:Core/Src/main.c **** 
+ 201:Core/Src/main.c ****     if (now_ms >= g_next_control_task_ms)
+ 202:Core/Src/main.c ****     {
+ 203:Core/Src/main.c ****       g_next_control_task_ms = now_ms + TASK_CONTROL_PERIOD_MS;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 5
+
+
+ 204:Core/Src/main.c ****       AFLC_RuntimeStep();
+ 205:Core/Src/main.c ****     }
+ 206:Core/Src/main.c **** 
+ 207:Core/Src/main.c ****     AFLC_AppTask(now_ms);
+ 208:Core/Src/main.c ****     UI_LCD_Task(now_ms);
+ 209:Core/Src/main.c **** 
+ 210:Core/Src/main.c ****     if (now_ms >= g_next_led_task_ms)
+ 211:Core/Src/main.c ****     {
+ 212:Core/Src/main.c ****       g_next_led_task_ms = now_ms + TASK_LED_PERIOD_MS;
+ 213:Core/Src/main.c ****       LedStatus_Task(now_ms);
+ 214:Core/Src/main.c ****     }
+ 215:Core/Src/main.c ****     /* USER CODE END WHILE */
+ 216:Core/Src/main.c **** 
+ 217:Core/Src/main.c ****     /* USER CODE BEGIN 3 */
+ 218:Core/Src/main.c ****   }
+ 219:Core/Src/main.c ****   /* USER CODE END 3 */
+ 220:Core/Src/main.c **** }
+ 221:Core/Src/main.c **** 
+ 222:Core/Src/main.c **** /**
+ 223:Core/Src/main.c ****   * @brief System Clock Configuration
+ 224:Core/Src/main.c ****   * @retval None
+ 225:Core/Src/main.c ****   */
+ 226:Core/Src/main.c **** void SystemClock_Config(void)
+ 227:Core/Src/main.c **** {
+ 228:Core/Src/main.c ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 229:Core/Src/main.c ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 230:Core/Src/main.c **** 
+ 231:Core/Src/main.c ****   /** Initializes the RCC Oscillators according to the specified parameters
+ 232:Core/Src/main.c ****   * in the RCC_OscInitTypeDef structure.
+ 233:Core/Src/main.c ****   */
+ 234:Core/Src/main.c ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+ 235:Core/Src/main.c ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 236:Core/Src/main.c ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 237:Core/Src/main.c ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 238:Core/Src/main.c ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 239:Core/Src/main.c ****   {
+ 240:Core/Src/main.c ****     Error_Handler();
+ 241:Core/Src/main.c ****   }
+ 242:Core/Src/main.c **** 
+ 243:Core/Src/main.c ****   /** Initializes the CPU, AHB and APB buses clocks
+ 244:Core/Src/main.c ****   */
+ 245:Core/Src/main.c ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+ 246:Core/Src/main.c ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 247:Core/Src/main.c ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+ 248:Core/Src/main.c ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 249:Core/Src/main.c ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 250:Core/Src/main.c ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 251:Core/Src/main.c **** 
+ 252:Core/Src/main.c ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+ 253:Core/Src/main.c ****   {
+ 254:Core/Src/main.c ****     Error_Handler();
+ 255:Core/Src/main.c ****   }
+ 256:Core/Src/main.c **** }
+ 257:Core/Src/main.c **** 
+ 258:Core/Src/main.c **** /* USER CODE BEGIN 4 */
+ 259:Core/Src/main.c **** void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+ 260:Core/Src/main.c **** {
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 6
+
+
+ 261:Core/Src/main.c ****   Tachometer_OnCapture(htim);
+ 262:Core/Src/main.c **** }
+ 263:Core/Src/main.c **** 
+ 264:Core/Src/main.c **** static void MX_AFLC_StartPeripherals(void)
+ 265:Core/Src/main.c **** {
+ 266:Core/Src/main.c ****   if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
+ 267:Core/Src/main.c ****   {
+ 268:Core/Src/main.c ****     Error_Handler();
+ 269:Core/Src/main.c ****   }
+ 270:Core/Src/main.c ****   if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_2) != HAL_OK)
+ 271:Core/Src/main.c ****   {
+ 272:Core/Src/main.c ****     Error_Handler();
+ 273:Core/Src/main.c ****   }
+ 274:Core/Src/main.c ****   if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3) != HAL_OK)
+ 275:Core/Src/main.c ****   {
+ 276:Core/Src/main.c ****     Error_Handler();
+ 277:Core/Src/main.c ****   }
+ 278:Core/Src/main.c ****   if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_4) != HAL_OK)
+ 279:Core/Src/main.c ****   {
+ 280:Core/Src/main.c ****     Error_Handler();
+ 281:Core/Src/main.c ****   }
+ 282:Core/Src/main.c **** 
+ 283:Core/Src/main.c ****   if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1) != HAL_OK)
+ 284:Core/Src/main.c ****   {
+ 285:Core/Src/main.c ****     Error_Handler();
+ 286:Core/Src/main.c ****   }
+ 287:Core/Src/main.c ****   if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2) != HAL_OK)
+ 288:Core/Src/main.c ****   {
+ 289:Core/Src/main.c ****     Error_Handler();
+ 290:Core/Src/main.c ****   }
+ 291:Core/Src/main.c ****   if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3) != HAL_OK)
+ 292:Core/Src/main.c ****   {
+ 293:Core/Src/main.c ****     Error_Handler();
+ 294:Core/Src/main.c ****   }
+ 295:Core/Src/main.c ****   if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4) != HAL_OK)
+ 296:Core/Src/main.c ****   {
+ 297:Core/Src/main.c ****     Error_Handler();
+ 298:Core/Src/main.c ****   }
+ 299:Core/Src/main.c **** }
+ 300:Core/Src/main.c **** 
+ 301:Core/Src/main.c **** static void AFLC_AppTask(uint32_t now_ms)
+ 302:Core/Src/main.c **** {
+ 303:Core/Src/main.c ****   switch (g_app.state)
+ 304:Core/Src/main.c ****   {
+ 305:Core/Src/main.c ****     case AFLC_APP_BOOT:
+ 306:Core/Src/main.c ****       AFLC_AppEnterState(AFLC_APP_PROFILES_CALCULATING, now_ms);
+ 307:Core/Src/main.c ****       break;
+ 308:Core/Src/main.c **** 
+ 309:Core/Src/main.c ****     case AFLC_APP_PROFILES_CALCULATING:
+ 310:Core/Src/main.c ****       Profil_CalculateAll();
+ 311:Core/Src/main.c ****       g_app.profiles = Profil_GetResult();
+ 312:Core/Src/main.c ****       if ((g_app.profiles != NULL) && g_app.profiles->ready && g_app.profiles->valid)
+ 313:Core/Src/main.c ****       {
+ 314:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_PROFILES_READY, now_ms);
+ 315:Core/Src/main.c ****       }
+ 316:Core/Src/main.c ****       else
+ 317:Core/Src/main.c ****       {
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 7
+
+
+ 318:Core/Src/main.c ****         g_app.startup_fail_mask = 0x0FU;
+ 319:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_SAFE_STATE, now_ms);
+ 320:Core/Src/main.c ****       }
+ 321:Core/Src/main.c ****       break;
+ 322:Core/Src/main.c **** 
+ 323:Core/Src/main.c ****     case AFLC_APP_PROFILES_READY:
+ 324:Core/Src/main.c ****       if ((now_ms - g_app.state_entered_ms) >= PROFILES_READY_SHOW_MS)
+ 325:Core/Src/main.c ****       {
+ 326:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_WAIT_CONFIRM, now_ms);
+ 327:Core/Src/main.c ****       }
+ 328:Core/Src/main.c ****       break;
+ 329:Core/Src/main.c **** 
+ 330:Core/Src/main.c ****     case AFLC_APP_WAIT_CONFIRM:
+ 331:Core/Src/main.c ****       if (Button_IsConfirmPressed())
+ 332:Core/Src/main.c ****       {
+ 333:Core/Src/main.c ****         Button_ClearConfirm();
+ 334:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_INIT, now_ms);
+ 335:Core/Src/main.c ****       }
+ 336:Core/Src/main.c ****       break;
+ 337:Core/Src/main.c **** 
+ 338:Core/Src/main.c ****     case AFLC_APP_STARTUP_TEST_INIT:
+ 339:Core/Src/main.c ****       g_app.startup_passed_mask = 0U;
+ 340:Core/Src/main.c ****       g_app.startup_fail_mask = 0U;
+ 341:Core/Src/main.c ****       FanControl_SetDutyPermilleAll(STARTUP_TEST_DUTY_PERMILLE);
+ 342:Core/Src/main.c ****       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, g_app.startup_fail_mask, 0U);
+ 343:Core/Src/main.c ****       AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_RUN, now_ms);
+ 344:Core/Src/main.c ****       break;
+ 345:Core/Src/main.c **** 
+ 346:Core/Src/main.c ****     case AFLC_APP_STARTUP_TEST_RUN:
+ 347:Core/Src/main.c ****       AFLC_UpdateStartupPassMask();
+ 348:Core/Src/main.c ****       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, 0U, 0U);
+ 349:Core/Src/main.c **** 
+ 350:Core/Src/main.c ****       if (g_app.startup_passed_mask == 0x0FU)
+ 351:Core/Src/main.c ****       {
+ 352:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_EVAL, now_ms);
+ 353:Core/Src/main.c ****       }
+ 354:Core/Src/main.c ****       else if ((now_ms - g_app.state_entered_ms) >= STARTUP_TEST_TIMEOUT_MS)
+ 355:Core/Src/main.c ****       {
+ 356:Core/Src/main.c ****         g_app.startup_fail_mask = (uint8_t)(0x0FU & (uint8_t)(~g_app.startup_passed_mask));
+ 357:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_EVAL, now_ms);
+ 358:Core/Src/main.c ****       }
+ 359:Core/Src/main.c ****       break;
+ 360:Core/Src/main.c **** 
+ 361:Core/Src/main.c ****     case AFLC_APP_STARTUP_TEST_EVAL:
+ 362:Core/Src/main.c ****       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, g_app.startup_fail_mask, 1U);
+ 363:Core/Src/main.c ****       if (g_app.startup_fail_mask == 0U)
+ 364:Core/Src/main.c ****       {
+ 365:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_RUNTIME_CONTROL, now_ms);
+ 366:Core/Src/main.c ****       }
+ 367:Core/Src/main.c ****       else
+ 368:Core/Src/main.c ****       {
+ 369:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_SAFE_STATE, now_ms);
+ 370:Core/Src/main.c ****       }
+ 371:Core/Src/main.c ****       break;
+ 372:Core/Src/main.c **** 
+ 373:Core/Src/main.c ****     case AFLC_APP_RUNTIME_CONTROL:
+ 374:Core/Src/main.c ****       UI_LCD_ShowRuntime(g_app.profiles,
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 8
+
+
+ 375:Core/Src/main.c ****                          g_app.temperatures,
+ 376:Core/Src/main.c ****                          &g_app.control_output,
+ 377:Core/Src/main.c ****                          FanControl_GetStatuses());
+ 378:Core/Src/main.c ****       break;
+ 379:Core/Src/main.c **** 
+ 380:Core/Src/main.c ****     case AFLC_APP_SAFE_STATE:
+ 381:Core/Src/main.c ****       FanControl_EnterSafeState();
+ 382:Core/Src/main.c ****       UI_LCD_ShowSafeState(g_app.startup_fail_mask);
+ 383:Core/Src/main.c ****       break;
+ 384:Core/Src/main.c **** 
+ 385:Core/Src/main.c ****     default:
+ 386:Core/Src/main.c ****       break;
+ 387:Core/Src/main.c ****   }
+ 388:Core/Src/main.c **** }
+ 389:Core/Src/main.c **** 
+ 390:Core/Src/main.c **** static void AFLC_AppEnterState(AflcAppState_t next_state, uint32_t now_ms)
+ 391:Core/Src/main.c **** {
+ 392:Core/Src/main.c ****   g_app.state = next_state;
+ 393:Core/Src/main.c ****   g_app.state_entered_ms = now_ms;
+ 394:Core/Src/main.c **** 
+ 395:Core/Src/main.c ****   switch (next_state)
+ 396:Core/Src/main.c ****   {
+ 397:Core/Src/main.c ****     case AFLC_APP_BOOT:
+ 398:Core/Src/main.c ****       LedStatus_SetMode(LED_STATUS_MODE_BOOT);
+ 399:Core/Src/main.c ****       break;
+ 400:Core/Src/main.c **** 
+ 401:Core/Src/main.c ****     case AFLC_APP_PROFILES_CALCULATING:
+ 402:Core/Src/main.c ****       LedStatus_SetMode(LED_STATUS_MODE_BOOT);
+ 403:Core/Src/main.c ****       break;
+ 404:Core/Src/main.c **** 
+ 405:Core/Src/main.c ****     case AFLC_APP_PROFILES_READY:
+ 406:Core/Src/main.c ****       LedStatus_SetMode(LED_STATUS_MODE_PROFILES_READY);
+ 407:Core/Src/main.c ****       UI_LCD_ShowProfilesReady(g_app.profiles);
+ 408:Core/Src/main.c ****       break;
+ 409:Core/Src/main.c **** 
+ 410:Core/Src/main.c ****     case AFLC_APP_WAIT_CONFIRM:
+ 411:Core/Src/main.c ****       LedStatus_SetMode(LED_STATUS_MODE_WAIT_CONFIRM);
+ 412:Core/Src/main.c ****       UI_LCD_ShowWaitConfirm(g_app.profiles);
+ 413:Core/Src/main.c ****       break;
+ 414:Core/Src/main.c **** 
+ 415:Core/Src/main.c ****     case AFLC_APP_STARTUP_TEST_INIT:
+ 416:Core/Src/main.c ****     case AFLC_APP_STARTUP_TEST_RUN:
+ 417:Core/Src/main.c ****     case AFLC_APP_STARTUP_TEST_EVAL:
+ 418:Core/Src/main.c ****       LedStatus_SetMode(LED_STATUS_MODE_STARTUP_TEST);
+ 419:Core/Src/main.c ****       break;
+ 420:Core/Src/main.c **** 
+ 421:Core/Src/main.c ****     case AFLC_APP_RUNTIME_CONTROL:
+ 422:Core/Src/main.c ****       LedStatus_SetMode(LED_STATUS_MODE_RUNTIME);
+ 423:Core/Src/main.c ****       break;
+ 424:Core/Src/main.c **** 
+ 425:Core/Src/main.c ****     case AFLC_APP_SAFE_STATE:
+ 426:Core/Src/main.c ****       LedStatus_SetMode(LED_STATUS_MODE_FAULT);
+ 427:Core/Src/main.c ****       break;
+ 428:Core/Src/main.c **** 
+ 429:Core/Src/main.c ****     default:
+ 430:Core/Src/main.c ****       break;
+ 431:Core/Src/main.c ****   }
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 9
+
+
+ 432:Core/Src/main.c **** }
+ 433:Core/Src/main.c **** 
+ 434:Core/Src/main.c **** static void AFLC_RuntimeStep(void)
+ 435:Core/Src/main.c **** {
+ 436:Core/Src/main.c ****   uint16_t max_rpm[PROFIL_FAN_COUNT];
+ 437:Core/Src/main.c **** 
+ 438:Core/Src/main.c ****   if ((g_app.state != AFLC_APP_RUNTIME_CONTROL) || (g_app.profiles == NULL) || (g_app.temperatures 
+ 439:Core/Src/main.c ****   {
+ 440:Core/Src/main.c ****     return;
+ 441:Core/Src/main.c ****   }
+ 442:Core/Src/main.c **** 
+ 443:Core/Src/main.c ****   Tachometer_GetSnapshot(&g_app.tach_snapshot);
+ 444:Core/Src/main.c ****   AFLCalcul_Compute(g_app.profiles, g_app.temperatures, &g_app.tach_snapshot, &g_app.control_output
+ 445:Core/Src/main.c ****   AFLC_BuildMaxRpmArray(max_rpm);
+ 446:Core/Src/main.c ****   FanControl_SetTargetRpmArray(g_app.control_output.target_rpm, max_rpm);
+ 447:Core/Src/main.c **** }
+ 448:Core/Src/main.c **** 
+ 449:Core/Src/main.c **** static void AFLC_UpdateStartupPassMask(void)
+ 450:Core/Src/main.c **** {
+ 451:Core/Src/main.c ****   uint8_t index;
+ 452:Core/Src/main.c **** 
+ 453:Core/Src/main.c ****   Tachometer_GetSnapshot(&g_app.tach_snapshot);
+ 454:Core/Src/main.c **** 
+ 455:Core/Src/main.c ****   for (index = 0U; index < PROFIL_FAN_COUNT; index++)
+ 456:Core/Src/main.c ****   {
+ 457:Core/Src/main.c ****     if (g_app.tach_snapshot.fans[index].rpm_filtered >= STARTUP_TEST_PASS_RPM)
+ 458:Core/Src/main.c ****     {
+ 459:Core/Src/main.c ****       g_app.startup_passed_mask |= (uint8_t)(1U << index);
+ 460:Core/Src/main.c ****     }
+ 461:Core/Src/main.c ****   }
+ 462:Core/Src/main.c **** }
+ 463:Core/Src/main.c **** 
+ 464:Core/Src/main.c **** static void AFLC_BuildMaxRpmArray(uint16_t max_rpm[PROFIL_FAN_COUNT])
+ 465:Core/Src/main.c **** {
+  27              		.loc 1 465 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+ 466:Core/Src/main.c ****   uint8_t index;
+  32              		.loc 1 466 3 view .LVU1
+ 467:Core/Src/main.c **** 
+ 468:Core/Src/main.c ****   if ((max_rpm == NULL) || (g_app.profiles == NULL))
+  33              		.loc 1 468 3 view .LVU2
+  34              		.loc 1 468 6 is_stmt 0 view .LVU3
+  35 0000 8446     		mov	ip, r0
+  36 0002 88B1     		cbz	r0, .L1
+  37              		.loc 1 468 34 discriminator 1 view .LVU4
+  38 0004 094B     		ldr	r3, .L5
+  39 0006 9B68     		ldr	r3, [r3, #8]
+  40              		.loc 1 468 25 discriminator 1 view .LVU5
+  41 0008 73B1     		cbz	r3, .L1
+ 469:Core/Src/main.c ****   {
+ 470:Core/Src/main.c ****     return;
+ 471:Core/Src/main.c ****   }
+ 472:Core/Src/main.c **** 
+ 473:Core/Src/main.c ****   for (index = 0U; index < PROFIL_FAN_COUNT; index++)
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 10
+
+
+  42              		.loc 1 473 14 view .LVU6
+  43 000a 0023     		movs	r3, #0
+  44 000c 0AE0     		b	.L3
+  45              	.LVL1:
+  46              	.L4:
+ 474:Core/Src/main.c ****   {
+ 475:Core/Src/main.c ****     max_rpm[index] = g_app.profiles->fans[index].max_rpm;
+  47              		.loc 1 475 5 is_stmt 1 view .LVU7
+  48              		.loc 1 475 27 is_stmt 0 view .LVU8
+  49 000e 074A     		ldr	r2, .L5
+  50 0010 9268     		ldr	r2, [r2, #8]
+  51              		.loc 1 475 49 view .LVU9
+  52 0012 C3EBC301 		rsb	r1, r3, r3, lsl #3
+  53 0016 02EB4102 		add	r2, r2, r1, lsl #1
+  54 001a 1289     		ldrh	r2, [r2, #8]
+  55              		.loc 1 475 20 view .LVU10
+  56 001c 2CF81320 		strh	r2, [ip, r3, lsl #1]	@ movhi
+ 473:Core/Src/main.c ****   {
+  57              		.loc 1 473 51 is_stmt 1 discriminator 3 view .LVU11
+  58 0020 0133     		adds	r3, r3, #1
+  59              	.LVL2:
+ 473:Core/Src/main.c ****   {
+  60              		.loc 1 473 51 is_stmt 0 discriminator 3 view .LVU12
+  61 0022 DBB2     		uxtb	r3, r3
+  62              	.LVL3:
+  63              	.L3:
+ 473:Core/Src/main.c ****   {
+  64              		.loc 1 473 26 is_stmt 1 discriminator 1 view .LVU13
+  65 0024 032B     		cmp	r3, #3
+  66 0026 F2D9     		bls	.L4
+  67              	.LVL4:
+  68              	.L1:
+ 476:Core/Src/main.c ****   }
+ 477:Core/Src/main.c **** }
+  69              		.loc 1 477 1 is_stmt 0 view .LVU14
+  70 0028 7047     		bx	lr
+  71              	.L6:
+  72 002a 00BF     		.align	2
+  73              	.L5:
+  74 002c 00000000 		.word	g_app
+  75              		.cfi_endproc
+  76              	.LFE73:
+  78              		.section	.text.AFLC_AppEnterState,"ax",%progbits
+  79              		.align	1
+  80              		.syntax unified
+  81              		.thumb
+  82              		.thumb_func
+  84              	AFLC_AppEnterState:
+  85              	.LVL5:
+  86              	.LFB70:
+ 391:Core/Src/main.c ****   g_app.state = next_state;
+  87              		.loc 1 391 1 is_stmt 1 view -0
+  88              		.cfi_startproc
+  89              		@ args = 0, pretend = 0, frame = 0
+  90              		@ frame_needed = 0, uses_anonymous_args = 0
+ 391:Core/Src/main.c ****   g_app.state = next_state;
+  91              		.loc 1 391 1 is_stmt 0 view .LVU16
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 11
+
+
+  92 0000 08B5     		push	{r3, lr}
+  93              	.LCFI0:
+  94              		.cfi_def_cfa_offset 8
+  95              		.cfi_offset 3, -8
+  96              		.cfi_offset 14, -4
+ 392:Core/Src/main.c ****   g_app.state_entered_ms = now_ms;
+  97              		.loc 1 392 3 is_stmt 1 view .LVU17
+ 392:Core/Src/main.c ****   g_app.state_entered_ms = now_ms;
+  98              		.loc 1 392 15 is_stmt 0 view .LVU18
+  99 0002 1B4B     		ldr	r3, .L20
+ 100 0004 1870     		strb	r0, [r3]
+ 393:Core/Src/main.c **** 
+ 101              		.loc 1 393 3 is_stmt 1 view .LVU19
+ 393:Core/Src/main.c **** 
+ 102              		.loc 1 393 26 is_stmt 0 view .LVU20
+ 103 0006 5960     		str	r1, [r3, #4]
+ 395:Core/Src/main.c ****   {
+ 104              		.loc 1 395 3 is_stmt 1 view .LVU21
+ 105 0008 0328     		cmp	r0, #3
+ 106 000a 25D0     		beq	.L8
+ 107 000c 07D8     		bhi	.L9
+ 108 000e 0128     		cmp	r0, #1
+ 109 0010 16D0     		beq	.L10
+ 110 0012 0228     		cmp	r0, #2
+ 111 0014 18D0     		beq	.L11
+ 112 0016 08B9     		cbnz	r0, .L7
+ 398:Core/Src/main.c ****       break;
+ 113              		.loc 1 398 7 view .LVU22
+ 114 0018 FFF7FEFF 		bl	LedStatus_SetMode
+ 115              	.LVL6:
+ 399:Core/Src/main.c **** 
+ 116              		.loc 1 399 7 view .LVU23
+ 117              	.L7:
+ 432:Core/Src/main.c **** 
+ 118              		.loc 1 432 1 is_stmt 0 view .LVU24
+ 119 001c 08BD     		pop	{r3, pc}
+ 120              	.LVL7:
+ 121              	.L9:
+ 395:Core/Src/main.c ****   {
+ 122              		.loc 1 395 3 view .LVU25
+ 123 001e 0728     		cmp	r0, #7
+ 124 0020 22D0     		beq	.L14
+ 125 0022 07D8     		bhi	.L15
+ 126 0024 0438     		subs	r0, r0, #4
+ 127              	.LVL8:
+ 395:Core/Src/main.c ****   {
+ 128              		.loc 1 395 3 view .LVU26
+ 129 0026 C0B2     		uxtb	r0, r0
+ 130 0028 0228     		cmp	r0, #2
+ 131 002a F7D8     		bhi	.L7
+ 418:Core/Src/main.c ****       break;
+ 132              		.loc 1 418 7 is_stmt 1 view .LVU27
+ 133 002c 0320     		movs	r0, #3
+ 134 002e FFF7FEFF 		bl	LedStatus_SetMode
+ 135              	.LVL9:
+ 419:Core/Src/main.c **** 
+ 136              		.loc 1 419 7 view .LVU28
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 12
+
+
+ 137 0032 F3E7     		b	.L7
+ 138              	.LVL10:
+ 139              	.L15:
+ 395:Core/Src/main.c ****   {
+ 140              		.loc 1 395 3 is_stmt 0 view .LVU29
+ 141 0034 0828     		cmp	r0, #8
+ 142 0036 F1D1     		bne	.L7
+ 426:Core/Src/main.c ****       break;
+ 143              		.loc 1 426 7 is_stmt 1 view .LVU30
+ 144 0038 0520     		movs	r0, #5
+ 145              	.LVL11:
+ 426:Core/Src/main.c ****       break;
+ 146              		.loc 1 426 7 is_stmt 0 view .LVU31
+ 147 003a FFF7FEFF 		bl	LedStatus_SetMode
+ 148              	.LVL12:
+ 427:Core/Src/main.c **** 
+ 149              		.loc 1 427 7 is_stmt 1 view .LVU32
+ 432:Core/Src/main.c **** 
+ 150              		.loc 1 432 1 is_stmt 0 view .LVU33
+ 151 003e EDE7     		b	.L7
+ 152              	.LVL13:
+ 153              	.L10:
+ 402:Core/Src/main.c ****       break;
+ 154              		.loc 1 402 7 is_stmt 1 view .LVU34
+ 155 0040 0020     		movs	r0, #0
+ 156              	.LVL14:
+ 402:Core/Src/main.c ****       break;
+ 157              		.loc 1 402 7 is_stmt 0 view .LVU35
+ 158 0042 FFF7FEFF 		bl	LedStatus_SetMode
+ 159              	.LVL15:
+ 403:Core/Src/main.c **** 
+ 160              		.loc 1 403 7 is_stmt 1 view .LVU36
+ 161 0046 E9E7     		b	.L7
+ 162              	.LVL16:
+ 163              	.L11:
+ 406:Core/Src/main.c ****       UI_LCD_ShowProfilesReady(g_app.profiles);
+ 164              		.loc 1 406 7 view .LVU37
+ 165 0048 0120     		movs	r0, #1
+ 166              	.LVL17:
+ 406:Core/Src/main.c ****       UI_LCD_ShowProfilesReady(g_app.profiles);
+ 167              		.loc 1 406 7 is_stmt 0 view .LVU38
+ 168 004a FFF7FEFF 		bl	LedStatus_SetMode
+ 169              	.LVL18:
+ 407:Core/Src/main.c ****       break;
+ 170              		.loc 1 407 7 is_stmt 1 view .LVU39
+ 171 004e 084B     		ldr	r3, .L20
+ 172 0050 9868     		ldr	r0, [r3, #8]
+ 173 0052 FFF7FEFF 		bl	UI_LCD_ShowProfilesReady
+ 174              	.LVL19:
+ 408:Core/Src/main.c **** 
+ 175              		.loc 1 408 7 view .LVU40
+ 176 0056 E1E7     		b	.L7
+ 177              	.LVL20:
+ 178              	.L8:
+ 411:Core/Src/main.c ****       UI_LCD_ShowWaitConfirm(g_app.profiles);
+ 179              		.loc 1 411 7 view .LVU41
+ 180 0058 0220     		movs	r0, #2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 13
+
+
+ 181              	.LVL21:
+ 411:Core/Src/main.c ****       UI_LCD_ShowWaitConfirm(g_app.profiles);
+ 182              		.loc 1 411 7 is_stmt 0 view .LVU42
+ 183 005a FFF7FEFF 		bl	LedStatus_SetMode
+ 184              	.LVL22:
+ 412:Core/Src/main.c ****       break;
+ 185              		.loc 1 412 7 is_stmt 1 view .LVU43
+ 186 005e 044B     		ldr	r3, .L20
+ 187 0060 9868     		ldr	r0, [r3, #8]
+ 188 0062 FFF7FEFF 		bl	UI_LCD_ShowWaitConfirm
+ 189              	.LVL23:
+ 413:Core/Src/main.c **** 
+ 190              		.loc 1 413 7 view .LVU44
+ 191 0066 D9E7     		b	.L7
+ 192              	.LVL24:
+ 193              	.L14:
+ 422:Core/Src/main.c ****       break;
+ 194              		.loc 1 422 7 view .LVU45
+ 195 0068 0420     		movs	r0, #4
+ 196              	.LVL25:
+ 422:Core/Src/main.c ****       break;
+ 197              		.loc 1 422 7 is_stmt 0 view .LVU46
+ 198 006a FFF7FEFF 		bl	LedStatus_SetMode
+ 199              	.LVL26:
+ 423:Core/Src/main.c **** 
+ 200              		.loc 1 423 7 is_stmt 1 view .LVU47
+ 201 006e D5E7     		b	.L7
+ 202              	.L21:
+ 203              		.align	2
+ 204              	.L20:
+ 205 0070 00000000 		.word	g_app
+ 206              		.cfi_endproc
+ 207              	.LFE70:
+ 209              		.section	.text.AFLC_UpdateStartupPassMask,"ax",%progbits
+ 210              		.align	1
+ 211              		.syntax unified
+ 212              		.thumb
+ 213              		.thumb_func
+ 215              	AFLC_UpdateStartupPassMask:
+ 216              	.LFB72:
+ 450:Core/Src/main.c ****   uint8_t index;
+ 217              		.loc 1 450 1 view -0
+ 218              		.cfi_startproc
+ 219              		@ args = 0, pretend = 0, frame = 0
+ 220              		@ frame_needed = 0, uses_anonymous_args = 0
+ 221 0000 08B5     		push	{r3, lr}
+ 222              	.LCFI1:
+ 223              		.cfi_def_cfa_offset 8
+ 224              		.cfi_offset 3, -8
+ 225              		.cfi_offset 14, -4
+ 451:Core/Src/main.c **** 
+ 226              		.loc 1 451 3 view .LVU49
+ 453:Core/Src/main.c **** 
+ 227              		.loc 1 453 3 view .LVU50
+ 228 0002 0E48     		ldr	r0, .L28
+ 229 0004 FFF7FEFF 		bl	Tachometer_GetSnapshot
+ 230              	.LVL27:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 14
+
+
+ 455:Core/Src/main.c ****   {
+ 231              		.loc 1 455 3 view .LVU51
+ 455:Core/Src/main.c ****   {
+ 232              		.loc 1 455 14 is_stmt 0 view .LVU52
+ 233 0008 0023     		movs	r3, #0
+ 455:Core/Src/main.c ****   {
+ 234              		.loc 1 455 3 view .LVU53
+ 235 000a 01E0     		b	.L23
+ 236              	.LVL28:
+ 237              	.L24:
+ 455:Core/Src/main.c ****   {
+ 238              		.loc 1 455 51 is_stmt 1 discriminator 2 view .LVU54
+ 239 000c 0133     		adds	r3, r3, #1
+ 240              	.LVL29:
+ 455:Core/Src/main.c ****   {
+ 241              		.loc 1 455 51 is_stmt 0 discriminator 2 view .LVU55
+ 242 000e DBB2     		uxtb	r3, r3
+ 243              	.LVL30:
+ 244              	.L23:
+ 455:Core/Src/main.c ****   {
+ 245              		.loc 1 455 26 is_stmt 1 discriminator 1 view .LVU56
+ 246 0010 032B     		cmp	r3, #3
+ 247 0012 11D8     		bhi	.L27
+ 457:Core/Src/main.c ****     {
+ 248              		.loc 1 457 5 view .LVU57
+ 457:Core/Src/main.c ****     {
+ 249              		.loc 1 457 40 is_stmt 0 view .LVU58
+ 250 0014 03EB4301 		add	r1, r3, r3, lsl #1
+ 251 0018 094A     		ldr	r2, .L28+4
+ 252 001a 02EB4102 		add	r2, r2, r1, lsl #1
+ 253 001e D289     		ldrh	r2, [r2, #14]
+ 457:Core/Src/main.c ****     {
+ 254              		.loc 1 457 8 view .LVU59
+ 255 0020 C72A     		cmp	r2, #199
+ 256 0022 F3D9     		bls	.L24
+ 459:Core/Src/main.c ****     }
+ 257              		.loc 1 459 7 is_stmt 1 view .LVU60
+ 459:Core/Src/main.c ****     }
+ 258              		.loc 1 459 12 is_stmt 0 view .LVU61
+ 259 0024 0648     		ldr	r0, .L28+4
+ 260 0026 90F83010 		ldrb	r1, [r0, #48]	@ zero_extendqisi2
+ 459:Core/Src/main.c ****     }
+ 261              		.loc 1 459 49 view .LVU62
+ 262 002a 0122     		movs	r2, #1
+ 263 002c 9A40     		lsls	r2, r2, r3
+ 459:Core/Src/main.c ****     }
+ 264              		.loc 1 459 36 view .LVU63
+ 265 002e D2B2     		uxtb	r2, r2
+ 459:Core/Src/main.c ****     }
+ 266              		.loc 1 459 33 view .LVU64
+ 267 0030 0A43     		orrs	r2, r2, r1
+ 268 0032 80F83020 		strb	r2, [r0, #48]
+ 269 0036 E9E7     		b	.L24
+ 270              	.L27:
+ 462:Core/Src/main.c **** 
+ 271              		.loc 1 462 1 view .LVU65
+ 272 0038 08BD     		pop	{r3, pc}
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 15
+
+
+ 273              	.LVL31:
+ 274              	.L29:
+ 462:Core/Src/main.c **** 
+ 275              		.loc 1 462 1 view .LVU66
+ 276 003a 00BF     		.align	2
+ 277              	.L28:
+ 278 003c 0C000000 		.word	g_app+12
+ 279 0040 00000000 		.word	g_app
+ 280              		.cfi_endproc
+ 281              	.LFE72:
+ 283              		.section	.text.AFLC_RuntimeStep,"ax",%progbits
+ 284              		.align	1
+ 285              		.syntax unified
+ 286              		.thumb
+ 287              		.thumb_func
+ 289              	AFLC_RuntimeStep:
+ 290              	.LFB71:
+ 435:Core/Src/main.c ****   uint16_t max_rpm[PROFIL_FAN_COUNT];
+ 291              		.loc 1 435 1 is_stmt 1 view -0
+ 292              		.cfi_startproc
+ 293              		@ args = 0, pretend = 0, frame = 8
+ 294              		@ frame_needed = 0, uses_anonymous_args = 0
+ 436:Core/Src/main.c **** 
+ 295              		.loc 1 436 3 view .LVU68
+ 438:Core/Src/main.c ****   {
+ 296              		.loc 1 438 3 view .LVU69
+ 438:Core/Src/main.c ****   {
+ 297              		.loc 1 438 13 is_stmt 0 view .LVU70
+ 298 0000 114B     		ldr	r3, .L38
+ 299 0002 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 438:Core/Src/main.c ****   {
+ 300              		.loc 1 438 6 view .LVU71
+ 301 0004 072B     		cmp	r3, #7
+ 302 0006 1DD1     		bne	.L35
+ 438:Core/Src/main.c ****   {
+ 303              		.loc 1 438 58 discriminator 1 view .LVU72
+ 304 0008 0F4B     		ldr	r3, .L38
+ 305 000a 9B68     		ldr	r3, [r3, #8]
+ 438:Core/Src/main.c ****   {
+ 306              		.loc 1 438 49 discriminator 1 view .LVU73
+ 307 000c D3B1     		cbz	r3, .L35
+ 438:Core/Src/main.c ****   {
+ 308              		.loc 1 438 86 discriminator 2 view .LVU74
+ 309 000e 0E4B     		ldr	r3, .L38
+ 310 0010 DB6A     		ldr	r3, [r3, #44]
+ 438:Core/Src/main.c ****   {
+ 311              		.loc 1 438 77 discriminator 2 view .LVU75
+ 312 0012 BBB1     		cbz	r3, .L35
+ 435:Core/Src/main.c ****   uint16_t max_rpm[PROFIL_FAN_COUNT];
+ 313              		.loc 1 435 1 view .LVU76
+ 314 0014 00B5     		push	{lr}
+ 315              	.LCFI2:
+ 316              		.cfi_def_cfa_offset 4
+ 317              		.cfi_offset 14, -4
+ 318 0016 83B0     		sub	sp, sp, #12
+ 319              	.LCFI3:
+ 320              		.cfi_def_cfa_offset 16
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 16
+
+
+ 443:Core/Src/main.c ****   AFLCalcul_Compute(g_app.profiles, g_app.temperatures, &g_app.tach_snapshot, &g_app.control_output
+ 321              		.loc 1 443 3 is_stmt 1 view .LVU77
+ 322 0018 0C48     		ldr	r0, .L38+4
+ 323 001a FFF7FEFF 		bl	Tachometer_GetSnapshot
+ 324              	.LVL32:
+ 444:Core/Src/main.c ****   AFLC_BuildMaxRpmArray(max_rpm);
+ 325              		.loc 1 444 3 view .LVU78
+ 326 001e 0B4B     		ldr	r3, .L38+4
+ 327 0020 A3F10C00 		sub	r0, r3, #12
+ 328 0024 1833     		adds	r3, r3, #24
+ 329 0026 00F10C02 		add	r2, r0, #12
+ 330 002a C16A     		ldr	r1, [r0, #44]
+ 331 002c 8068     		ldr	r0, [r0, #8]
+ 332 002e FFF7FEFF 		bl	AFLCalcul_Compute
+ 333              	.LVL33:
+ 445:Core/Src/main.c ****   FanControl_SetTargetRpmArray(g_app.control_output.target_rpm, max_rpm);
+ 334              		.loc 1 445 3 view .LVU79
+ 335 0032 6846     		mov	r0, sp
+ 336 0034 FFF7FEFF 		bl	AFLC_BuildMaxRpmArray
+ 337              	.LVL34:
+ 446:Core/Src/main.c **** }
+ 338              		.loc 1 446 3 view .LVU80
+ 339 0038 6946     		mov	r1, sp
+ 340 003a 0548     		ldr	r0, .L38+8
+ 341 003c FFF7FEFF 		bl	FanControl_SetTargetRpmArray
+ 342              	.LVL35:
+ 447:Core/Src/main.c **** 
+ 343              		.loc 1 447 1 is_stmt 0 view .LVU81
+ 344 0040 03B0     		add	sp, sp, #12
+ 345              	.LCFI4:
+ 346              		.cfi_def_cfa_offset 4
+ 347              		@ sp needed
+ 348 0042 00BD     		pop	{pc}
+ 349              	.L35:
+ 350              	.LCFI5:
+ 351              		.cfi_def_cfa_offset 0
+ 352              		.cfi_restore 14
+ 353 0044 7047     		bx	lr
+ 354              	.L39:
+ 355 0046 00BF     		.align	2
+ 356              	.L38:
+ 357 0048 00000000 		.word	g_app
+ 358 004c 0C000000 		.word	g_app+12
+ 359 0050 24000000 		.word	g_app+36
+ 360              		.cfi_endproc
+ 361              	.LFE71:
+ 363              		.section	.text.AFLC_AppTask,"ax",%progbits
+ 364              		.align	1
+ 365              		.syntax unified
+ 366              		.thumb
+ 367              		.thumb_func
+ 369              	AFLC_AppTask:
+ 370              	.LVL36:
+ 371              	.LFB69:
+ 302:Core/Src/main.c ****   switch (g_app.state)
+ 372              		.loc 1 302 1 is_stmt 1 view -0
+ 373              		.cfi_startproc
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 17
+
+
+ 374              		@ args = 0, pretend = 0, frame = 0
+ 375              		@ frame_needed = 0, uses_anonymous_args = 0
+ 302:Core/Src/main.c ****   switch (g_app.state)
+ 376              		.loc 1 302 1 is_stmt 0 view .LVU83
+ 377 0000 70B5     		push	{r4, r5, r6, lr}
+ 378              	.LCFI6:
+ 379              		.cfi_def_cfa_offset 16
+ 380              		.cfi_offset 4, -16
+ 381              		.cfi_offset 5, -12
+ 382              		.cfi_offset 6, -8
+ 383              		.cfi_offset 14, -4
+ 384 0002 0546     		mov	r5, r0
+ 303:Core/Src/main.c ****   {
+ 385              		.loc 1 303 3 is_stmt 1 view .LVU84
+ 303:Core/Src/main.c ****   {
+ 386              		.loc 1 303 16 is_stmt 0 view .LVU85
+ 387 0004 594B     		ldr	r3, .L61
+ 388 0006 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 303:Core/Src/main.c ****   {
+ 389              		.loc 1 303 3 view .LVU86
+ 390 0008 042B     		cmp	r3, #4
+ 391 000a 61D0     		beq	.L41
+ 392 000c 1AD9     		bls	.L58
+ 393 000e 072B     		cmp	r3, #7
+ 394 0010 00F09F80 		beq	.L49
+ 395 0014 3CD8     		bhi	.L50
+ 396 0016 052B     		cmp	r3, #5
+ 397 0018 71D0     		beq	.L51
+ 398 001a 062B     		cmp	r3, #6
+ 399 001c 46D1     		bne	.L40
+ 362:Core/Src/main.c ****       if (g_app.startup_fail_mask == 0U)
+ 400              		.loc 1 362 7 is_stmt 1 view .LVU87
+ 401 001e 0122     		movs	r2, #1
+ 402 0020 524B     		ldr	r3, .L61
+ 403 0022 93F83110 		ldrb	r1, [r3, #49]	@ zero_extendqisi2
+ 404 0026 1C46     		mov	r4, r3
+ 405 0028 93F83000 		ldrb	r0, [r3, #48]	@ zero_extendqisi2
+ 406              	.LVL37:
+ 362:Core/Src/main.c ****       if (g_app.startup_fail_mask == 0U)
+ 407              		.loc 1 362 7 is_stmt 0 view .LVU88
+ 408 002c FFF7FEFF 		bl	UI_LCD_ShowStartupTest
+ 409              	.LVL38:
+ 363:Core/Src/main.c ****       {
+ 410              		.loc 1 363 7 is_stmt 1 view .LVU89
+ 363:Core/Src/main.c ****       {
+ 411              		.loc 1 363 16 is_stmt 0 view .LVU90
+ 412 0030 94F83130 		ldrb	r3, [r4, #49]	@ zero_extendqisi2
+ 363:Core/Src/main.c ****       {
+ 413              		.loc 1 363 10 view .LVU91
+ 414 0034 002B     		cmp	r3, #0
+ 415 0036 40F08780 		bne	.L56
+ 365:Core/Src/main.c ****       }
+ 416              		.loc 1 365 9 is_stmt 1 view .LVU92
+ 417 003a 2946     		mov	r1, r5
+ 418 003c 0720     		movs	r0, #7
+ 419 003e FFF7FEFF 		bl	AFLC_AppEnterState
+ 420              	.LVL39:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 18
+
+
+ 421 0042 33E0     		b	.L40
+ 422              	.LVL40:
+ 423              	.L58:
+ 303:Core/Src/main.c ****   {
+ 424              		.loc 1 303 3 is_stmt 0 view .LVU93
+ 425 0044 022B     		cmp	r3, #2
+ 426 0046 37D0     		beq	.L43
+ 427 0048 16D8     		bhi	.L44
+ 428 004a 5BB3     		cbz	r3, .L45
+ 429 004c 012B     		cmp	r3, #1
+ 430 004e 2DD1     		bne	.L40
+ 310:Core/Src/main.c ****       g_app.profiles = Profil_GetResult();
+ 431              		.loc 1 310 7 is_stmt 1 view .LVU94
+ 432 0050 FFF7FEFF 		bl	Profil_CalculateAll
+ 433              	.LVL41:
+ 311:Core/Src/main.c ****       if ((g_app.profiles != NULL) && g_app.profiles->ready && g_app.profiles->valid)
+ 434              		.loc 1 311 7 view .LVU95
+ 311:Core/Src/main.c ****       if ((g_app.profiles != NULL) && g_app.profiles->ready && g_app.profiles->valid)
+ 435              		.loc 1 311 24 is_stmt 0 view .LVU96
+ 436 0054 FFF7FEFF 		bl	Profil_GetResult
+ 437              	.LVL42:
+ 311:Core/Src/main.c ****       if ((g_app.profiles != NULL) && g_app.profiles->ready && g_app.profiles->valid)
+ 438              		.loc 1 311 22 discriminator 1 view .LVU97
+ 439 0058 444B     		ldr	r3, .L61
+ 440 005a 9860     		str	r0, [r3, #8]
+ 312:Core/Src/main.c ****       {
+ 441              		.loc 1 312 7 is_stmt 1 view .LVU98
+ 312:Core/Src/main.c ****       {
+ 442              		.loc 1 312 10 is_stmt 0 view .LVU99
+ 443 005c 18B1     		cbz	r0, .L54
+ 312:Core/Src/main.c ****       {
+ 444              		.loc 1 312 53 discriminator 1 view .LVU100
+ 445 005e 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 312:Core/Src/main.c ****       {
+ 446              		.loc 1 312 36 discriminator 1 view .LVU101
+ 447 0060 0BB1     		cbz	r3, .L54
+ 312:Core/Src/main.c ****       {
+ 448              		.loc 1 312 78 discriminator 2 view .LVU102
+ 449 0062 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+ 312:Core/Src/main.c ****       {
+ 450              		.loc 1 312 61 discriminator 2 view .LVU103
+ 451 0064 1BBB     		cbnz	r3, .L59
+ 452              	.L54:
+ 318:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_SAFE_STATE, now_ms);
+ 453              		.loc 1 318 9 is_stmt 1 view .LVU104
+ 318:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_SAFE_STATE, now_ms);
+ 454              		.loc 1 318 33 is_stmt 0 view .LVU105
+ 455 0066 414B     		ldr	r3, .L61
+ 456 0068 0F22     		movs	r2, #15
+ 457 006a 83F83120 		strb	r2, [r3, #49]
+ 319:Core/Src/main.c ****       }
+ 458              		.loc 1 319 9 is_stmt 1 view .LVU106
+ 459 006e 2946     		mov	r1, r5
+ 460 0070 0820     		movs	r0, #8
+ 461 0072 FFF7FEFF 		bl	AFLC_AppEnterState
+ 462              	.LVL43:
+ 463 0076 19E0     		b	.L40
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 19
+
+
+ 464              	.LVL44:
+ 465              	.L44:
+ 303:Core/Src/main.c ****   {
+ 466              		.loc 1 303 3 is_stmt 0 view .LVU107
+ 467 0078 032B     		cmp	r3, #3
+ 468 007a 17D1     		bne	.L40
+ 331:Core/Src/main.c ****       {
+ 469              		.loc 1 331 7 is_stmt 1 view .LVU108
+ 331:Core/Src/main.c ****       {
+ 470              		.loc 1 331 11 is_stmt 0 view .LVU109
+ 471 007c FFF7FEFF 		bl	Button_IsConfirmPressed
+ 472              	.LVL45:
+ 331:Core/Src/main.c ****       {
+ 473              		.loc 1 331 10 discriminator 1 view .LVU110
+ 474 0080 A0B1     		cbz	r0, .L40
+ 333:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_INIT, now_ms);
+ 475              		.loc 1 333 9 is_stmt 1 view .LVU111
+ 476 0082 FFF7FEFF 		bl	Button_ClearConfirm
+ 477              	.LVL46:
+ 334:Core/Src/main.c ****       }
+ 478              		.loc 1 334 9 view .LVU112
+ 479 0086 2946     		mov	r1, r5
+ 480 0088 0420     		movs	r0, #4
+ 481 008a FFF7FEFF 		bl	AFLC_AppEnterState
+ 482              	.LVL47:
+ 483 008e 0DE0     		b	.L40
+ 484              	.LVL48:
+ 485              	.L50:
+ 303:Core/Src/main.c ****   {
+ 486              		.loc 1 303 3 is_stmt 0 view .LVU113
+ 487 0090 082B     		cmp	r3, #8
+ 488 0092 0BD1     		bne	.L40
+ 381:Core/Src/main.c ****       UI_LCD_ShowSafeState(g_app.startup_fail_mask);
+ 489              		.loc 1 381 7 is_stmt 1 view .LVU114
+ 490 0094 FFF7FEFF 		bl	FanControl_EnterSafeState
+ 491              	.LVL49:
+ 382:Core/Src/main.c ****       break;
+ 492              		.loc 1 382 7 view .LVU115
+ 493 0098 344B     		ldr	r3, .L61
+ 494 009a 93F83100 		ldrb	r0, [r3, #49]	@ zero_extendqisi2
+ 495 009e FFF7FEFF 		bl	UI_LCD_ShowSafeState
+ 496              	.LVL50:
+ 383:Core/Src/main.c **** 
+ 497              		.loc 1 383 7 view .LVU116
+ 388:Core/Src/main.c **** 
+ 498              		.loc 1 388 1 is_stmt 0 view .LVU117
+ 499 00a2 03E0     		b	.L40
+ 500              	.LVL51:
+ 501              	.L45:
+ 306:Core/Src/main.c ****       break;
+ 502              		.loc 1 306 7 is_stmt 1 view .LVU118
+ 503 00a4 0146     		mov	r1, r0
+ 504 00a6 0120     		movs	r0, #1
+ 505              	.LVL52:
+ 306:Core/Src/main.c ****       break;
+ 506              		.loc 1 306 7 is_stmt 0 view .LVU119
+ 507 00a8 FFF7FEFF 		bl	AFLC_AppEnterState
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 20
+
+
+ 508              	.LVL53:
+ 307:Core/Src/main.c **** 
+ 509              		.loc 1 307 7 is_stmt 1 view .LVU120
+ 510              	.L40:
+ 388:Core/Src/main.c **** 
+ 511              		.loc 1 388 1 is_stmt 0 view .LVU121
+ 512 00ac 70BD     		pop	{r4, r5, r6, pc}
+ 513              	.LVL54:
+ 514              	.L59:
+ 314:Core/Src/main.c ****       }
+ 515              		.loc 1 314 9 is_stmt 1 view .LVU122
+ 516 00ae 2946     		mov	r1, r5
+ 517 00b0 0220     		movs	r0, #2
+ 518 00b2 FFF7FEFF 		bl	AFLC_AppEnterState
+ 519              	.LVL55:
+ 520 00b6 F9E7     		b	.L40
+ 521              	.LVL56:
+ 522              	.L43:
+ 324:Core/Src/main.c ****       {
+ 523              		.loc 1 324 7 view .LVU123
+ 324:Core/Src/main.c ****       {
+ 524              		.loc 1 324 26 is_stmt 0 view .LVU124
+ 525 00b8 2C4B     		ldr	r3, .L61
+ 526 00ba 5B68     		ldr	r3, [r3, #4]
+ 324:Core/Src/main.c ****       {
+ 527              		.loc 1 324 19 view .LVU125
+ 528 00bc C31A     		subs	r3, r0, r3
+ 324:Core/Src/main.c ****       {
+ 529              		.loc 1 324 10 view .LVU126
+ 530 00be 40F2DB52 		movw	r2, #1499
+ 531 00c2 9342     		cmp	r3, r2
+ 532 00c4 F2D9     		bls	.L40
+ 326:Core/Src/main.c ****       }
+ 533              		.loc 1 326 9 is_stmt 1 view .LVU127
+ 534 00c6 0146     		mov	r1, r0
+ 535 00c8 0320     		movs	r0, #3
+ 536              	.LVL57:
+ 326:Core/Src/main.c ****       }
+ 537              		.loc 1 326 9 is_stmt 0 view .LVU128
+ 538 00ca FFF7FEFF 		bl	AFLC_AppEnterState
+ 539              	.LVL58:
+ 540 00ce EDE7     		b	.L40
+ 541              	.LVL59:
+ 542              	.L41:
+ 339:Core/Src/main.c ****       g_app.startup_fail_mask = 0U;
+ 543              		.loc 1 339 7 is_stmt 1 view .LVU129
+ 339:Core/Src/main.c ****       g_app.startup_fail_mask = 0U;
+ 544              		.loc 1 339 33 is_stmt 0 view .LVU130
+ 545 00d0 264B     		ldr	r3, .L61
+ 546 00d2 4FF00002 		mov	r2, #0
+ 547 00d6 83F83020 		strb	r2, [r3, #48]
+ 340:Core/Src/main.c ****       FanControl_SetDutyPermilleAll(STARTUP_TEST_DUTY_PERMILLE);
+ 548              		.loc 1 340 7 is_stmt 1 view .LVU131
+ 340:Core/Src/main.c ****       FanControl_SetDutyPermilleAll(STARTUP_TEST_DUTY_PERMILLE);
+ 549              		.loc 1 340 31 is_stmt 0 view .LVU132
+ 550 00da 1C46     		mov	r4, r3
+ 551 00dc 83F83120 		strb	r2, [r3, #49]
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 21
+
+
+ 341:Core/Src/main.c ****       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, g_app.startup_fail_mask, 0U);
+ 552              		.loc 1 341 7 is_stmt 1 view .LVU133
+ 553 00e0 FA20     		movs	r0, #250
+ 554              	.LVL60:
+ 341:Core/Src/main.c ****       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, g_app.startup_fail_mask, 0U);
+ 555              		.loc 1 341 7 is_stmt 0 view .LVU134
+ 556 00e2 FFF7FEFF 		bl	FanControl_SetDutyPermilleAll
+ 557              	.LVL61:
+ 342:Core/Src/main.c ****       AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_RUN, now_ms);
+ 558              		.loc 1 342 7 is_stmt 1 view .LVU135
+ 559 00e6 0022     		movs	r2, #0
+ 560 00e8 94F83110 		ldrb	r1, [r4, #49]	@ zero_extendqisi2
+ 561 00ec 94F83000 		ldrb	r0, [r4, #48]	@ zero_extendqisi2
+ 562 00f0 FFF7FEFF 		bl	UI_LCD_ShowStartupTest
+ 563              	.LVL62:
+ 343:Core/Src/main.c ****       break;
+ 564              		.loc 1 343 7 view .LVU136
+ 565 00f4 2946     		mov	r1, r5
+ 566 00f6 0520     		movs	r0, #5
+ 567 00f8 FFF7FEFF 		bl	AFLC_AppEnterState
+ 568              	.LVL63:
+ 344:Core/Src/main.c **** 
+ 569              		.loc 1 344 7 view .LVU137
+ 570 00fc D6E7     		b	.L40
+ 571              	.LVL64:
+ 572              	.L51:
+ 347:Core/Src/main.c ****       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, 0U, 0U);
+ 573              		.loc 1 347 7 view .LVU138
+ 574 00fe FFF7FEFF 		bl	AFLC_UpdateStartupPassMask
+ 575              	.LVL65:
+ 348:Core/Src/main.c **** 
+ 576              		.loc 1 348 7 view .LVU139
+ 577 0102 0022     		movs	r2, #0
+ 578 0104 1146     		mov	r1, r2
+ 579 0106 194B     		ldr	r3, .L61
+ 580 0108 1C46     		mov	r4, r3
+ 581 010a 93F83000 		ldrb	r0, [r3, #48]	@ zero_extendqisi2
+ 582 010e FFF7FEFF 		bl	UI_LCD_ShowStartupTest
+ 583              	.LVL66:
+ 350:Core/Src/main.c ****       {
+ 584              		.loc 1 350 7 view .LVU140
+ 350:Core/Src/main.c ****       {
+ 585              		.loc 1 350 16 is_stmt 0 view .LVU141
+ 586 0112 94F83030 		ldrb	r3, [r4, #48]	@ zero_extendqisi2
+ 350:Core/Src/main.c ****       {
+ 587              		.loc 1 350 10 view .LVU142
+ 588 0116 0F2B     		cmp	r3, #15
+ 589 0118 11D0     		beq	.L60
+ 354:Core/Src/main.c ****       {
+ 590              		.loc 1 354 12 is_stmt 1 view .LVU143
+ 354:Core/Src/main.c ****       {
+ 591              		.loc 1 354 31 is_stmt 0 view .LVU144
+ 592 011a 144A     		ldr	r2, .L61
+ 593 011c 5268     		ldr	r2, [r2, #4]
+ 354:Core/Src/main.c ****       {
+ 594              		.loc 1 354 24 view .LVU145
+ 595 011e AA1A     		subs	r2, r5, r2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 22
+
+
+ 354:Core/Src/main.c ****       {
+ 596              		.loc 1 354 15 view .LVU146
+ 597 0120 40F6B731 		movw	r1, #2999
+ 598 0124 8A42     		cmp	r2, r1
+ 599 0126 C1D9     		bls	.L40
+ 356:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_EVAL, now_ms);
+ 600              		.loc 1 356 9 is_stmt 1 view .LVU147
+ 356:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_EVAL, now_ms);
+ 601              		.loc 1 356 35 is_stmt 0 view .LVU148
+ 602 0128 DB43     		mvns	r3, r3
+ 603 012a 03F00F03 		and	r3, r3, #15
+ 356:Core/Src/main.c ****         AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_EVAL, now_ms);
+ 604              		.loc 1 356 33 view .LVU149
+ 605 012e 0F4A     		ldr	r2, .L61
+ 606 0130 82F83130 		strb	r3, [r2, #49]
+ 357:Core/Src/main.c ****       }
+ 607              		.loc 1 357 9 is_stmt 1 view .LVU150
+ 608 0134 2946     		mov	r1, r5
+ 609 0136 0620     		movs	r0, #6
+ 610 0138 FFF7FEFF 		bl	AFLC_AppEnterState
+ 611              	.LVL67:
+ 612 013c B6E7     		b	.L40
+ 613              	.L60:
+ 352:Core/Src/main.c ****       }
+ 614              		.loc 1 352 9 view .LVU151
+ 615 013e 2946     		mov	r1, r5
+ 616 0140 0620     		movs	r0, #6
+ 617 0142 FFF7FEFF 		bl	AFLC_AppEnterState
+ 618              	.LVL68:
+ 619 0146 B1E7     		b	.L40
+ 620              	.L56:
+ 369:Core/Src/main.c ****       }
+ 621              		.loc 1 369 9 view .LVU152
+ 622 0148 2946     		mov	r1, r5
+ 623 014a 0820     		movs	r0, #8
+ 624 014c FFF7FEFF 		bl	AFLC_AppEnterState
+ 625              	.LVL69:
+ 626 0150 ACE7     		b	.L40
+ 627              	.LVL70:
+ 628              	.L49:
+ 374:Core/Src/main.c ****                          g_app.temperatures,
+ 629              		.loc 1 374 7 view .LVU153
+ 630 0152 064C     		ldr	r4, .L61
+ 631 0154 A568     		ldr	r5, [r4, #8]
+ 632 0156 E66A     		ldr	r6, [r4, #44]
+ 633 0158 FFF7FEFF 		bl	FanControl_GetStatuses
+ 634              	.LVL71:
+ 374:Core/Src/main.c ****                          g_app.temperatures,
+ 635              		.loc 1 374 7 is_stmt 0 view .LVU154
+ 636 015c 0346     		mov	r3, r0
+ 374:Core/Src/main.c ****                          g_app.temperatures,
+ 637              		.loc 1 374 7 discriminator 1 view .LVU155
+ 638 015e 04F12402 		add	r2, r4, #36
+ 639 0162 3146     		mov	r1, r6
+ 640 0164 2846     		mov	r0, r5
+ 641 0166 FFF7FEFF 		bl	UI_LCD_ShowRuntime
+ 642              	.LVL72:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 23
+
+
+ 378:Core/Src/main.c **** 
+ 643              		.loc 1 378 7 is_stmt 1 view .LVU156
+ 644 016a 9FE7     		b	.L40
+ 645              	.L62:
+ 646              		.align	2
+ 647              	.L61:
+ 648 016c 00000000 		.word	g_app
+ 649              		.cfi_endproc
+ 650              	.LFE69:
+ 652              		.section	.text.HAL_TIM_IC_CaptureCallback,"ax",%progbits
+ 653              		.align	1
+ 654              		.global	HAL_TIM_IC_CaptureCallback
+ 655              		.syntax unified
+ 656              		.thumb
+ 657              		.thumb_func
+ 659              	HAL_TIM_IC_CaptureCallback:
+ 660              	.LVL73:
+ 661              	.LFB67:
+ 260:Core/Src/main.c ****   Tachometer_OnCapture(htim);
+ 662              		.loc 1 260 1 view -0
+ 663              		.cfi_startproc
+ 664              		@ args = 0, pretend = 0, frame = 0
+ 665              		@ frame_needed = 0, uses_anonymous_args = 0
+ 260:Core/Src/main.c ****   Tachometer_OnCapture(htim);
+ 666              		.loc 1 260 1 is_stmt 0 view .LVU158
+ 667 0000 08B5     		push	{r3, lr}
+ 668              	.LCFI7:
+ 669              		.cfi_def_cfa_offset 8
+ 670              		.cfi_offset 3, -8
+ 671              		.cfi_offset 14, -4
+ 261:Core/Src/main.c **** }
+ 672              		.loc 1 261 3 is_stmt 1 view .LVU159
+ 673 0002 FFF7FEFF 		bl	Tachometer_OnCapture
+ 674              	.LVL74:
+ 262:Core/Src/main.c **** 
+ 675              		.loc 1 262 1 is_stmt 0 view .LVU160
+ 676 0006 08BD     		pop	{r3, pc}
+ 677              		.cfi_endproc
+ 678              	.LFE67:
+ 680              		.section	.text.Error_Handler,"ax",%progbits
+ 681              		.align	1
+ 682              		.global	Error_Handler
+ 683              		.syntax unified
+ 684              		.thumb
+ 685              		.thumb_func
+ 687              	Error_Handler:
+ 688              	.LFB74:
+ 478:Core/Src/main.c **** /* USER CODE END 4 */
+ 479:Core/Src/main.c **** 
+ 480:Core/Src/main.c **** /**
+ 481:Core/Src/main.c ****   * @brief  This function is executed in case of error occurrence.
+ 482:Core/Src/main.c ****   * @retval None
+ 483:Core/Src/main.c ****   */
+ 484:Core/Src/main.c **** void Error_Handler(void)
+ 485:Core/Src/main.c **** {
+ 689              		.loc 1 485 1 is_stmt 1 view -0
+ 690              		.cfi_startproc
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 24
+
+
+ 691              		@ Volatile: function does not return.
+ 692              		@ args = 0, pretend = 0, frame = 0
+ 693              		@ frame_needed = 0, uses_anonymous_args = 0
+ 694              		@ link register save eliminated.
+ 486:Core/Src/main.c ****   /* USER CODE BEGIN Error_Handler_Debug */
+ 487:Core/Src/main.c ****   __disable_irq();
+ 695              		.loc 1 487 3 view .LVU162
+ 696              	.LBB4:
+ 697              	.LBI4:
+ 698              		.file 2 "Drivers/CMSIS/Include/cmsis_gcc.h"
+   1:Drivers/CMSIS/Include/cmsis_gcc.h **** /**************************************************************************//**
+   2:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @file     cmsis_gcc.h
+   3:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @brief    CMSIS compiler GCC header file
+   4:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @version  V5.0.4
+   5:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @date     09. April 2018
+   6:Drivers/CMSIS/Include/cmsis_gcc.h ****  ******************************************************************************/
+   7:Drivers/CMSIS/Include/cmsis_gcc.h **** /*
+   8:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Copyright (c) 2009-2018 Arm Limited. All rights reserved.
+   9:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  10:Drivers/CMSIS/Include/cmsis_gcc.h ****  * SPDX-License-Identifier: Apache-2.0
+  11:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  12:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  13:Drivers/CMSIS/Include/cmsis_gcc.h ****  * not use this file except in compliance with the License.
+  14:Drivers/CMSIS/Include/cmsis_gcc.h ****  * You may obtain a copy of the License at
+  15:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  16:Drivers/CMSIS/Include/cmsis_gcc.h ****  * www.apache.org/licenses/LICENSE-2.0
+  17:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  18:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Unless required by applicable law or agreed to in writing, software
+  19:Drivers/CMSIS/Include/cmsis_gcc.h ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  20:Drivers/CMSIS/Include/cmsis_gcc.h ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  21:Drivers/CMSIS/Include/cmsis_gcc.h ****  * See the License for the specific language governing permissions and
+  22:Drivers/CMSIS/Include/cmsis_gcc.h ****  * limitations under the License.
+  23:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+  24:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  25:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __CMSIS_GCC_H
+  26:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __CMSIS_GCC_H
+  27:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  28:Drivers/CMSIS/Include/cmsis_gcc.h **** /* ignore some GCC warnings */
+  29:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic push
+  30:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wsign-conversion"
+  31:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wconversion"
+  32:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wunused-parameter"
+  33:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  34:Drivers/CMSIS/Include/cmsis_gcc.h **** /* Fallback for __has_builtin */
+  35:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __has_builtin
+  36:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __has_builtin(x) (0)
+  37:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  38:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  39:Drivers/CMSIS/Include/cmsis_gcc.h **** /* CMSIS compiler specific defines */
+  40:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ASM
+  41:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ASM                                  __asm
+  42:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  43:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __INLINE
+  44:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __INLINE                               inline
+  45:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  46:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __STATIC_INLINE
+  47:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __STATIC_INLINE                        static inline
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 25
+
+
+  48:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  49:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __STATIC_FORCEINLINE                 
+  50:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __STATIC_FORCEINLINE                   __attribute__((always_inline)) static inline
+  51:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif                                           
+  52:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __NO_RETURN
+  53:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __NO_RETURN                            __attribute__((__noreturn__))
+  54:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  55:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __USED
+  56:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __USED                                 __attribute__((used))
+  57:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  58:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __WEAK
+  59:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __WEAK                                 __attribute__((weak))
+  60:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  61:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED
+  62:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED                               __attribute__((packed, aligned(1)))
+  63:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  64:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED_STRUCT
+  65:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED_STRUCT                        struct __attribute__((packed, aligned(1)))
+  66:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  67:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED_UNION
+  68:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED_UNION                         union __attribute__((packed, aligned(1)))
+  69:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  70:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32        /* deprecated */
+  71:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  72:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  73:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  74:Drivers/CMSIS/Include/cmsis_gcc.h ****   struct __attribute__((packed)) T_UINT32 { uint32_t v; };
+  75:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  76:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
+  77:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  78:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_WRITE
+  79:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  80:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  81:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  82:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_WRITE { uint16_t v; };
+  83:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  84:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_WRITE(addr, val)    (void)((((struct T_UINT16_WRITE *)(void *)(addr))-
+  85:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  86:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_READ
+  87:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  88:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  89:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  90:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_READ { uint16_t v; };
+  91:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  92:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_READ(addr)          (((const struct T_UINT16_READ *)(const void *)(add
+  93:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  94:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_WRITE
+  95:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  96:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  97:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  98:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
+  99:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 100:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))-
+ 101:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 102:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_READ
+ 103:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+ 104:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 26
+
+
+ 105:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+ 106:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_READ { uint32_t v; };
+ 107:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 108:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_READ(addr)          (((const struct T_UINT32_READ *)(const void *)(add
+ 109:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 110:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ALIGNED
+ 111:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ALIGNED(x)                           __attribute__((aligned(x)))
+ 112:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 113:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __RESTRICT
+ 114:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __RESTRICT                             __restrict
+ 115:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 116:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 117:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 118:Drivers/CMSIS/Include/cmsis_gcc.h **** /* ###########################  Core Function Access  ########################### */
+ 119:Drivers/CMSIS/Include/cmsis_gcc.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 120:Drivers/CMSIS/Include/cmsis_gcc.h ****     \defgroup CMSIS_Core_RegAccFunctions CMSIS Core Register Access Functions
+ 121:Drivers/CMSIS/Include/cmsis_gcc.h ****   @{
+ 122:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 123:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 124:Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 125:Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Enable IRQ Interrupts
+ 126:Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Enables IRQ interrupts by clearing the I-bit in the CPSR.
+ 127:Drivers/CMSIS/Include/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+ 128:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 129:Drivers/CMSIS/Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __enable_irq(void)
+ 130:Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 131:Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsie i" : : : "memory");
+ 132:Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 133:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 134:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 135:Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 136:Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Disable IRQ Interrupts
+ 137:Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Disables IRQ interrupts by setting the I-bit in the CPSR.
+ 138:Drivers/CMSIS/Include/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+ 139:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 140:Drivers/CMSIS/Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __disable_irq(void)
+ 699              		.loc 2 140 27 view .LVU163
+ 700              	.LBB5:
+ 141:Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 142:Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsid i" : : : "memory");
+ 701              		.loc 2 142 3 view .LVU164
+ 702              		.syntax unified
+ 703              	@ 142 "Drivers/CMSIS/Include/cmsis_gcc.h" 1
+ 704 0000 72B6     		cpsid i
+ 705              	@ 0 "" 2
+ 706              		.thumb
+ 707              		.syntax unified
+ 708              	.L66:
+ 709              	.LBE5:
+ 710              	.LBE4:
+ 488:Core/Src/main.c ****   while (1)
+ 711              		.loc 1 488 3 view .LVU165
+ 489:Core/Src/main.c ****   {
+ 490:Core/Src/main.c ****   }
+ 712              		.loc 1 490 3 view .LVU166
+ 488:Core/Src/main.c ****   while (1)
+ 713              		.loc 1 488 9 view .LVU167
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 27
+
+
+ 714 0002 FEE7     		b	.L66
+ 715              		.cfi_endproc
+ 716              	.LFE74:
+ 718              		.section	.text.MX_AFLC_StartPeripherals,"ax",%progbits
+ 719              		.align	1
+ 720              		.syntax unified
+ 721              		.thumb
+ 722              		.thumb_func
+ 724              	MX_AFLC_StartPeripherals:
+ 725              	.LFB68:
+ 265:Core/Src/main.c ****   if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
+ 726              		.loc 1 265 1 view -0
+ 727              		.cfi_startproc
+ 728              		@ args = 0, pretend = 0, frame = 0
+ 729              		@ frame_needed = 0, uses_anonymous_args = 0
+ 730 0000 08B5     		push	{r3, lr}
+ 731              	.LCFI8:
+ 732              		.cfi_def_cfa_offset 8
+ 733              		.cfi_offset 3, -8
+ 734              		.cfi_offset 14, -4
+ 266:Core/Src/main.c ****   {
+ 735              		.loc 1 266 3 view .LVU169
+ 266:Core/Src/main.c ****   {
+ 736              		.loc 1 266 7 is_stmt 0 view .LVU170
+ 737 0002 0021     		movs	r1, #0
+ 738 0004 1B48     		ldr	r0, .L85
+ 739 0006 FFF7FEFF 		bl	HAL_TIM_IC_Start_IT
+ 740              	.LVL75:
+ 266:Core/Src/main.c ****   {
+ 741              		.loc 1 266 6 discriminator 1 view .LVU171
+ 742 000a 18BB     		cbnz	r0, .L77
+ 270:Core/Src/main.c ****   {
+ 743              		.loc 1 270 3 is_stmt 1 view .LVU172
+ 270:Core/Src/main.c ****   {
+ 744              		.loc 1 270 7 is_stmt 0 view .LVU173
+ 745 000c 0421     		movs	r1, #4
+ 746 000e 1948     		ldr	r0, .L85
+ 747 0010 FFF7FEFF 		bl	HAL_TIM_IC_Start_IT
+ 748              	.LVL76:
+ 270:Core/Src/main.c ****   {
+ 749              		.loc 1 270 6 discriminator 1 view .LVU174
+ 750 0014 00BB     		cbnz	r0, .L78
+ 274:Core/Src/main.c ****   {
+ 751              		.loc 1 274 3 is_stmt 1 view .LVU175
+ 274:Core/Src/main.c ****   {
+ 752              		.loc 1 274 7 is_stmt 0 view .LVU176
+ 753 0016 0821     		movs	r1, #8
+ 754 0018 1648     		ldr	r0, .L85
+ 755 001a FFF7FEFF 		bl	HAL_TIM_IC_Start_IT
+ 756              	.LVL77:
+ 274:Core/Src/main.c ****   {
+ 757              		.loc 1 274 6 discriminator 1 view .LVU177
+ 758 001e E8B9     		cbnz	r0, .L79
+ 278:Core/Src/main.c ****   {
+ 759              		.loc 1 278 3 is_stmt 1 view .LVU178
+ 278:Core/Src/main.c ****   {
+ 760              		.loc 1 278 7 is_stmt 0 view .LVU179
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 28
+
+
+ 761 0020 0C21     		movs	r1, #12
+ 762 0022 1448     		ldr	r0, .L85
+ 763 0024 FFF7FEFF 		bl	HAL_TIM_IC_Start_IT
+ 764              	.LVL78:
+ 278:Core/Src/main.c ****   {
+ 765              		.loc 1 278 6 discriminator 1 view .LVU180
+ 766 0028 D0B9     		cbnz	r0, .L80
+ 283:Core/Src/main.c ****   {
+ 767              		.loc 1 283 3 is_stmt 1 view .LVU181
+ 283:Core/Src/main.c ****   {
+ 768              		.loc 1 283 7 is_stmt 0 view .LVU182
+ 769 002a 0146     		mov	r1, r0
+ 770 002c 1248     		ldr	r0, .L85+4
+ 771 002e FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 772              	.LVL79:
+ 283:Core/Src/main.c ****   {
+ 773              		.loc 1 283 6 discriminator 1 view .LVU183
+ 774 0032 B8B9     		cbnz	r0, .L81
+ 287:Core/Src/main.c ****   {
+ 775              		.loc 1 287 3 is_stmt 1 view .LVU184
+ 287:Core/Src/main.c ****   {
+ 776              		.loc 1 287 7 is_stmt 0 view .LVU185
+ 777 0034 0421     		movs	r1, #4
+ 778 0036 1048     		ldr	r0, .L85+4
+ 779 0038 FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 780              	.LVL80:
+ 287:Core/Src/main.c ****   {
+ 781              		.loc 1 287 6 discriminator 1 view .LVU186
+ 782 003c A0B9     		cbnz	r0, .L82
+ 291:Core/Src/main.c ****   {
+ 783              		.loc 1 291 3 is_stmt 1 view .LVU187
+ 291:Core/Src/main.c ****   {
+ 784              		.loc 1 291 7 is_stmt 0 view .LVU188
+ 785 003e 0821     		movs	r1, #8
+ 786 0040 0D48     		ldr	r0, .L85+4
+ 787 0042 FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 788              	.LVL81:
+ 291:Core/Src/main.c ****   {
+ 789              		.loc 1 291 6 discriminator 1 view .LVU189
+ 790 0046 88B9     		cbnz	r0, .L83
+ 295:Core/Src/main.c ****   {
+ 791              		.loc 1 295 3 is_stmt 1 view .LVU190
+ 295:Core/Src/main.c ****   {
+ 792              		.loc 1 295 7 is_stmt 0 view .LVU191
+ 793 0048 0C21     		movs	r1, #12
+ 794 004a 0B48     		ldr	r0, .L85+4
+ 795 004c FFF7FEFF 		bl	HAL_TIM_PWM_Start
+ 796              	.LVL82:
+ 295:Core/Src/main.c ****   {
+ 797              		.loc 1 295 6 discriminator 1 view .LVU192
+ 798 0050 70B9     		cbnz	r0, .L84
+ 299:Core/Src/main.c **** 
+ 799              		.loc 1 299 1 view .LVU193
+ 800 0052 08BD     		pop	{r3, pc}
+ 801              	.L77:
+ 268:Core/Src/main.c ****   }
+ 802              		.loc 1 268 5 is_stmt 1 view .LVU194
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 29
+
+
+ 803 0054 FFF7FEFF 		bl	Error_Handler
+ 804              	.LVL83:
+ 805              	.L78:
+ 272:Core/Src/main.c ****   }
+ 806              		.loc 1 272 5 view .LVU195
+ 807 0058 FFF7FEFF 		bl	Error_Handler
+ 808              	.LVL84:
+ 809              	.L79:
+ 276:Core/Src/main.c ****   }
+ 810              		.loc 1 276 5 view .LVU196
+ 811 005c FFF7FEFF 		bl	Error_Handler
+ 812              	.LVL85:
+ 813              	.L80:
+ 280:Core/Src/main.c ****   }
+ 814              		.loc 1 280 5 view .LVU197
+ 815 0060 FFF7FEFF 		bl	Error_Handler
+ 816              	.LVL86:
+ 817              	.L81:
+ 285:Core/Src/main.c ****   }
+ 818              		.loc 1 285 5 view .LVU198
+ 819 0064 FFF7FEFF 		bl	Error_Handler
+ 820              	.LVL87:
+ 821              	.L82:
+ 289:Core/Src/main.c ****   }
+ 822              		.loc 1 289 5 view .LVU199
+ 823 0068 FFF7FEFF 		bl	Error_Handler
+ 824              	.LVL88:
+ 825              	.L83:
+ 293:Core/Src/main.c ****   }
+ 826              		.loc 1 293 5 view .LVU200
+ 827 006c FFF7FEFF 		bl	Error_Handler
+ 828              	.LVL89:
+ 829              	.L84:
+ 297:Core/Src/main.c ****   }
+ 830              		.loc 1 297 5 view .LVU201
+ 831 0070 FFF7FEFF 		bl	Error_Handler
+ 832              	.LVL90:
+ 833              	.L86:
+ 834              		.align	2
+ 835              	.L85:
+ 836 0074 00000000 		.word	htim2
+ 837 0078 00000000 		.word	htim3
+ 838              		.cfi_endproc
+ 839              	.LFE68:
+ 841              		.section	.text.SystemClock_Config,"ax",%progbits
+ 842              		.align	1
+ 843              		.global	SystemClock_Config
+ 844              		.syntax unified
+ 845              		.thumb
+ 846              		.thumb_func
+ 848              	SystemClock_Config:
+ 849              	.LFB66:
+ 227:Core/Src/main.c ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 850              		.loc 1 227 1 view -0
+ 851              		.cfi_startproc
+ 852              		@ args = 0, pretend = 0, frame = 64
+ 853              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 30
+
+
+ 854 0000 10B5     		push	{r4, lr}
+ 855              	.LCFI9:
+ 856              		.cfi_def_cfa_offset 8
+ 857              		.cfi_offset 4, -8
+ 858              		.cfi_offset 14, -4
+ 859 0002 90B0     		sub	sp, sp, #64
+ 860              	.LCFI10:
+ 861              		.cfi_def_cfa_offset 72
+ 228:Core/Src/main.c ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 862              		.loc 1 228 3 view .LVU203
+ 228:Core/Src/main.c ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 863              		.loc 1 228 22 is_stmt 0 view .LVU204
+ 864 0004 06AC     		add	r4, sp, #24
+ 865 0006 2822     		movs	r2, #40
+ 866 0008 0021     		movs	r1, #0
+ 867 000a 2046     		mov	r0, r4
+ 868 000c FFF7FEFF 		bl	memset
+ 869              	.LVL91:
+ 229:Core/Src/main.c **** 
+ 870              		.loc 1 229 3 is_stmt 1 view .LVU205
+ 229:Core/Src/main.c **** 
+ 871              		.loc 1 229 22 is_stmt 0 view .LVU206
+ 872 0010 0023     		movs	r3, #0
+ 873 0012 0193     		str	r3, [sp, #4]
+ 874 0014 0293     		str	r3, [sp, #8]
+ 875 0016 0393     		str	r3, [sp, #12]
+ 876 0018 0493     		str	r3, [sp, #16]
+ 877 001a 0593     		str	r3, [sp, #20]
+ 234:Core/Src/main.c ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 878              		.loc 1 234 3 is_stmt 1 view .LVU207
+ 234:Core/Src/main.c ****   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 879              		.loc 1 234 36 is_stmt 0 view .LVU208
+ 880 001c 0223     		movs	r3, #2
+ 881 001e 0693     		str	r3, [sp, #24]
+ 235:Core/Src/main.c ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 882              		.loc 1 235 3 is_stmt 1 view .LVU209
+ 235:Core/Src/main.c ****   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 883              		.loc 1 235 30 is_stmt 0 view .LVU210
+ 884 0020 0123     		movs	r3, #1
+ 885 0022 0A93     		str	r3, [sp, #40]
+ 236:Core/Src/main.c ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 886              		.loc 1 236 3 is_stmt 1 view .LVU211
+ 236:Core/Src/main.c ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 887              		.loc 1 236 41 is_stmt 0 view .LVU212
+ 888 0024 1023     		movs	r3, #16
+ 889 0026 0B93     		str	r3, [sp, #44]
+ 237:Core/Src/main.c ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 890              		.loc 1 237 3 is_stmt 1 view .LVU213
+ 238:Core/Src/main.c ****   {
+ 891              		.loc 1 238 3 view .LVU214
+ 238:Core/Src/main.c ****   {
+ 892              		.loc 1 238 7 is_stmt 0 view .LVU215
+ 893 0028 2046     		mov	r0, r4
+ 894 002a FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 895              	.LVL92:
+ 238:Core/Src/main.c ****   {
+ 896              		.loc 1 238 6 discriminator 1 view .LVU216
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 31
+
+
+ 897 002e 60B9     		cbnz	r0, .L91
+ 245:Core/Src/main.c ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 898              		.loc 1 245 3 is_stmt 1 view .LVU217
+ 245:Core/Src/main.c ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 899              		.loc 1 245 31 is_stmt 0 view .LVU218
+ 900 0030 0F23     		movs	r3, #15
+ 901 0032 0193     		str	r3, [sp, #4]
+ 247:Core/Src/main.c ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 902              		.loc 1 247 3 is_stmt 1 view .LVU219
+ 247:Core/Src/main.c ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 903              		.loc 1 247 34 is_stmt 0 view .LVU220
+ 904 0034 0146     		mov	r1, r0
+ 905 0036 0290     		str	r0, [sp, #8]
+ 248:Core/Src/main.c ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 906              		.loc 1 248 3 is_stmt 1 view .LVU221
+ 248:Core/Src/main.c ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 907              		.loc 1 248 35 is_stmt 0 view .LVU222
+ 908 0038 0390     		str	r0, [sp, #12]
+ 249:Core/Src/main.c ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 909              		.loc 1 249 3 is_stmt 1 view .LVU223
+ 249:Core/Src/main.c ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 910              		.loc 1 249 36 is_stmt 0 view .LVU224
+ 911 003a 0490     		str	r0, [sp, #16]
+ 250:Core/Src/main.c **** 
+ 912              		.loc 1 250 3 is_stmt 1 view .LVU225
+ 250:Core/Src/main.c **** 
+ 913              		.loc 1 250 36 is_stmt 0 view .LVU226
+ 914 003c 0590     		str	r0, [sp, #20]
+ 252:Core/Src/main.c ****   {
+ 915              		.loc 1 252 3 is_stmt 1 view .LVU227
+ 252:Core/Src/main.c ****   {
+ 916              		.loc 1 252 7 is_stmt 0 view .LVU228
+ 917 003e 01A8     		add	r0, sp, #4
+ 918 0040 FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 919              	.LVL93:
+ 252:Core/Src/main.c ****   {
+ 920              		.loc 1 252 6 discriminator 1 view .LVU229
+ 921 0044 18B9     		cbnz	r0, .L92
+ 256:Core/Src/main.c **** 
+ 922              		.loc 1 256 1 view .LVU230
+ 923 0046 10B0     		add	sp, sp, #64
+ 924              	.LCFI11:
+ 925              		.cfi_remember_state
+ 926              		.cfi_def_cfa_offset 8
+ 927              		@ sp needed
+ 928 0048 10BD     		pop	{r4, pc}
+ 929              	.L91:
+ 930              	.LCFI12:
+ 931              		.cfi_restore_state
+ 240:Core/Src/main.c ****   }
+ 932              		.loc 1 240 5 is_stmt 1 view .LVU231
+ 933 004a FFF7FEFF 		bl	Error_Handler
+ 934              	.LVL94:
+ 935              	.L92:
+ 254:Core/Src/main.c ****   }
+ 936              		.loc 1 254 5 view .LVU232
+ 937 004e FFF7FEFF 		bl	Error_Handler
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 32
+
+
+ 938              	.LVL95:
+ 939              		.cfi_endproc
+ 940              	.LFE66:
+ 942              		.section	.text.main,"ax",%progbits
+ 943              		.align	1
+ 944              		.global	main
+ 945              		.syntax unified
+ 946              		.thumb
+ 947              		.thumb_func
+ 949              	main:
+ 950              	.LFB65:
+ 116:Core/Src/main.c ****   /* USER CODE BEGIN 1 */
+ 951              		.loc 1 116 1 view -0
+ 952              		.cfi_startproc
+ 953              		@ args = 0, pretend = 0, frame = 0
+ 954              		@ frame_needed = 0, uses_anonymous_args = 0
+ 955 0000 10B5     		push	{r4, lr}
+ 956              	.LCFI13:
+ 957              		.cfi_def_cfa_offset 8
+ 958              		.cfi_offset 4, -8
+ 959              		.cfi_offset 14, -4
+ 124:Core/Src/main.c **** 
+ 960              		.loc 1 124 3 view .LVU234
+ 961 0002 FFF7FEFF 		bl	HAL_Init
+ 962              	.LVL96:
+ 131:Core/Src/main.c **** 
+ 963              		.loc 1 131 3 view .LVU235
+ 964 0006 FFF7FEFF 		bl	SystemClock_Config
+ 965              	.LVL97:
+ 138:Core/Src/main.c ****   MX_USART1_UART_Init();
+ 966              		.loc 1 138 3 view .LVU236
+ 967 000a FFF7FEFF 		bl	MX_GPIO_Init
+ 968              	.LVL98:
+ 139:Core/Src/main.c ****   MX_TIM2_Init();
+ 969              		.loc 1 139 3 view .LVU237
+ 970 000e FFF7FEFF 		bl	MX_USART1_UART_Init
+ 971              	.LVL99:
+ 140:Core/Src/main.c ****   MX_TIM3_Init();
+ 972              		.loc 1 140 3 view .LVU238
+ 973 0012 FFF7FEFF 		bl	MX_TIM2_Init
+ 974              	.LVL100:
+ 141:Core/Src/main.c ****   /* USER CODE BEGIN 2 */
+ 975              		.loc 1 141 3 view .LVU239
+ 976 0016 FFF7FEFF 		bl	MX_TIM3_Init
+ 977              	.LVL101:
+ 143:Core/Src/main.c ****   Tachometer_Init();
+ 978              		.loc 1 143 3 view .LVU240
+ 979 001a FFF7FEFF 		bl	MX_AFLC_StartPeripherals
+ 980              	.LVL102:
+ 144:Core/Src/main.c ****   FanControl_Init(&htim3);
+ 981              		.loc 1 144 3 view .LVU241
+ 982 001e FFF7FEFF 		bl	Tachometer_Init
+ 983              	.LVL103:
+ 145:Core/Src/main.c ****   LedStatus_Init();
+ 984              		.loc 1 145 3 view .LVU242
+ 985 0022 4648     		ldr	r0, .L107
+ 986 0024 FFF7FEFF 		bl	FanControl_Init
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 33
+
+
+ 987              	.LVL104:
+ 146:Core/Src/main.c ****   Button_Init();
+ 988              		.loc 1 146 3 view .LVU243
+ 989 0028 FFF7FEFF 		bl	LedStatus_Init
+ 990              	.LVL105:
+ 147:Core/Src/main.c ****   TemperatureStub_Init();
+ 991              		.loc 1 147 3 view .LVU244
+ 992 002c FFF7FEFF 		bl	Button_Init
+ 993              	.LVL106:
+ 148:Core/Src/main.c ****   Profil_Init();
+ 994              		.loc 1 148 3 view .LVU245
+ 995 0030 FFF7FEFF 		bl	TemperatureStub_Init
+ 996              	.LVL107:
+ 149:Core/Src/main.c ****   UI_LCD_Init();
+ 997              		.loc 1 149 3 view .LVU246
+ 998 0034 FFF7FEFF 		bl	Profil_Init
+ 999              	.LVL108:
+ 150:Core/Src/main.c ****   UART_Cmd_Init();
+ 1000              		.loc 1 150 3 view .LVU247
+ 1001 0038 FFF7FEFF 		bl	UI_LCD_Init
+ 1002              	.LVL109:
+ 151:Core/Src/main.c **** 
+ 1003              		.loc 1 151 3 view .LVU248
+ 1004 003c FFF7FEFF 		bl	UART_Cmd_Init
+ 1005              	.LVL110:
+ 153:Core/Src/main.c ****   g_app.profiles = NULL;
+ 1006              		.loc 1 153 3 view .LVU249
+ 153:Core/Src/main.c ****   g_app.profiles = NULL;
+ 1007              		.loc 1 153 24 is_stmt 0 view .LVU250
+ 1008 0040 FFF7FEFF 		bl	TemperatureStub_GetSnapshot
+ 1009              	.LVL111:
+ 153:Core/Src/main.c ****   g_app.profiles = NULL;
+ 1010              		.loc 1 153 22 discriminator 1 view .LVU251
+ 1011 0044 3E4B     		ldr	r3, .L107+4
+ 1012 0046 D862     		str	r0, [r3, #44]
+ 154:Core/Src/main.c ****   g_app.startup_passed_mask = 0U;
+ 1013              		.loc 1 154 3 is_stmt 1 view .LVU252
+ 154:Core/Src/main.c ****   g_app.startup_passed_mask = 0U;
+ 1014              		.loc 1 154 18 is_stmt 0 view .LVU253
+ 1015 0048 0024     		movs	r4, #0
+ 1016 004a 9C60     		str	r4, [r3, #8]
+ 155:Core/Src/main.c ****   g_app.startup_fail_mask = 0U;
+ 1017              		.loc 1 155 3 is_stmt 1 view .LVU254
+ 155:Core/Src/main.c ****   g_app.startup_fail_mask = 0U;
+ 1018              		.loc 1 155 29 is_stmt 0 view .LVU255
+ 1019 004c 83F83040 		strb	r4, [r3, #48]
+ 156:Core/Src/main.c **** 
+ 1020              		.loc 1 156 3 is_stmt 1 view .LVU256
+ 156:Core/Src/main.c **** 
+ 1021              		.loc 1 156 27 is_stmt 0 view .LVU257
+ 1022 0050 83F83140 		strb	r4, [r3, #49]
+ 158:Core/Src/main.c ****   g_next_tach_task_ms = HAL_GetTick();
+ 1023              		.loc 1 158 3 is_stmt 1 view .LVU258
+ 158:Core/Src/main.c ****   g_next_tach_task_ms = HAL_GetTick();
+ 1024              		.loc 1 158 27 is_stmt 0 view .LVU259
+ 1025 0054 FFF7FEFF 		bl	HAL_GetTick
+ 1026              	.LVL112:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 34
+
+
+ 158:Core/Src/main.c ****   g_next_tach_task_ms = HAL_GetTick();
+ 1027              		.loc 1 158 25 discriminator 1 view .LVU260
+ 1028 0058 3A4B     		ldr	r3, .L107+8
+ 1029 005a 1860     		str	r0, [r3]
+ 159:Core/Src/main.c ****   g_next_fan_task_ms = HAL_GetTick();
+ 1030              		.loc 1 159 3 is_stmt 1 view .LVU261
+ 159:Core/Src/main.c ****   g_next_fan_task_ms = HAL_GetTick();
+ 1031              		.loc 1 159 25 is_stmt 0 view .LVU262
+ 1032 005c FFF7FEFF 		bl	HAL_GetTick
+ 1033              	.LVL113:
+ 159:Core/Src/main.c ****   g_next_fan_task_ms = HAL_GetTick();
+ 1034              		.loc 1 159 23 discriminator 1 view .LVU263
+ 1035 0060 394B     		ldr	r3, .L107+12
+ 1036 0062 1860     		str	r0, [r3]
+ 160:Core/Src/main.c ****   g_next_control_task_ms = HAL_GetTick();
+ 1037              		.loc 1 160 3 is_stmt 1 view .LVU264
+ 160:Core/Src/main.c ****   g_next_control_task_ms = HAL_GetTick();
+ 1038              		.loc 1 160 24 is_stmt 0 view .LVU265
+ 1039 0064 FFF7FEFF 		bl	HAL_GetTick
+ 1040              	.LVL114:
+ 160:Core/Src/main.c ****   g_next_control_task_ms = HAL_GetTick();
+ 1041              		.loc 1 160 22 discriminator 1 view .LVU266
+ 1042 0068 384B     		ldr	r3, .L107+16
+ 1043 006a 1860     		str	r0, [r3]
+ 161:Core/Src/main.c ****   g_next_led_task_ms = HAL_GetTick();
+ 1044              		.loc 1 161 3 is_stmt 1 view .LVU267
+ 161:Core/Src/main.c ****   g_next_led_task_ms = HAL_GetTick();
+ 1045              		.loc 1 161 28 is_stmt 0 view .LVU268
+ 1046 006c FFF7FEFF 		bl	HAL_GetTick
+ 1047              	.LVL115:
+ 161:Core/Src/main.c ****   g_next_led_task_ms = HAL_GetTick();
+ 1048              		.loc 1 161 26 discriminator 1 view .LVU269
+ 1049 0070 374B     		ldr	r3, .L107+20
+ 1050 0072 1860     		str	r0, [r3]
+ 162:Core/Src/main.c ****   g_next_temperature_task_ms = HAL_GetTick();
+ 1051              		.loc 1 162 3 is_stmt 1 view .LVU270
+ 162:Core/Src/main.c ****   g_next_temperature_task_ms = HAL_GetTick();
+ 1052              		.loc 1 162 24 is_stmt 0 view .LVU271
+ 1053 0074 FFF7FEFF 		bl	HAL_GetTick
+ 1054              	.LVL116:
+ 162:Core/Src/main.c ****   g_next_temperature_task_ms = HAL_GetTick();
+ 1055              		.loc 1 162 22 discriminator 1 view .LVU272
+ 1056 0078 364B     		ldr	r3, .L107+24
+ 1057 007a 1860     		str	r0, [r3]
+ 163:Core/Src/main.c **** 
+ 1058              		.loc 1 163 3 is_stmt 1 view .LVU273
+ 163:Core/Src/main.c **** 
+ 1059              		.loc 1 163 32 is_stmt 0 view .LVU274
+ 1060 007c FFF7FEFF 		bl	HAL_GetTick
+ 1061              	.LVL117:
+ 163:Core/Src/main.c **** 
+ 1062              		.loc 1 163 30 discriminator 1 view .LVU275
+ 1063 0080 354B     		ldr	r3, .L107+28
+ 1064 0082 1860     		str	r0, [r3]
+ 165:Core/Src/main.c ****   /* USER CODE END 2 */
+ 1065              		.loc 1 165 3 is_stmt 1 view .LVU276
+ 1066 0084 FFF7FEFF 		bl	HAL_GetTick
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 35
+
+
+ 1067              	.LVL118:
+ 1068 0088 0146     		mov	r1, r0
+ 165:Core/Src/main.c ****   /* USER CODE END 2 */
+ 1069              		.loc 1 165 3 is_stmt 0 discriminator 1 view .LVU277
+ 1070 008a 2046     		mov	r0, r4
+ 1071 008c FFF7FEFF 		bl	AFLC_AppEnterState
+ 1072              	.LVL119:
+ 1073 0090 19E0     		b	.L99
+ 1074              	.LVL120:
+ 1075              	.L94:
+ 1076              	.LBB6:
+ 182:Core/Src/main.c ****     {
+ 1077              		.loc 1 182 5 is_stmt 1 view .LVU278
+ 182:Core/Src/main.c ****     {
+ 1078              		.loc 1 182 16 is_stmt 0 view .LVU279
+ 1079 0092 2D4B     		ldr	r3, .L107+12
+ 1080 0094 1B68     		ldr	r3, [r3]
+ 182:Core/Src/main.c ****     {
+ 1081              		.loc 1 182 8 view .LVU280
+ 1082 0096 A342     		cmp	r3, r4
+ 1083 0098 25D9     		bls	.L102
+ 1084              	.L95:
+ 188:Core/Src/main.c ****     {
+ 1085              		.loc 1 188 5 is_stmt 1 view .LVU281
+ 188:Core/Src/main.c ****     {
+ 1086              		.loc 1 188 16 is_stmt 0 view .LVU282
+ 1087 009a 2C4B     		ldr	r3, .L107+16
+ 1088 009c 1B68     		ldr	r3, [r3]
+ 188:Core/Src/main.c ****     {
+ 1089              		.loc 1 188 8 view .LVU283
+ 1090 009e A342     		cmp	r3, r4
+ 1091 00a0 29D9     		bls	.L103
+ 1092              	.L96:
+ 194:Core/Src/main.c ****     {
+ 1093              		.loc 1 194 5 is_stmt 1 view .LVU284
+ 194:Core/Src/main.c ****     {
+ 1094              		.loc 1 194 16 is_stmt 0 view .LVU285
+ 1095 00a2 2D4B     		ldr	r3, .L107+28
+ 1096 00a4 1B68     		ldr	r3, [r3]
+ 194:Core/Src/main.c ****     {
+ 1097              		.loc 1 194 8 view .LVU286
+ 1098 00a6 A342     		cmp	r3, r4
+ 1099 00a8 2DD9     		bls	.L104
+ 1100              	.L97:
+ 201:Core/Src/main.c ****     {
+ 1101              		.loc 1 201 5 is_stmt 1 view .LVU287
+ 201:Core/Src/main.c ****     {
+ 1102              		.loc 1 201 16 is_stmt 0 view .LVU288
+ 1103 00aa 294B     		ldr	r3, .L107+20
+ 1104 00ac 1B68     		ldr	r3, [r3]
+ 201:Core/Src/main.c ****     {
+ 1105              		.loc 1 201 8 view .LVU289
+ 1106 00ae A342     		cmp	r3, r4
+ 1107 00b0 35D9     		bls	.L105
+ 1108              	.L98:
+ 207:Core/Src/main.c ****     UI_LCD_Task(now_ms);
+ 1109              		.loc 1 207 5 is_stmt 1 view .LVU290
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 36
+
+
+ 1110 00b2 2046     		mov	r0, r4
+ 1111 00b4 FFF7FEFF 		bl	AFLC_AppTask
+ 1112              	.LVL121:
+ 208:Core/Src/main.c **** 
+ 1113              		.loc 1 208 5 view .LVU291
+ 1114 00b8 2046     		mov	r0, r4
+ 1115 00ba FFF7FEFF 		bl	UI_LCD_Task
+ 1116              	.LVL122:
+ 210:Core/Src/main.c ****     {
+ 1117              		.loc 1 210 5 view .LVU292
+ 210:Core/Src/main.c ****     {
+ 1118              		.loc 1 210 16 is_stmt 0 view .LVU293
+ 1119 00be 254B     		ldr	r3, .L107+24
+ 1120 00c0 1B68     		ldr	r3, [r3]
+ 210:Core/Src/main.c ****     {
+ 1121              		.loc 1 210 8 view .LVU294
+ 1122 00c2 A342     		cmp	r3, r4
+ 1123 00c4 32D9     		bls	.L106
+ 1124              	.LVL123:
+ 1125              	.L99:
+ 210:Core/Src/main.c ****     {
+ 1126              		.loc 1 210 8 view .LVU295
+ 1127              	.LBE6:
+ 170:Core/Src/main.c ****   {
+ 1128              		.loc 1 170 3 is_stmt 1 view .LVU296
+ 1129              	.LBB7:
+ 172:Core/Src/main.c **** 
+ 1130              		.loc 1 172 5 view .LVU297
+ 172:Core/Src/main.c **** 
+ 1131              		.loc 1 172 23 is_stmt 0 view .LVU298
+ 1132 00c6 FFF7FEFF 		bl	HAL_GetTick
+ 1133              	.LVL124:
+ 1134 00ca 0446     		mov	r4, r0
+ 1135              	.LVL125:
+ 174:Core/Src/main.c **** 
+ 1136              		.loc 1 174 5 is_stmt 1 view .LVU299
+ 1137 00cc FFF7FEFF 		bl	UART_Cmd_Task
+ 1138              	.LVL126:
+ 176:Core/Src/main.c ****     {
+ 1139              		.loc 1 176 5 view .LVU300
+ 176:Core/Src/main.c ****     {
+ 1140              		.loc 1 176 16 is_stmt 0 view .LVU301
+ 1141 00d0 1C4B     		ldr	r3, .L107+8
+ 1142 00d2 1B68     		ldr	r3, [r3]
+ 176:Core/Src/main.c ****     {
+ 1143              		.loc 1 176 8 view .LVU302
+ 1144 00d4 A342     		cmp	r3, r4
+ 1145 00d6 DCD8     		bhi	.L94
+ 178:Core/Src/main.c ****       Button_Task();
+ 1146              		.loc 1 178 7 is_stmt 1 view .LVU303
+ 178:Core/Src/main.c ****       Button_Task();
+ 1147              		.loc 1 178 38 is_stmt 0 view .LVU304
+ 1148 00d8 04F11403 		add	r3, r4, #20
+ 178:Core/Src/main.c ****       Button_Task();
+ 1149              		.loc 1 178 29 view .LVU305
+ 1150 00dc 194A     		ldr	r2, .L107+8
+ 1151 00de 1360     		str	r3, [r2]
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 37
+
+
+ 179:Core/Src/main.c ****     }
+ 1152              		.loc 1 179 7 is_stmt 1 view .LVU306
+ 1153 00e0 FFF7FEFF 		bl	Button_Task
+ 1154              	.LVL127:
+ 1155 00e4 D5E7     		b	.L94
+ 1156              	.L102:
+ 184:Core/Src/main.c ****       Tachometer_Task(now_ms);
+ 1157              		.loc 1 184 7 view .LVU307
+ 184:Core/Src/main.c ****       Tachometer_Task(now_ms);
+ 1158              		.loc 1 184 36 is_stmt 0 view .LVU308
+ 1159 00e6 04F13203 		add	r3, r4, #50
+ 184:Core/Src/main.c ****       Tachometer_Task(now_ms);
+ 1160              		.loc 1 184 27 view .LVU309
+ 1161 00ea 174A     		ldr	r2, .L107+12
+ 1162 00ec 1360     		str	r3, [r2]
+ 185:Core/Src/main.c ****     }
+ 1163              		.loc 1 185 7 is_stmt 1 view .LVU310
+ 1164 00ee 2046     		mov	r0, r4
+ 1165 00f0 FFF7FEFF 		bl	Tachometer_Task
+ 1166              	.LVL128:
+ 1167 00f4 D1E7     		b	.L95
+ 1168              	.L103:
+ 190:Core/Src/main.c ****       FanControl_Task(now_ms);
+ 1169              		.loc 1 190 7 view .LVU311
+ 190:Core/Src/main.c ****       FanControl_Task(now_ms);
+ 1170              		.loc 1 190 35 is_stmt 0 view .LVU312
+ 1171 00f6 04F16403 		add	r3, r4, #100
+ 190:Core/Src/main.c ****       FanControl_Task(now_ms);
+ 1172              		.loc 1 190 26 view .LVU313
+ 1173 00fa 144A     		ldr	r2, .L107+16
+ 1174 00fc 1360     		str	r3, [r2]
+ 191:Core/Src/main.c ****     }
+ 1175              		.loc 1 191 7 is_stmt 1 view .LVU314
+ 1176 00fe 2046     		mov	r0, r4
+ 1177 0100 FFF7FEFF 		bl	FanControl_Task
+ 1178              	.LVL129:
+ 1179 0104 CDE7     		b	.L96
+ 1180              	.L104:
+ 196:Core/Src/main.c ****       TemperatureStub_Task(now_ms);
+ 1181              		.loc 1 196 7 view .LVU315
+ 196:Core/Src/main.c ****       TemperatureStub_Task(now_ms);
+ 1182              		.loc 1 196 43 is_stmt 0 view .LVU316
+ 1183 0106 04F1FA03 		add	r3, r4, #250
+ 196:Core/Src/main.c ****       TemperatureStub_Task(now_ms);
+ 1184              		.loc 1 196 34 view .LVU317
+ 1185 010a 134A     		ldr	r2, .L107+28
+ 1186 010c 1360     		str	r3, [r2]
+ 197:Core/Src/main.c ****       g_app.temperatures = TemperatureStub_GetSnapshot();
+ 1187              		.loc 1 197 7 is_stmt 1 view .LVU318
+ 1188 010e 2046     		mov	r0, r4
+ 1189 0110 FFF7FEFF 		bl	TemperatureStub_Task
+ 1190              	.LVL130:
+ 198:Core/Src/main.c ****     }
+ 1191              		.loc 1 198 7 view .LVU319
+ 198:Core/Src/main.c ****     }
+ 1192              		.loc 1 198 28 is_stmt 0 view .LVU320
+ 1193 0114 FFF7FEFF 		bl	TemperatureStub_GetSnapshot
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 38
+
+
+ 1194              	.LVL131:
+ 198:Core/Src/main.c ****     }
+ 1195              		.loc 1 198 26 discriminator 1 view .LVU321
+ 1196 0118 094B     		ldr	r3, .L107+4
+ 1197 011a D862     		str	r0, [r3, #44]
+ 1198 011c C5E7     		b	.L97
+ 1199              	.L105:
+ 203:Core/Src/main.c ****       AFLC_RuntimeStep();
+ 1200              		.loc 1 203 7 is_stmt 1 view .LVU322
+ 203:Core/Src/main.c ****       AFLC_RuntimeStep();
+ 1201              		.loc 1 203 39 is_stmt 0 view .LVU323
+ 1202 011e 04F1FA03 		add	r3, r4, #250
+ 203:Core/Src/main.c ****       AFLC_RuntimeStep();
+ 1203              		.loc 1 203 30 view .LVU324
+ 1204 0122 0B4A     		ldr	r2, .L107+20
+ 1205 0124 1360     		str	r3, [r2]
+ 204:Core/Src/main.c ****     }
+ 1206              		.loc 1 204 7 is_stmt 1 view .LVU325
+ 1207 0126 FFF7FEFF 		bl	AFLC_RuntimeStep
+ 1208              	.LVL132:
+ 1209 012a C2E7     		b	.L98
+ 1210              	.L106:
+ 212:Core/Src/main.c ****       LedStatus_Task(now_ms);
+ 1211              		.loc 1 212 7 view .LVU326
+ 212:Core/Src/main.c ****       LedStatus_Task(now_ms);
+ 1212              		.loc 1 212 35 is_stmt 0 view .LVU327
+ 1213 012c 04F13202 		add	r2, r4, #50
+ 212:Core/Src/main.c ****       LedStatus_Task(now_ms);
+ 1214              		.loc 1 212 26 view .LVU328
+ 1215 0130 084B     		ldr	r3, .L107+24
+ 1216 0132 1A60     		str	r2, [r3]
+ 213:Core/Src/main.c ****     }
+ 1217              		.loc 1 213 7 is_stmt 1 view .LVU329
+ 1218 0134 2046     		mov	r0, r4
+ 1219 0136 FFF7FEFF 		bl	LedStatus_Task
+ 1220              	.LVL133:
+ 1221 013a C4E7     		b	.L99
+ 1222              	.L108:
+ 1223              		.align	2
+ 1224              	.L107:
+ 1225 013c 00000000 		.word	htim3
+ 1226 0140 00000000 		.word	g_app
+ 1227 0144 00000000 		.word	g_next_button_task_ms
+ 1228 0148 00000000 		.word	g_next_tach_task_ms
+ 1229 014c 00000000 		.word	g_next_fan_task_ms
+ 1230 0150 00000000 		.word	g_next_control_task_ms
+ 1231 0154 00000000 		.word	g_next_led_task_ms
+ 1232 0158 00000000 		.word	g_next_temperature_task_ms
+ 1233              	.LBE7:
+ 1234              		.cfi_endproc
+ 1235              	.LFE65:
+ 1237              		.section	.bss.g_app,"aw",%nobits
+ 1238              		.align	2
+ 1241              	g_app:
+ 1242 0000 00000000 		.space	52
+ 1242      00000000 
+ 1242      00000000 
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 39
+
+
+ 1242      00000000 
+ 1242      00000000 
+ 1243              		.section	.bss.g_next_temperature_task_ms,"aw",%nobits
+ 1244              		.align	2
+ 1247              	g_next_temperature_task_ms:
+ 1248 0000 00000000 		.space	4
+ 1249              		.section	.bss.g_next_led_task_ms,"aw",%nobits
+ 1250              		.align	2
+ 1253              	g_next_led_task_ms:
+ 1254 0000 00000000 		.space	4
+ 1255              		.section	.bss.g_next_control_task_ms,"aw",%nobits
+ 1256              		.align	2
+ 1259              	g_next_control_task_ms:
+ 1260 0000 00000000 		.space	4
+ 1261              		.section	.bss.g_next_fan_task_ms,"aw",%nobits
+ 1262              		.align	2
+ 1265              	g_next_fan_task_ms:
+ 1266 0000 00000000 		.space	4
+ 1267              		.section	.bss.g_next_tach_task_ms,"aw",%nobits
+ 1268              		.align	2
+ 1271              	g_next_tach_task_ms:
+ 1272 0000 00000000 		.space	4
+ 1273              		.section	.bss.g_next_button_task_ms,"aw",%nobits
+ 1274              		.align	2
+ 1277              	g_next_button_task_ms:
+ 1278 0000 00000000 		.space	4
+ 1279              		.text
+ 1280              	.Letext0:
+ 1281              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
+ 1282              		.file 4 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
+ 1283              		.file 5 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 1284              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 1285              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h"
+ 1286              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h"
+ 1287              		.file 9 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 1288              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h"
+ 1289              		.file 11 "Core/Inc/tim.h"
+ 1290              		.file 12 "Core/Inc/Profil.h"
+ 1291              		.file 13 "Core/Inc/tachometer.h"
+ 1292              		.file 14 "Core/Inc/temperature_stub.h"
+ 1293              		.file 15 "Core/Inc/AFLCalcul.h"
+ 1294              		.file 16 "Core/Inc/fan_control.h"
+ 1295              		.file 17 "Core/Inc/led_status.h"
+ 1296              		.file 18 "Core/Inc/ui_lcd.h"
+ 1297              		.file 19 "Core/Inc/button.h"
+ 1298              		.file 20 "Core/Inc/uart_cmd.h"
+ 1299              		.file 21 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ 1300              		.file 22 "Core/Inc/usart.h"
+ 1301              		.file 23 "Core/Inc/gpio.h"
+ 1302              		.file 24 "<built-in>"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 40
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:19     .text.AFLC_BuildMaxRpmArray:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:24     .text.AFLC_BuildMaxRpmArray:00000000 AFLC_BuildMaxRpmArray
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:74     .text.AFLC_BuildMaxRpmArray:0000002c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1241   .bss.g_app:00000000 g_app
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:79     .text.AFLC_AppEnterState:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:84     .text.AFLC_AppEnterState:00000000 AFLC_AppEnterState
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:205    .text.AFLC_AppEnterState:00000070 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:210    .text.AFLC_UpdateStartupPassMask:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:215    .text.AFLC_UpdateStartupPassMask:00000000 AFLC_UpdateStartupPassMask
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:278    .text.AFLC_UpdateStartupPassMask:0000003c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:284    .text.AFLC_RuntimeStep:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:289    .text.AFLC_RuntimeStep:00000000 AFLC_RuntimeStep
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:357    .text.AFLC_RuntimeStep:00000048 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:364    .text.AFLC_AppTask:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:369    .text.AFLC_AppTask:00000000 AFLC_AppTask
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:648    .text.AFLC_AppTask:0000016c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:653    .text.HAL_TIM_IC_CaptureCallback:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:659    .text.HAL_TIM_IC_CaptureCallback:00000000 HAL_TIM_IC_CaptureCallback
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:681    .text.Error_Handler:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:687    .text.Error_Handler:00000000 Error_Handler
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:719    .text.MX_AFLC_StartPeripherals:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:724    .text.MX_AFLC_StartPeripherals:00000000 MX_AFLC_StartPeripherals
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:836    .text.MX_AFLC_StartPeripherals:00000074 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:842    .text.SystemClock_Config:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:848    .text.SystemClock_Config:00000000 SystemClock_Config
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:943    .text.main:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:949    .text.main:00000000 main
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1225   .text.main:0000013c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1277   .bss.g_next_button_task_ms:00000000 g_next_button_task_ms
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1271   .bss.g_next_tach_task_ms:00000000 g_next_tach_task_ms
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1265   .bss.g_next_fan_task_ms:00000000 g_next_fan_task_ms
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1259   .bss.g_next_control_task_ms:00000000 g_next_control_task_ms
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1253   .bss.g_next_led_task_ms:00000000 g_next_led_task_ms
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1247   .bss.g_next_temperature_task_ms:00000000 g_next_temperature_task_ms
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1238   .bss.g_app:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1244   .bss.g_next_temperature_task_ms:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1250   .bss.g_next_led_task_ms:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1256   .bss.g_next_control_task_ms:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1262   .bss.g_next_fan_task_ms:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1268   .bss.g_next_tach_task_ms:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s:1274   .bss.g_next_button_task_ms:00000000 $d
+
+UNDEFINED SYMBOLS
+LedStatus_SetMode
+UI_LCD_ShowProfilesReady
+UI_LCD_ShowWaitConfirm
+Tachometer_GetSnapshot
+AFLCalcul_Compute
+FanControl_SetTargetRpmArray
+UI_LCD_ShowStartupTest
+Profil_CalculateAll
+Profil_GetResult
+Button_IsConfirmPressed
+Button_ClearConfirm
+FanControl_EnterSafeState
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccW7cJo9.s 			page 41
+
+
+UI_LCD_ShowSafeState
+FanControl_SetDutyPermilleAll
+FanControl_GetStatuses
+UI_LCD_ShowRuntime
+Tachometer_OnCapture
+HAL_TIM_IC_Start_IT
+HAL_TIM_PWM_Start
+htim2
+htim3
+memset
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
+HAL_Init
+MX_GPIO_Init
+MX_USART1_UART_Init
+MX_TIM2_Init
+MX_TIM3_Init
+Tachometer_Init
+FanControl_Init
+LedStatus_Init
+Button_Init
+TemperatureStub_Init
+Profil_Init
+UI_LCD_Init
+UART_Cmd_Init
+TemperatureStub_GetSnapshot
+HAL_GetTick
+UI_LCD_Task
+UART_Cmd_Task
+Button_Task
+Tachometer_Task
+FanControl_Task
+TemperatureStub_Task
+LedStatus_Task

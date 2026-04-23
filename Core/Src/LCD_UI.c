@@ -15,11 +15,10 @@ static void UI_WriteLineCached(uint8_t row, const char *line);
 const char* UI_FanStateToStr(FanState_t state){
     switch(state){
         case FAN_STATE_OFF:     return "Off ";
-        case FAN_STATE_ON:      return "On  ";
-        case FAN_STATE_CONTROL: return "Con.";
+        case FAN_STATE_STARTING:return "Strt";
+        case FAN_STATE_RUNNING: return "Run ";
         case FAN_STATE_ERROR:   return "Err.";
-        case FAN_STATE_NC:      return "NC. ";
-        default:                return "NC. ";
+        default:                return "Err.";
     }
 }
 
@@ -29,7 +28,7 @@ const char* UI_FanActionToStr(FanAction_t action){
         case FAN_ACTION_DETECT:   return "@@@";
         case FAN_ACTION_DECEL:    return "---";
         case FAN_ACTION_IDLE:     return "===";
-        case FAN_ACTION_DISABLED: return "xxx";
+        case FAN_ACTION_RAMP:     return "^^^";
         case FAN_ACTION_NONE:     return "xxx";
         default:                  return "xxx";
     }
@@ -38,7 +37,7 @@ const char* UI_FanActionToStr(FanAction_t action){
 const char* UI_FanAlertToStr(FanAlert_t alert){
     switch(alert){
         case FAN_ALERT_WARN:     return "!!!";
-        case FAN_ALERT_SHUTDOWN: return "!!!";
+        case FAN_ALERT_FAULT:    return "!!!";
         case FAN_ALERT_NONE:     return "   ";
         default:                 return "   ";
     }
@@ -57,7 +56,8 @@ const char* UI_GetAnimatedAction(FanAction_t action){
             return decel_frames[g_ui_anim.tick % 3U];
         case FAN_ACTION_IDLE:
             return g_ui_anim.blink ? "===" : "= =";
-        case FAN_ACTION_DISABLED:
+        case FAN_ACTION_RAMP:
+            return g_ui_anim.blink ? "^^^" : " ^ ";
         case FAN_ACTION_NONE:
         default:
             return "xxx";

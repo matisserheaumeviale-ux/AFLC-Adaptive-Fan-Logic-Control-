@@ -57,38 +57,59 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_BP_Pin GPIO_PIN_13
-#define LED_BP_GPIO_Port GPIOC
-#define P1_0_Pin GPIO_PIN_1
-#define P1_0_GPIO_Port GPIOA
-#define P1_2_Pin GPIO_PIN_3
-#define P1_2_GPIO_Port GPIOA
-#define P1_3_Pin GPIO_PIN_4
-#define P1_3_GPIO_Port GPIOA
-#define P1_4_Pin GPIO_PIN_5
-#define P1_4_GPIO_Port GPIOA
-#define P1_6_Pin GPIO_PIN_7
-#define P1_6_GPIO_Port GPIOA
-#define P2_0_Pin GPIO_PIN_0
-#define P2_0_GPIO_Port GPIOB
-#define P2_6_Pin GPIO_PIN_1
-#define P2_6_GPIO_Port GPIOB
-#define P1_7_Pin GPIO_PIN_8
-#define P1_7_GPIO_Port GPIOA
-#define P2_3_Pin GPIO_PIN_3
-#define P2_3_GPIO_Port GPIOB
-#define P2_1_Pin GPIO_PIN_4
-#define P2_1_GPIO_Port GPIOB
-#define P2_2_Pin GPIO_PIN_5
-#define P2_2_GPIO_Port GPIOB
-#define P2_5_Pin GPIO_PIN_6
-#define P2_5_GPIO_Port GPIOB
-#define P2_4_Pin GPIO_PIN_7
-#define P2_4_GPIO_Port GPIOB
-#define P2_7_Pin GPIO_PIN_8
-#define P2_7_GPIO_Port GPIOB
+#define FAN1_TACH_Pin GPIO_PIN_0
+#define FAN1_TACH_GPIO_Port GPIOA
+#define FAN2_TACH_Pin GPIO_PIN_1
+#define FAN2_TACH_GPIO_Port GPIOA
+#define FAN3_TACH_Pin GPIO_PIN_2
+#define FAN3_TACH_GPIO_Port GPIOA
+#define FAN4_TACH_Pin GPIO_PIN_3
+#define FAN4_TACH_GPIO_Port GPIOA
+#define LED_EXTRA1_Pin GPIO_PIN_8
+#define LED_EXTRA1_GPIO_Port GPIOA
+#define UART_TX_Pin GPIO_PIN_9
+#define UART_TX_GPIO_Port GPIOA
+#define UART_RX_Pin GPIO_PIN_10
+#define UART_RX_GPIO_Port GPIOA
+#define USB_DM_Pin GPIO_PIN_11
+#define USB_DM_GPIO_Port GPIOA
+#define USB_DP_Pin GPIO_PIN_12
+#define USB_DP_GPIO_Port GPIOA
+#define FAN1_PWM_Pin GPIO_PIN_6
+#define FAN1_PWM_GPIO_Port GPIOA
+#define FAN2_PWM_Pin GPIO_PIN_7
+#define FAN2_PWM_GPIO_Port GPIOA
+#define FAN3_PWM_Pin GPIO_PIN_0
+#define FAN3_PWM_GPIO_Port GPIOB
+#define FAN4_PWM_Pin GPIO_PIN_1
+#define FAN4_PWM_GPIO_Port GPIOB
+#define BOOT1_Pin GPIO_PIN_2
+#define BOOT1_GPIO_Port GPIOB
+#define AFLC_SYNC_Pin GPIO_PIN_5
+#define AFLC_SYNC_GPIO_Port GPIOB
+#define LED_STATUS_Pin GPIO_PIN_13
+#define LED_STATUS_GPIO_Port GPIOC
+#define LED_USB_Pin GPIO_PIN_14
+#define LED_USB_GPIO_Port GPIOC
+#define LED_ERROR_Pin GPIO_PIN_15
+#define LED_ERROR_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
+
+#define LCD_RS_Pin GPIO_PIN_9
+#define LCD_RS_GPIO_Port GPIOB
+#define LCD_RW_Pin GPIO_PIN_10
+#define LCD_RW_GPIO_Port GPIOB
+#define LCD_EN_Pin GPIO_PIN_11
+#define LCD_EN_GPIO_Port GPIOB
+#define LCD_D4_Pin GPIO_PIN_12
+#define LCD_D4_GPIO_Port GPIOB
+#define LCD_D5_Pin GPIO_PIN_13
+#define LCD_D5_GPIO_Port GPIOB
+#define LCD_D6_Pin GPIO_PIN_14
+#define LCD_D6_GPIO_Port GPIOB
+#define LCD_D7_Pin GPIO_PIN_15
+#define LCD_D7_GPIO_Port GPIOB
 
 /* USER CODE END Private defines */
 

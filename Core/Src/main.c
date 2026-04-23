@@ -24,21 +24,55 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "_DeclarationGenerale.h"
-#include "printf-scanf.h"
-#include "PORT_1-2.h"
-#include "stdbool.h"
-#include <string.h>
+#include "AFLCalcul.h"
+#include "Profil.h"
+#include "button.h"
+#include "fan_control.h"
+#include "led_status.h"
+#include "tachometer.h"
+#include "temperature_stub.h"
+#include "uart_cmd.h"
+#include "ui_lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef enum {
+  AFLC_APP_BOOT = 0,
+  AFLC_APP_PROFILES_CALCULATING,
+  AFLC_APP_PROFILES_READY,
+  AFLC_APP_WAIT_CONFIRM,
+  AFLC_APP_STARTUP_TEST_INIT,
+  AFLC_APP_STARTUP_TEST_RUN,
+  AFLC_APP_STARTUP_TEST_EVAL,
+  AFLC_APP_RUNTIME_CONTROL,
+  AFLC_APP_SAFE_STATE
+} AflcAppState_t;
 
+typedef struct {
+  AflcAppState_t state;
+  uint32_t state_entered_ms;
+  const Profil_Result_t *profiles;
+  TachometerSnapshot_t tach_snapshot;
+  AFLCalcul_Output_t control_output;
+  const TemperatureSnapshot_t *temperatures;
+  uint8_t startup_passed_mask;
+  uint8_t startup_fail_mask;
+} AflcAppContext_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define TASK_BUTTON_PERIOD_MS         20UL
+#define TASK_TACH_PERIOD_MS           50UL
+#define TASK_FAN_PERIOD_MS            100UL
+#define TASK_CONTROL_PERIOD_MS        250UL
+#define TASK_LED_PERIOD_MS            50UL
+#define TASK_TEMPERATURE_PERIOD_MS    250UL
+#define PROFILES_READY_SHOW_MS        1500UL
+#define STARTUP_TEST_DUTY_PERMILLE    250U
+#define STARTUP_TEST_TIMEOUT_MS       3000UL
+#define STARTUP_TEST_PASS_RPM         200U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,35 +83,24 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-#define FAN_PPR               2u
-#define TIM2_TICK_HZ          125000u   // PSC=63 @ 8MHz => 8us/tick
-#define PWM_ARR_TIM3          319u      // 25kHz @ 8MHz, PSC=0
-#define DUTY_MIN_PERM         200u
-#define DUTY_MAX_PERM         1000u
-#define STATUS_PRINT_MS       500u
-#define TACH_TIMEOUT_MS       1200u
-#define SW2_MASQUE   0x04   // P2_2 ? diminue
-#define SW3_MASQUE   0x08   // P2_3 ? 50% / stop
-#define SW4_MASQUE   0x10   // P2_4 ? augmente
-
-volatile uint32_t gulLastCap      = 0;
-volatile uint32_t gulPeriod       = 0;
-volatile uint8_t  gucNewPer       = 0;
-volatile uint8_t  gucFirstCap     = 1;
-volatile uint32_t gulLastEdgeMs   = 0;
-volatile uint32_t gulRPM_inst     = 0;
-volatile uint32_t gulRPM_filt     = 0;
-
-uint16_t gusDuty_perm = 300;
-
-uint32_t gulLastStatusPrintMs = 0;
+static uint32_t g_next_button_task_ms;
+static uint32_t g_next_tach_task_ms;
+static uint32_t g_next_fan_task_ms;
+static uint32_t g_next_control_task_ms;
+static uint32_t g_next_led_task_ms;
+static uint32_t g_next_temperature_task_ms;
+static AflcAppContext_t g_app;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
-
+static void MX_AFLC_StartPeripherals(void);
+static void AFLC_AppTask(uint32_t now_ms);
+static void AFLC_AppEnterState(AflcAppState_t next_state, uint32_t now_ms);
+static void AFLC_RuntimeStep(void);
+static void AFLC_UpdateStartupPassMask(void);
+static void AFLC_BuildMaxRpmArray(uint16_t max_rpm[PROFIL_FAN_COUNT]);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -91,7 +114,6 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -118,15 +140,78 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  MX_AFLC_StartPeripherals();
+  Tachometer_Init();
+  FanControl_Init(&htim3);
+  LedStatus_Init();
+  Button_Init();
+  TemperatureStub_Init();
+  Profil_Init();
+  UI_LCD_Init();
+  UART_Cmd_Init();
 
+  g_app.temperatures = TemperatureStub_GetSnapshot();
+  g_app.profiles = NULL;
+  g_app.startup_passed_mask = 0U;
+  g_app.startup_fail_mask = 0U;
+
+  g_next_button_task_ms = HAL_GetTick();
+  g_next_tach_task_ms = HAL_GetTick();
+  g_next_fan_task_ms = HAL_GetTick();
+  g_next_control_task_ms = HAL_GetTick();
+  g_next_led_task_ms = HAL_GetTick();
+  g_next_temperature_task_ms = HAL_GetTick();
+
+  AFLC_AppEnterState(AFLC_APP_BOOT, HAL_GetTick());
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    vTraiterCommandeUART();
-    vCalculRPM();
+    uint32_t now_ms = HAL_GetTick();
+
+    UART_Cmd_Task();
+
+    if (now_ms >= g_next_button_task_ms)
+    {
+      g_next_button_task_ms = now_ms + TASK_BUTTON_PERIOD_MS;
+      Button_Task();
+    }
+
+    if (now_ms >= g_next_tach_task_ms)
+    {
+      g_next_tach_task_ms = now_ms + TASK_TACH_PERIOD_MS;
+      Tachometer_Task(now_ms);
+    }
+
+    if (now_ms >= g_next_fan_task_ms)
+    {
+      g_next_fan_task_ms = now_ms + TASK_FAN_PERIOD_MS;
+      FanControl_Task(now_ms);
+    }
+
+    if (now_ms >= g_next_temperature_task_ms)
+    {
+      g_next_temperature_task_ms = now_ms + TASK_TEMPERATURE_PERIOD_MS;
+      TemperatureStub_Task(now_ms);
+      g_app.temperatures = TemperatureStub_GetSnapshot();
+    }
+
+    if (now_ms >= g_next_control_task_ms)
+    {
+      g_next_control_task_ms = now_ms + TASK_CONTROL_PERIOD_MS;
+      AFLC_RuntimeStep();
+    }
+
+    AFLC_AppTask(now_ms);
+    UI_LCD_Task(now_ms);
+
+    if (now_ms >= g_next_led_task_ms)
+    {
+      g_next_led_task_ms = now_ms + TASK_LED_PERIOD_MS;
+      LedStatus_Task(now_ms);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -173,146 +258,223 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
-  if ((htim->Instance == TIM2) && (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3))
+  Tachometer_OnCapture(htim);
+}
+
+static void MX_AFLC_StartPeripherals(void)
+{
+  if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
   {
-    uint32_t ulNow;
-    uint32_t ulPer;
-
-    ulNow = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-
-    if (gucFirstCap != 0u)
-    {
-      gulLastCap = ulNow;
-      gulLastEdgeMs = HAL_GetTick();
-      gucFirstCap = 0u;
-      return;
-    }
-
-    if (ulNow >= gulLastCap)
-      ulPer = ulNow - gulLastCap;
-    else
-      ulPer = (0xFFFFu - gulLastCap) + ulNow + 1u;
-
-    gulLastCap = ulNow;
-    gulLastEdgeMs = HAL_GetTick();
-
-    if (ulPer > 0u)
-    {
-      gulPeriod = ulPer;
-      gucNewPer = 1u;
-    }
+    Error_Handler();
   }
-}
-//********************************vSetFanDutyPerm*******************************
-//    Nom de la fonction : vSetFanDutyPerm
-//    Auteur : Matisse Rh�aume Viale		
-//    Date de cr�ation : 2026-04-02
-//    Date de la derni�re modification : 
-//    Description : 	Routine pour ajuster le duty cycle du PWM du ventilateur.
-//                    La valeur est donn�e en pour mille (0 � 1000).
-//							
-//    Fonctions appel�es : __HAL_TIM_SET_COMPARE()		
-//    Param�tres d'entr�e : usDutyPerm (uint16_t, 0 � 1000)		
-//    Param�tres de sortie : Aucun		
-//    Variables utilis�es : ulCompare, gusDuty_perm
-//    Equate : PWM_ARR_TIM3, DUTY_MAX_PERM	
-//    #Define : Aucun	
-// 						
-//******************************************************************************
-static void vSetFanDutyPerm(uint16_t usDutyPerm)
-{
-  uint32_t ulCompare;
-
-  if (usDutyPerm > DUTY_MAX_PERM)
-    usDutyPerm = DUTY_MAX_PERM;
-
-  gusDuty_perm = usDutyPerm;
-
-  ulCompare = ((uint32_t)(PWM_ARR_TIM3 + 1u) * (uint32_t)gusDuty_perm) / 1000u;
-
-  if (ulCompare > PWM_ARR_TIM3)
-    ulCompare = PWM_ARR_TIM3;
-
-  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, ulCompare);
-}
-//*******************************vTraiterCommandeUART***************************
-//    Nom de la fonction : vTraiterCommandeUART
-//    Auteur : Matisse Rh�aume Viale		
-//    Date de cr�ation : 2026-04-02
-//    Date de la derni�re modification : 
-//    Description : 	Routine pour lire une commande via UART et ajuster le
-//                    duty cycle du ventilateur en cons�quence.
-//                    Commandes disponibles :
-//                    - '0' ou 'x' : arr�t
-//                    - '1' � '9' : 10% � 90%
-//                    - 'a' : 100%
-//                    - 'z' : rampe 0% � 100% en 5 secondes
-//							
-//    Fonctions appel�es : HAL_UART_Receive(), vSetFanDutyPerm(),
-//                         vRampe0a100_5s(), printf()		
-//    Param�tres d'entr�e : Aucun		
-//    Param�tres de sortie : Aucun		
-//    Variables utilis�es : ucRx
-//    Equate : Aucun	
-//    #Define : Aucun	
-// 						
-//******************************************************************************
-static void vTraiterCommandeUART(void)
-{
-  uint8_t ucRx;
-
-  if (HAL_UART_Receive(&huart1, &ucRx, 1, 0) == HAL_OK)
+  if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_2) != HAL_OK)
   {
-    if ((ucRx == 'x') || (ucRx == 'X') || (ucRx == '0'))
-    {
-      vSetFanDutyPerm(0u);
-      printf("Arret\r\n");
-    }
-    else if ((ucRx >= '1') && (ucRx <= '9'))
-    {
-      vSetFanDutyPerm((uint16_t)(ucRx - '0') * 100u);
-      printf("Duty = %d0%%\r\n", ucRx - '0');
-    }
-    else if ((ucRx == 'a') || (ucRx == 'A'))
-    {
-      vSetFanDutyPerm(1000u);
-      printf("Duty = 100%%\r\n");
-    }
-    else if ((ucRx == 'z') || (ucRx == 'Z'))
-    {
-      printf("Rampe 0 a 100%% en 5 s\r\n");
-      vRampe0a100_5s();
-    }
-    else if (ucRx == 't' || ucRx == 'T')
-{
-  vCalculRPM();
-  vPrintRPM();
-}
+    Error_Handler();
+  }
+  if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4) != HAL_OK)
+  {
+    Error_Handler();
   }
 }
 
-//********************************vCalculRPM************************************
-static void vCalculRPM(void)
+static void AFLC_AppTask(uint32_t now_ms)
 {
-  if ((HAL_GetTick() - gulLastEdgeMs) > TACH_TIMEOUT_MS)
+  switch (g_app.state)
   {
-    gulRPM_inst = 0;
-    gulRPM_filt = 0;
+    case AFLC_APP_BOOT:
+      AFLC_AppEnterState(AFLC_APP_PROFILES_CALCULATING, now_ms);
+      break;
+
+    case AFLC_APP_PROFILES_CALCULATING:
+      Profil_CalculateAll();
+      g_app.profiles = Profil_GetResult();
+      if ((g_app.profiles != NULL) && g_app.profiles->ready && g_app.profiles->valid)
+      {
+        AFLC_AppEnterState(AFLC_APP_PROFILES_READY, now_ms);
+      }
+      else
+      {
+        g_app.startup_fail_mask = 0x0FU;
+        AFLC_AppEnterState(AFLC_APP_SAFE_STATE, now_ms);
+      }
+      break;
+
+    case AFLC_APP_PROFILES_READY:
+      if ((now_ms - g_app.state_entered_ms) >= PROFILES_READY_SHOW_MS)
+      {
+        AFLC_AppEnterState(AFLC_APP_WAIT_CONFIRM, now_ms);
+      }
+      break;
+
+    case AFLC_APP_WAIT_CONFIRM:
+      if (Button_IsConfirmPressed())
+      {
+        Button_ClearConfirm();
+        AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_INIT, now_ms);
+      }
+      break;
+
+    case AFLC_APP_STARTUP_TEST_INIT:
+      g_app.startup_passed_mask = 0U;
+      g_app.startup_fail_mask = 0U;
+      FanControl_SetDutyPermilleAll(STARTUP_TEST_DUTY_PERMILLE);
+      UI_LCD_ShowStartupTest(g_app.startup_passed_mask, g_app.startup_fail_mask, 0U);
+      AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_RUN, now_ms);
+      break;
+
+    case AFLC_APP_STARTUP_TEST_RUN:
+      AFLC_UpdateStartupPassMask();
+      UI_LCD_ShowStartupTest(g_app.startup_passed_mask, 0U, 0U);
+
+      if (g_app.startup_passed_mask == 0x0FU)
+      {
+        AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_EVAL, now_ms);
+      }
+      else if ((now_ms - g_app.state_entered_ms) >= STARTUP_TEST_TIMEOUT_MS)
+      {
+        g_app.startup_fail_mask = (uint8_t)(0x0FU & (uint8_t)(~g_app.startup_passed_mask));
+        AFLC_AppEnterState(AFLC_APP_STARTUP_TEST_EVAL, now_ms);
+      }
+      break;
+
+    case AFLC_APP_STARTUP_TEST_EVAL:
+      UI_LCD_ShowStartupTest(g_app.startup_passed_mask, g_app.startup_fail_mask, 1U);
+      if (g_app.startup_fail_mask == 0U)
+      {
+        AFLC_AppEnterState(AFLC_APP_RUNTIME_CONTROL, now_ms);
+      }
+      else
+      {
+        AFLC_AppEnterState(AFLC_APP_SAFE_STATE, now_ms);
+      }
+      break;
+
+    case AFLC_APP_RUNTIME_CONTROL:
+      UI_LCD_ShowRuntime(g_app.profiles,
+                         g_app.temperatures,
+                         &g_app.control_output,
+                         FanControl_GetStatuses());
+      break;
+
+    case AFLC_APP_SAFE_STATE:
+      FanControl_EnterSafeState();
+      UI_LCD_ShowSafeState(g_app.startup_fail_mask);
+      break;
+
+    default:
+      break;
+  }
+}
+
+static void AFLC_AppEnterState(AflcAppState_t next_state, uint32_t now_ms)
+{
+  g_app.state = next_state;
+  g_app.state_entered_ms = now_ms;
+
+  switch (next_state)
+  {
+    case AFLC_APP_BOOT:
+      LedStatus_SetMode(LED_STATUS_MODE_BOOT);
+      break;
+
+    case AFLC_APP_PROFILES_CALCULATING:
+      LedStatus_SetMode(LED_STATUS_MODE_BOOT);
+      break;
+
+    case AFLC_APP_PROFILES_READY:
+      LedStatus_SetMode(LED_STATUS_MODE_PROFILES_READY);
+      UI_LCD_ShowProfilesReady(g_app.profiles);
+      break;
+
+    case AFLC_APP_WAIT_CONFIRM:
+      LedStatus_SetMode(LED_STATUS_MODE_WAIT_CONFIRM);
+      UI_LCD_ShowWaitConfirm(g_app.profiles);
+      break;
+
+    case AFLC_APP_STARTUP_TEST_INIT:
+    case AFLC_APP_STARTUP_TEST_RUN:
+    case AFLC_APP_STARTUP_TEST_EVAL:
+      LedStatus_SetMode(LED_STATUS_MODE_STARTUP_TEST);
+      break;
+
+    case AFLC_APP_RUNTIME_CONTROL:
+      LedStatus_SetMode(LED_STATUS_MODE_RUNTIME);
+      break;
+
+    case AFLC_APP_SAFE_STATE:
+      LedStatus_SetMode(LED_STATUS_MODE_FAULT);
+      break;
+
+    default:
+      break;
+  }
+}
+
+static void AFLC_RuntimeStep(void)
+{
+  uint16_t max_rpm[PROFIL_FAN_COUNT];
+
+  if ((g_app.state != AFLC_APP_RUNTIME_CONTROL) || (g_app.profiles == NULL) || (g_app.temperatures == NULL))
+  {
     return;
   }
 
-  if (gucNewPer != 0u)
-  {
-    gucNewPer = 0u;
+  Tachometer_GetSnapshot(&g_app.tach_snapshot);
+  AFLCalcul_Compute(g_app.profiles, g_app.temperatures, &g_app.tach_snapshot, &g_app.control_output);
+  AFLC_BuildMaxRpmArray(max_rpm);
+  FanControl_SetTargetRpmArray(g_app.control_output.target_rpm, max_rpm);
+}
 
-    if (gulPeriod > 0u)
+static void AFLC_UpdateStartupPassMask(void)
+{
+  uint8_t index;
+
+  Tachometer_GetSnapshot(&g_app.tach_snapshot);
+
+  for (index = 0U; index < PROFIL_FAN_COUNT; index++)
+  {
+    if (g_app.tach_snapshot.fans[index].rpm_filtered >= STARTUP_TEST_PASS_RPM)
     {
-      gulRPM_inst = ((TIM2_TICK_HZ * 60u) / gulPeriod) / FAN_PPR;
-      gulRPM_filt = gulRPM_inst;
+      g_app.startup_passed_mask |= (uint8_t)(1U << index);
     }
   }
 }
 
+static void AFLC_BuildMaxRpmArray(uint16_t max_rpm[PROFIL_FAN_COUNT])
+{
+  uint8_t index;
+
+  if ((max_rpm == NULL) || (g_app.profiles == NULL))
+  {
+    return;
+  }
+
+  for (index = 0U; index < PROFIL_FAN_COUNT; index++)
+  {
+    max_rpm[index] = g_app.profiles->fans[index].max_rpm;
+  }
+}
 /* USER CODE END 4 */
 
 /**
@@ -322,7 +484,6 @@ static void vCalculRPM(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
   {

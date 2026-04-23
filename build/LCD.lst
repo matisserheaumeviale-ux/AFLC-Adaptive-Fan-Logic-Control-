@@ -1,0 +1,1410 @@
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"LCD.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/LCD.c"
+  18              		.section	.text.LCD_DelayMs,"ax",%progbits
+  19              		.align	1
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  24              	LCD_DelayMs:
+  25              	.LVL0:
+  26              	.LFB68:
+   1:Core/Src/LCD.c **** #include "LCD.h"
+   2:Core/Src/LCD.c **** 
+   3:Core/Src/LCD.c **** #include <stdarg.h>
+   4:Core/Src/LCD.c **** #include <stdio.h>
+   5:Core/Src/LCD.c **** #include <string.h>
+   6:Core/Src/LCD.c **** 
+   7:Core/Src/LCD.c **** #define RS_Pin GPIO_PIN_9
+   8:Core/Src/LCD.c **** #define RW_Pin GPIO_PIN_10
+   9:Core/Src/LCD.c **** #define EN_Pin GPIO_PIN_11
+  10:Core/Src/LCD.c **** #define D4_Pin GPIO_PIN_12
+  11:Core/Src/LCD.c **** #define D5_Pin GPIO_PIN_13
+  12:Core/Src/LCD.c **** #define D6_Pin GPIO_PIN_14
+  13:Core/Src/LCD.c **** #define D7_Pin GPIO_PIN_15
+  14:Core/Src/LCD.c **** 
+  15:Core/Src/LCD.c **** #define LCD_DATA_MASK (D4_Pin | D5_Pin | D6_Pin | D7_Pin)
+  16:Core/Src/LCD.c **** 
+  17:Core/Src/LCD.c **** #define LCD_RS_HIGH() (GPIOB->BSRR = RS_Pin)
+  18:Core/Src/LCD.c **** #define LCD_RS_LOW()  (GPIOB->BRR  = RS_Pin)
+  19:Core/Src/LCD.c **** 
+  20:Core/Src/LCD.c **** #define LCD_RW_HIGH() (GPIOB->BSRR = RW_Pin)
+  21:Core/Src/LCD.c **** #define LCD_RW_LOW()  (GPIOB->BRR  = RW_Pin)
+  22:Core/Src/LCD.c **** 
+  23:Core/Src/LCD.c **** #define LCD_EN_HIGH() (GPIOB->BSRR = EN_Pin)
+  24:Core/Src/LCD.c **** #define LCD_EN_LOW()  (GPIOB->BRR  = EN_Pin)
+  25:Core/Src/LCD.c **** 
+  26:Core/Src/LCD.c **** #define LCD_DELAY_LOOP_PER_MS 8000U
+  27:Core/Src/LCD.c **** 
+  28:Core/Src/LCD.c **** static void LCD_DelayMs(uint32_t ms){
+  27              		.loc 1 28 37 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 8
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 2
+
+
+  31              		@ link register save eliminated.
+  32              		.loc 1 28 37 is_stmt 0 view .LVU1
+  33 0000 82B0     		sub	sp, sp, #8
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  29:Core/Src/LCD.c ****   for(volatile uint32_t i = 0; i < (ms * LCD_DELAY_LOOP_PER_MS); i++);
+  36              		.loc 1 29 3 is_stmt 1 view .LVU2
+  37              	.LBB2:
+  38              		.loc 1 29 7 view .LVU3
+  39              		.loc 1 29 25 is_stmt 0 view .LVU4
+  40 0002 0023     		movs	r3, #0
+  41 0004 0193     		str	r3, [sp, #4]
+  42              		.loc 1 29 3 view .LVU5
+  43 0006 02E0     		b	.L2
+  44              	.L3:
+  45              		.loc 1 29 67 is_stmt 1 discriminator 3 view .LVU6
+  46 0008 019B     		ldr	r3, [sp, #4]
+  47 000a 0133     		adds	r3, r3, #1
+  48 000c 0193     		str	r3, [sp, #4]
+  49              	.L2:
+  50              		.loc 1 29 34 discriminator 1 view .LVU7
+  51              		.loc 1 29 40 is_stmt 0 discriminator 1 view .LVU8
+  52 000e 4FF4FA53 		mov	r3, #8000
+  53 0012 00FB03F3 		mul	r3, r0, r3
+  54              		.loc 1 29 34 discriminator 1 view .LVU9
+  55 0016 019A     		ldr	r2, [sp, #4]
+  56 0018 9342     		cmp	r3, r2
+  57 001a F5D8     		bhi	.L3
+  58              	.LBE2:
+  30:Core/Src/LCD.c **** }
+  59              		.loc 1 30 1 view .LVU10
+  60 001c 02B0     		add	sp, sp, #8
+  61              	.LCFI1:
+  62              		.cfi_def_cfa_offset 0
+  63              		@ sp needed
+  64 001e 7047     		bx	lr
+  65              		.cfi_endproc
+  66              	.LFE68:
+  68              		.section	.text.LCD_DelayShort,"ax",%progbits
+  69              		.align	1
+  70              		.syntax unified
+  71              		.thumb
+  72              		.thumb_func
+  74              	LCD_DelayShort:
+  75              	.LFB69:
+  31:Core/Src/LCD.c **** 
+  32:Core/Src/LCD.c **** static void LCD_DelayShort(void){
+  76              		.loc 1 32 33 is_stmt 1 view -0
+  77              		.cfi_startproc
+  78              		@ args = 0, pretend = 0, frame = 8
+  79              		@ frame_needed = 0, uses_anonymous_args = 0
+  80              		@ link register save eliminated.
+  81 0000 82B0     		sub	sp, sp, #8
+  82              	.LCFI2:
+  83              		.cfi_def_cfa_offset 8
+  33:Core/Src/LCD.c ****   for(volatile uint32_t i = 0; i < 50U; i++);
+  84              		.loc 1 33 3 view .LVU12
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 3
+
+
+  85              	.LBB3:
+  86              		.loc 1 33 7 view .LVU13
+  87              		.loc 1 33 25 is_stmt 0 view .LVU14
+  88 0002 0023     		movs	r3, #0
+  89 0004 0193     		str	r3, [sp, #4]
+  90              		.loc 1 33 3 view .LVU15
+  91 0006 02E0     		b	.L6
+  92              	.L7:
+  93              		.loc 1 33 42 is_stmt 1 discriminator 3 view .LVU16
+  94 0008 019B     		ldr	r3, [sp, #4]
+  95 000a 0133     		adds	r3, r3, #1
+  96 000c 0193     		str	r3, [sp, #4]
+  97              	.L6:
+  98              		.loc 1 33 34 discriminator 1 view .LVU17
+  99 000e 019B     		ldr	r3, [sp, #4]
+ 100 0010 312B     		cmp	r3, #49
+ 101 0012 F9D9     		bls	.L7
+ 102              	.LBE3:
+  34:Core/Src/LCD.c **** }
+ 103              		.loc 1 34 1 is_stmt 0 view .LVU18
+ 104 0014 02B0     		add	sp, sp, #8
+ 105              	.LCFI3:
+ 106              		.cfi_def_cfa_offset 0
+ 107              		@ sp needed
+ 108 0016 7047     		bx	lr
+ 109              		.cfi_endproc
+ 110              	.LFE69:
+ 112              		.section	.text.LCD_EnablePulse,"ax",%progbits
+ 113              		.align	1
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 118              	LCD_EnablePulse:
+ 119              	.LFB70:
+  35:Core/Src/LCD.c **** 
+  36:Core/Src/LCD.c **** static void LCD_EnablePulse(void){
+ 120              		.loc 1 36 34 is_stmt 1 view -0
+ 121              		.cfi_startproc
+ 122              		@ args = 0, pretend = 0, frame = 0
+ 123              		@ frame_needed = 0, uses_anonymous_args = 0
+ 124 0000 38B5     		push	{r3, r4, r5, lr}
+ 125              	.LCFI4:
+ 126              		.cfi_def_cfa_offset 16
+ 127              		.cfi_offset 3, -16
+ 128              		.cfi_offset 4, -12
+ 129              		.cfi_offset 5, -8
+ 130              		.cfi_offset 14, -4
+  37:Core/Src/LCD.c ****   LCD_EN_HIGH();
+ 131              		.loc 1 37 3 view .LVU20
+ 132 0002 054C     		ldr	r4, .L11
+ 133 0004 4FF40065 		mov	r5, #2048
+ 134 0008 2561     		str	r5, [r4, #16]
+  38:Core/Src/LCD.c ****   LCD_DelayShort();
+ 135              		.loc 1 38 3 view .LVU21
+ 136 000a FFF7FEFF 		bl	LCD_DelayShort
+ 137              	.LVL1:
+  39:Core/Src/LCD.c ****   LCD_EN_LOW();
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 4
+
+
+ 138              		.loc 1 39 3 view .LVU22
+ 139 000e 6561     		str	r5, [r4, #20]
+  40:Core/Src/LCD.c ****   LCD_DelayShort();
+ 140              		.loc 1 40 3 view .LVU23
+ 141 0010 FFF7FEFF 		bl	LCD_DelayShort
+ 142              	.LVL2:
+  41:Core/Src/LCD.c **** }
+ 143              		.loc 1 41 1 is_stmt 0 view .LVU24
+ 144 0014 38BD     		pop	{r3, r4, r5, pc}
+ 145              	.L12:
+ 146 0016 00BF     		.align	2
+ 147              	.L11:
+ 148 0018 000C0140 		.word	1073810432
+ 149              		.cfi_endproc
+ 150              	.LFE70:
+ 152              		.section	.text.LCD_Send4Bits,"ax",%progbits
+ 153              		.align	1
+ 154              		.syntax unified
+ 155              		.thumb
+ 156              		.thumb_func
+ 158              	LCD_Send4Bits:
+ 159              	.LVL3:
+ 160              	.LFB71:
+  42:Core/Src/LCD.c **** 
+  43:Core/Src/LCD.c **** static void LCD_Send4Bits(uint8_t data){
+ 161              		.loc 1 43 40 is_stmt 1 view -0
+ 162              		.cfi_startproc
+ 163              		@ args = 0, pretend = 0, frame = 0
+ 164              		@ frame_needed = 0, uses_anonymous_args = 0
+ 165              		.loc 1 43 40 is_stmt 0 view .LVU26
+ 166 0000 08B5     		push	{r3, lr}
+ 167              	.LCFI5:
+ 168              		.cfi_def_cfa_offset 8
+ 169              		.cfi_offset 3, -8
+ 170              		.cfi_offset 14, -4
+  44:Core/Src/LCD.c ****   GPIOB->BRR = LCD_DATA_MASK;
+ 171              		.loc 1 44 3 is_stmt 1 view .LVU27
+ 172              		.loc 1 44 14 is_stmt 0 view .LVU28
+ 173 0002 054B     		ldr	r3, .L15
+ 174 0004 4FF47042 		mov	r2, #61440
+ 175 0008 5A61     		str	r2, [r3, #20]
+  45:Core/Src/LCD.c ****   GPIOB->BSRR = ((uint32_t)(data & 0x0FU) << 12);
+ 176              		.loc 1 45 3 is_stmt 1 view .LVU29
+ 177              		.loc 1 45 43 is_stmt 0 view .LVU30
+ 178 000a 0003     		lsls	r0, r0, #12
+ 179              	.LVL4:
+ 180              		.loc 1 45 43 view .LVU31
+ 181 000c 80B2     		uxth	r0, r0
+ 182              		.loc 1 45 15 view .LVU32
+ 183 000e 1861     		str	r0, [r3, #16]
+  46:Core/Src/LCD.c **** 
+  47:Core/Src/LCD.c ****   LCD_EnablePulse();
+ 184              		.loc 1 47 3 is_stmt 1 view .LVU33
+ 185 0010 FFF7FEFF 		bl	LCD_EnablePulse
+ 186              	.LVL5:
+  48:Core/Src/LCD.c **** }
+ 187              		.loc 1 48 1 is_stmt 0 view .LVU34
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 5
+
+
+ 188 0014 08BD     		pop	{r3, pc}
+ 189              	.L16:
+ 190 0016 00BF     		.align	2
+ 191              	.L15:
+ 192 0018 000C0140 		.word	1073810432
+ 193              		.cfi_endproc
+ 194              	.LFE71:
+ 196              		.section	.text.LCD_SendCommand,"ax",%progbits
+ 197              		.align	1
+ 198              		.global	LCD_SendCommand
+ 199              		.syntax unified
+ 200              		.thumb
+ 201              		.thumb_func
+ 203              	LCD_SendCommand:
+ 204              	.LVL6:
+ 205              	.LFB72:
+  49:Core/Src/LCD.c **** 
+  50:Core/Src/LCD.c **** void LCD_SendCommand(uint8_t data){
+ 206              		.loc 1 50 35 is_stmt 1 view -0
+ 207              		.cfi_startproc
+ 208              		@ args = 0, pretend = 0, frame = 0
+ 209              		@ frame_needed = 0, uses_anonymous_args = 0
+ 210              		.loc 1 50 35 is_stmt 0 view .LVU36
+ 211 0000 10B5     		push	{r4, lr}
+ 212              	.LCFI6:
+ 213              		.cfi_def_cfa_offset 8
+ 214              		.cfi_offset 4, -8
+ 215              		.cfi_offset 14, -4
+ 216 0002 0446     		mov	r4, r0
+  51:Core/Src/LCD.c ****   LCD_RS_LOW();
+ 217              		.loc 1 51 3 is_stmt 1 view .LVU37
+ 218 0004 074B     		ldr	r3, .L19
+ 219 0006 4FF40072 		mov	r2, #512
+ 220 000a 5A61     		str	r2, [r3, #20]
+  52:Core/Src/LCD.c ****   LCD_RW_LOW();
+ 221              		.loc 1 52 3 view .LVU38
+ 222 000c 4FF48062 		mov	r2, #1024
+ 223 0010 5A61     		str	r2, [r3, #20]
+  53:Core/Src/LCD.c **** 
+  54:Core/Src/LCD.c ****   LCD_Send4Bits(data >> 4);
+ 224              		.loc 1 54 3 view .LVU39
+ 225 0012 0009     		lsrs	r0, r0, #4
+ 226              	.LVL7:
+ 227              		.loc 1 54 3 is_stmt 0 view .LVU40
+ 228 0014 FFF7FEFF 		bl	LCD_Send4Bits
+ 229              	.LVL8:
+  55:Core/Src/LCD.c ****   LCD_Send4Bits(data & 0x0F);
+ 230              		.loc 1 55 3 is_stmt 1 view .LVU41
+ 231 0018 04F00F00 		and	r0, r4, #15
+ 232 001c FFF7FEFF 		bl	LCD_Send4Bits
+ 233              	.LVL9:
+  56:Core/Src/LCD.c **** }
+ 234              		.loc 1 56 1 is_stmt 0 view .LVU42
+ 235 0020 10BD     		pop	{r4, pc}
+ 236              	.LVL10:
+ 237              	.L20:
+ 238              		.loc 1 56 1 view .LVU43
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 6
+
+
+ 239 0022 00BF     		.align	2
+ 240              	.L19:
+ 241 0024 000C0140 		.word	1073810432
+ 242              		.cfi_endproc
+ 243              	.LFE72:
+ 245              		.section	.text.LCD_SendChar,"ax",%progbits
+ 246              		.align	1
+ 247              		.global	LCD_SendChar
+ 248              		.syntax unified
+ 249              		.thumb
+ 250              		.thumb_func
+ 252              	LCD_SendChar:
+ 253              	.LVL11:
+ 254              	.LFB73:
+  57:Core/Src/LCD.c **** 
+  58:Core/Src/LCD.c **** void LCD_SendChar(char data){
+ 255              		.loc 1 58 29 is_stmt 1 view -0
+ 256              		.cfi_startproc
+ 257              		@ args = 0, pretend = 0, frame = 0
+ 258              		@ frame_needed = 0, uses_anonymous_args = 0
+ 259              		.loc 1 58 29 is_stmt 0 view .LVU45
+ 260 0000 10B5     		push	{r4, lr}
+ 261              	.LCFI7:
+ 262              		.cfi_def_cfa_offset 8
+ 263              		.cfi_offset 4, -8
+ 264              		.cfi_offset 14, -4
+ 265 0002 0446     		mov	r4, r0
+  59:Core/Src/LCD.c ****   LCD_RS_HIGH();
+ 266              		.loc 1 59 3 is_stmt 1 view .LVU46
+ 267 0004 074B     		ldr	r3, .L23
+ 268 0006 4FF40072 		mov	r2, #512
+ 269 000a 1A61     		str	r2, [r3, #16]
+  60:Core/Src/LCD.c ****   LCD_RW_LOW();
+ 270              		.loc 1 60 3 view .LVU47
+ 271 000c 4FF48062 		mov	r2, #1024
+ 272 0010 5A61     		str	r2, [r3, #20]
+  61:Core/Src/LCD.c **** 
+  62:Core/Src/LCD.c ****   LCD_Send4Bits(data >> 4);
+ 273              		.loc 1 62 3 view .LVU48
+ 274 0012 0009     		lsrs	r0, r0, #4
+ 275              	.LVL12:
+ 276              		.loc 1 62 3 is_stmt 0 view .LVU49
+ 277 0014 FFF7FEFF 		bl	LCD_Send4Bits
+ 278              	.LVL13:
+  63:Core/Src/LCD.c ****   LCD_Send4Bits(data & 0x0F);
+ 279              		.loc 1 63 3 is_stmt 1 view .LVU50
+ 280 0018 04F00F00 		and	r0, r4, #15
+ 281 001c FFF7FEFF 		bl	LCD_Send4Bits
+ 282              	.LVL14:
+  64:Core/Src/LCD.c **** }
+ 283              		.loc 1 64 1 is_stmt 0 view .LVU51
+ 284 0020 10BD     		pop	{r4, pc}
+ 285              	.LVL15:
+ 286              	.L24:
+ 287              		.loc 1 64 1 view .LVU52
+ 288 0022 00BF     		.align	2
+ 289              	.L23:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 7
+
+
+ 290 0024 000C0140 		.word	1073810432
+ 291              		.cfi_endproc
+ 292              	.LFE73:
+ 294              		.section	.text.LCD_SendString,"ax",%progbits
+ 295              		.align	1
+ 296              		.global	LCD_SendString
+ 297              		.syntax unified
+ 298              		.thumb
+ 299              		.thumb_func
+ 301              	LCD_SendString:
+ 302              	.LVL16:
+ 303              	.LFB74:
+  65:Core/Src/LCD.c **** 
+  66:Core/Src/LCD.c **** void LCD_SendString(const char *str){
+ 304              		.loc 1 66 37 is_stmt 1 view -0
+ 305              		.cfi_startproc
+ 306              		@ args = 0, pretend = 0, frame = 0
+ 307              		@ frame_needed = 0, uses_anonymous_args = 0
+ 308              		.loc 1 66 37 is_stmt 0 view .LVU54
+ 309 0000 10B5     		push	{r4, lr}
+ 310              	.LCFI8:
+ 311              		.cfi_def_cfa_offset 8
+ 312              		.cfi_offset 4, -8
+ 313              		.cfi_offset 14, -4
+  67:Core/Src/LCD.c ****   if(str == NULL) return;
+ 314              		.loc 1 67 3 is_stmt 1 view .LVU55
+ 315              		.loc 1 67 5 is_stmt 0 view .LVU56
+ 316 0002 0446     		mov	r4, r0
+ 317 0004 18B9     		cbnz	r0, .L27
+ 318 0006 05E0     		b	.L25
+ 319              	.LVL17:
+ 320              	.L28:
+  68:Core/Src/LCD.c **** 
+  69:Core/Src/LCD.c ****   while(*str){
+  70:Core/Src/LCD.c ****     LCD_SendChar(*str++);
+ 321              		.loc 1 70 5 is_stmt 1 view .LVU57
+ 322              		.loc 1 70 22 is_stmt 0 view .LVU58
+ 323 0008 0134     		adds	r4, r4, #1
+ 324              	.LVL18:
+ 325              		.loc 1 70 5 view .LVU59
+ 326 000a FFF7FEFF 		bl	LCD_SendChar
+ 327              	.LVL19:
+ 328              	.L27:
+  69:Core/Src/LCD.c ****     LCD_SendChar(*str++);
+ 329              		.loc 1 69 9 is_stmt 1 view .LVU60
+ 330 000e 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 331 0010 0028     		cmp	r0, #0
+ 332 0012 F9D1     		bne	.L28
+ 333              	.L25:
+  71:Core/Src/LCD.c ****   }
+  72:Core/Src/LCD.c **** }
+ 334              		.loc 1 72 1 is_stmt 0 view .LVU61
+ 335 0014 10BD     		pop	{r4, pc}
+ 336              		.loc 1 72 1 view .LVU62
+ 337              		.cfi_endproc
+ 338              	.LFE74:
+ 340              		.section	.text.LCD_SetCursor,"ax",%progbits
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 8
+
+
+ 341              		.align	1
+ 342              		.global	LCD_SetCursor
+ 343              		.syntax unified
+ 344              		.thumb
+ 345              		.thumb_func
+ 347              	LCD_SetCursor:
+ 348              	.LVL20:
+ 349              	.LFB75:
+  73:Core/Src/LCD.c **** 
+  74:Core/Src/LCD.c **** void LCD_SetCursor(uint8_t col, uint8_t row){
+ 350              		.loc 1 74 45 is_stmt 1 view -0
+ 351              		.cfi_startproc
+ 352              		@ args = 0, pretend = 0, frame = 0
+ 353              		@ frame_needed = 0, uses_anonymous_args = 0
+  75:Core/Src/LCD.c ****   static const uint8_t RowAddress[4] = {0x80, 0xC0, 0x94, 0xD4};
+ 354              		.loc 1 75 3 view .LVU64
+  76:Core/Src/LCD.c **** 
+  77:Core/Src/LCD.c ****   if(row > 3U) return;
+ 355              		.loc 1 77 3 view .LVU65
+ 356              		.loc 1 77 5 is_stmt 0 view .LVU66
+ 357 0000 0329     		cmp	r1, #3
+ 358 0002 01D8     		bhi	.L33
+  78:Core/Src/LCD.c ****   if(col > 19U) return;
+ 359              		.loc 1 78 3 is_stmt 1 view .LVU67
+ 360              		.loc 1 78 5 is_stmt 0 view .LVU68
+ 361 0004 1328     		cmp	r0, #19
+ 362 0006 00D9     		bls	.L36
+ 363              	.L33:
+ 364 0008 7047     		bx	lr
+ 365              	.L36:
+  74:Core/Src/LCD.c ****   static const uint8_t RowAddress[4] = {0x80, 0xC0, 0x94, 0xD4};
+ 366              		.loc 1 74 45 view .LVU69
+ 367 000a 08B5     		push	{r3, lr}
+ 368              	.LCFI9:
+ 369              		.cfi_def_cfa_offset 8
+ 370              		.cfi_offset 3, -8
+ 371              		.cfi_offset 14, -4
+  79:Core/Src/LCD.c **** 
+  80:Core/Src/LCD.c ****   LCD_SendCommand(RowAddress[row] + col);
+ 372              		.loc 1 80 3 is_stmt 1 view .LVU70
+ 373              		.loc 1 80 29 is_stmt 0 view .LVU71
+ 374 000c 034B     		ldr	r3, .L37
+ 375 000e 5B5C     		ldrb	r3, [r3, r1]	@ zero_extendqisi2
+ 376              		.loc 1 80 3 view .LVU72
+ 377 0010 1844     		add	r0, r0, r3
+ 378              	.LVL21:
+ 379              		.loc 1 80 3 view .LVU73
+ 380 0012 C0B2     		uxtb	r0, r0
+ 381 0014 FFF7FEFF 		bl	LCD_SendCommand
+ 382              	.LVL22:
+  81:Core/Src/LCD.c **** }
+ 383              		.loc 1 81 1 view .LVU74
+ 384 0018 08BD     		pop	{r3, pc}
+ 385              	.L38:
+ 386 001a 00BF     		.align	2
+ 387              	.L37:
+ 388 001c 00000000 		.word	RowAddress.0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 9
+
+
+ 389              		.cfi_endproc
+ 390              	.LFE75:
+ 392              		.section	.text.LCD_Printf,"ax",%progbits
+ 393              		.align	1
+ 394              		.global	LCD_Printf
+ 395              		.syntax unified
+ 396              		.thumb
+ 397              		.thumb_func
+ 399              	LCD_Printf:
+ 400              	.LVL23:
+ 401              	.LFB76:
+  82:Core/Src/LCD.c **** 
+  83:Core/Src/LCD.c **** void LCD_Printf(const char *fmt, ...){
+ 402              		.loc 1 83 38 is_stmt 1 view -0
+ 403              		.cfi_startproc
+ 404              		@ args = 4, pretend = 16, frame = 88
+ 405              		@ frame_needed = 0, uses_anonymous_args = 1
+ 406              		.loc 1 83 38 is_stmt 0 view .LVU76
+ 407 0000 0FB4     		push	{r0, r1, r2, r3}
+ 408              	.LCFI10:
+ 409              		.cfi_def_cfa_offset 16
+ 410              		.cfi_offset 0, -16
+ 411              		.cfi_offset 1, -12
+ 412              		.cfi_offset 2, -8
+ 413              		.cfi_offset 3, -4
+ 414 0002 70B5     		push	{r4, r5, r6, lr}
+ 415              	.LCFI11:
+ 416              		.cfi_def_cfa_offset 32
+ 417              		.cfi_offset 4, -32
+ 418              		.cfi_offset 5, -28
+ 419              		.cfi_offset 6, -24
+ 420              		.cfi_offset 14, -20
+ 421 0004 96B0     		sub	sp, sp, #88
+ 422              	.LCFI12:
+ 423              		.cfi_def_cfa_offset 120
+ 424 0006 1A9A     		ldr	r2, [sp, #104]
+  84:Core/Src/LCD.c ****   char buffer[81];
+ 425              		.loc 1 84 3 is_stmt 1 view .LVU77
+  85:Core/Src/LCD.c ****   uint8_t row = 0U;
+ 426              		.loc 1 85 3 view .LVU78
+ 427              	.LVL24:
+  86:Core/Src/LCD.c ****   uint8_t col = 0U;
+ 428              		.loc 1 86 3 view .LVU79
+  87:Core/Src/LCD.c ****   va_list args;
+ 429              		.loc 1 87 3 view .LVU80
+  88:Core/Src/LCD.c **** 
+  89:Core/Src/LCD.c ****   if(fmt == NULL) return;
+ 430              		.loc 1 89 3 view .LVU81
+ 431              		.loc 1 89 5 is_stmt 0 view .LVU82
+ 432 0008 A2B3     		cbz	r2, .L39
+  90:Core/Src/LCD.c **** 
+  91:Core/Src/LCD.c ****   va_start(args, fmt);
+ 433              		.loc 1 91 3 is_stmt 1 view .LVU83
+ 434 000a 1BAB     		add	r3, sp, #108
+ 435 000c 0093     		str	r3, [sp]
+  92:Core/Src/LCD.c ****   (void)vsnprintf(buffer, sizeof(buffer), fmt, args);
+ 436              		.loc 1 92 3 view .LVU84
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 10
+
+
+ 437              		.loc 1 92 9 is_stmt 0 view .LVU85
+ 438 000e 5121     		movs	r1, #81
+ 439 0010 01A8     		add	r0, sp, #4
+ 440 0012 FFF7FEFF 		bl	vsnprintf
+ 441              	.LVL25:
+  93:Core/Src/LCD.c ****   va_end(args);
+ 442              		.loc 1 93 3 is_stmt 1 view .LVU86
+  94:Core/Src/LCD.c **** 
+  95:Core/Src/LCD.c ****   LCD_SetCursor(0, 0);
+ 443              		.loc 1 95 3 view .LVU87
+ 444 0016 0021     		movs	r1, #0
+ 445 0018 0846     		mov	r0, r1
+ 446 001a FFF7FEFF 		bl	LCD_SetCursor
+ 447              	.LVL26:
+  96:Core/Src/LCD.c ****   for(size_t i = 0; (buffer[i] != '\0') && (row < 4U); i++){
+ 448              		.loc 1 96 3 view .LVU88
+ 449              	.LBB4:
+ 450              		.loc 1 96 7 view .LVU89
+ 451              		.loc 1 96 14 is_stmt 0 view .LVU90
+ 452 001e 0026     		movs	r6, #0
+ 453              	.LBE4:
+  86:Core/Src/LCD.c ****   va_list args;
+ 454              		.loc 1 86 11 view .LVU91
+ 455 0020 3546     		mov	r5, r6
+  85:Core/Src/LCD.c ****   uint8_t col = 0U;
+ 456              		.loc 1 85 11 view .LVU92
+ 457 0022 3446     		mov	r4, r6
+ 458              	.LBB5:
+ 459              		.loc 1 96 3 view .LVU93
+ 460 0024 05E0     		b	.L42
+ 461              	.LVL27:
+ 462              	.L51:
+  97:Core/Src/LCD.c ****     if(buffer[i] == '\n'){
+  98:Core/Src/LCD.c ****       row++;
+ 463              		.loc 1 98 7 is_stmt 1 view .LVU94
+ 464              		.loc 1 98 10 is_stmt 0 view .LVU95
+ 465 0026 0134     		adds	r4, r4, #1
+ 466              	.LVL28:
+ 467              		.loc 1 98 10 view .LVU96
+ 468 0028 E4B2     		uxtb	r4, r4
+ 469              	.LVL29:
+  99:Core/Src/LCD.c ****       col = 0U;
+ 470              		.loc 1 99 7 is_stmt 1 view .LVU97
+ 100:Core/Src/LCD.c ****       if(row < 4U) LCD_SetCursor(0, row);
+ 471              		.loc 1 100 7 view .LVU98
+ 472              		.loc 1 100 9 is_stmt 0 view .LVU99
+ 473 002a 032C     		cmp	r4, #3
+ 474 002c 17D9     		bls	.L50
+ 475              	.L44:
+ 101:Core/Src/LCD.c ****       continue;
+ 476              		.loc 1 101 7 is_stmt 1 view .LVU100
+  99:Core/Src/LCD.c ****       col = 0U;
+ 477              		.loc 1 99 11 is_stmt 0 view .LVU101
+ 478 002e 0025     		movs	r5, #0
+ 479              	.LVL30:
+ 480              	.L45:
+  96:Core/Src/LCD.c ****     if(buffer[i] == '\n'){
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 11
+
+
+ 481              		.loc 1 96 57 is_stmt 1 discriminator 2 view .LVU102
+ 482 0030 0136     		adds	r6, r6, #1
+ 483              	.LVL31:
+ 484              	.L42:
+  96:Core/Src/LCD.c ****     if(buffer[i] == '\n'){
+ 485              		.loc 1 96 41 discriminator 1 view .LVU103
+  96:Core/Src/LCD.c ****     if(buffer[i] == '\n'){
+ 486              		.loc 1 96 28 is_stmt 0 discriminator 1 view .LVU104
+ 487 0032 06F15803 		add	r3, r6, #88
+ 488 0036 6B44     		add	r3, sp, r3
+ 489 0038 13F8540C 		ldrb	r0, [r3, #-84]	@ zero_extendqisi2
+  96:Core/Src/LCD.c ****     if(buffer[i] == '\n'){
+ 490              		.loc 1 96 41 discriminator 1 view .LVU105
+ 491 003c D0B1     		cbz	r0, .L39
+  96:Core/Src/LCD.c ****     if(buffer[i] == '\n'){
+ 492              		.loc 1 96 41 discriminator 3 view .LVU106
+ 493 003e 032C     		cmp	r4, #3
+ 494 0040 18D8     		bhi	.L39
+  97:Core/Src/LCD.c ****       row++;
+ 495              		.loc 1 97 5 is_stmt 1 view .LVU107
+  97:Core/Src/LCD.c ****       row++;
+ 496              		.loc 1 97 7 is_stmt 0 view .LVU108
+ 497 0042 0A28     		cmp	r0, #10
+ 498 0044 EFD0     		beq	.L51
+ 102:Core/Src/LCD.c ****     }
+ 103:Core/Src/LCD.c **** 
+ 104:Core/Src/LCD.c ****     LCD_SendChar(buffer[i]);
+ 499              		.loc 1 104 5 is_stmt 1 view .LVU109
+ 500 0046 FFF7FEFF 		bl	LCD_SendChar
+ 501              	.LVL32:
+ 105:Core/Src/LCD.c ****     col++;
+ 502              		.loc 1 105 5 view .LVU110
+ 503              		.loc 1 105 8 is_stmt 0 view .LVU111
+ 504 004a 0135     		adds	r5, r5, #1
+ 505              	.LVL33:
+ 506              		.loc 1 105 8 view .LVU112
+ 507 004c EDB2     		uxtb	r5, r5
+ 508              	.LVL34:
+ 106:Core/Src/LCD.c ****     if(col >= 20U){
+ 509              		.loc 1 106 5 is_stmt 1 view .LVU113
+ 510              		.loc 1 106 7 is_stmt 0 view .LVU114
+ 511 004e 132D     		cmp	r5, #19
+ 512 0050 EED9     		bls	.L45
+ 107:Core/Src/LCD.c ****       row++;
+ 513              		.loc 1 107 7 is_stmt 1 view .LVU115
+ 514              		.loc 1 107 10 is_stmt 0 view .LVU116
+ 515 0052 0134     		adds	r4, r4, #1
+ 516              	.LVL35:
+ 517              		.loc 1 107 10 view .LVU117
+ 518 0054 E4B2     		uxtb	r4, r4
+ 519              	.LVL36:
+ 108:Core/Src/LCD.c ****       col = 0U;
+ 520              		.loc 1 108 7 is_stmt 1 view .LVU118
+ 109:Core/Src/LCD.c ****       if(row < 4U) LCD_SetCursor(0, row);
+ 521              		.loc 1 109 7 view .LVU119
+ 522              		.loc 1 109 9 is_stmt 0 view .LVU120
+ 523 0056 032C     		cmp	r4, #3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 12
+
+
+ 524 0058 06D9     		bls	.L52
+ 108:Core/Src/LCD.c ****       col = 0U;
+ 525              		.loc 1 108 11 view .LVU121
+ 526 005a 0025     		movs	r5, #0
+ 527 005c E8E7     		b	.L45
+ 528              	.L50:
+ 100:Core/Src/LCD.c ****       continue;
+ 529              		.loc 1 100 20 is_stmt 1 discriminator 1 view .LVU122
+ 530 005e 2146     		mov	r1, r4
+ 531 0060 0020     		movs	r0, #0
+ 532 0062 FFF7FEFF 		bl	LCD_SetCursor
+ 533              	.LVL37:
+ 534 0066 E2E7     		b	.L44
+ 535              	.L52:
+ 536              		.loc 1 109 20 discriminator 1 view .LVU123
+ 537 0068 2146     		mov	r1, r4
+ 538 006a 0020     		movs	r0, #0
+ 539 006c FFF7FEFF 		bl	LCD_SetCursor
+ 540              	.LVL38:
+ 108:Core/Src/LCD.c ****       col = 0U;
+ 541              		.loc 1 108 11 is_stmt 0 view .LVU124
+ 542 0070 0025     		movs	r5, #0
+ 543 0072 DDE7     		b	.L45
+ 544              	.LVL39:
+ 545              	.L39:
+ 108:Core/Src/LCD.c ****       col = 0U;
+ 546              		.loc 1 108 11 view .LVU125
+ 547              	.LBE5:
+ 110:Core/Src/LCD.c ****     }
+ 111:Core/Src/LCD.c ****   }
+ 112:Core/Src/LCD.c **** }
+ 548              		.loc 1 112 1 view .LVU126
+ 549 0074 16B0     		add	sp, sp, #88
+ 550              	.LCFI13:
+ 551              		.cfi_def_cfa_offset 32
+ 552              		@ sp needed
+ 553 0076 BDE87040 		pop	{r4, r5, r6, lr}
+ 554              	.LCFI14:
+ 555              		.cfi_restore 14
+ 556              		.cfi_restore 6
+ 557              		.cfi_restore 5
+ 558              		.cfi_restore 4
+ 559              		.cfi_def_cfa_offset 16
+ 560 007a 04B0     		add	sp, sp, #16
+ 561              	.LCFI15:
+ 562              		.cfi_restore 3
+ 563              		.cfi_restore 2
+ 564              		.cfi_restore 1
+ 565              		.cfi_restore 0
+ 566              		.cfi_def_cfa_offset 0
+ 567 007c 7047     		bx	lr
+ 568              		.cfi_endproc
+ 569              	.LFE76:
+ 571              		.section	.text.LCD_ClearLine,"ax",%progbits
+ 572              		.align	1
+ 573              		.global	LCD_ClearLine
+ 574              		.syntax unified
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 13
+
+
+ 575              		.thumb
+ 576              		.thumb_func
+ 578              	LCD_ClearLine:
+ 579              	.LVL40:
+ 580              	.LFB77:
+ 113:Core/Src/LCD.c **** 
+ 114:Core/Src/LCD.c **** void LCD_ClearLine(uint8_t row){
+ 581              		.loc 1 114 32 is_stmt 1 view -0
+ 582              		.cfi_startproc
+ 583              		@ args = 0, pretend = 0, frame = 0
+ 584              		@ frame_needed = 0, uses_anonymous_args = 0
+ 115:Core/Src/LCD.c ****   if(row > 3U) return;
+ 585              		.loc 1 115 3 view .LVU128
+ 586              		.loc 1 115 5 is_stmt 0 view .LVU129
+ 587 0000 0328     		cmp	r0, #3
+ 588 0002 00D9     		bls	.L61
+ 589 0004 7047     		bx	lr
+ 590              	.L61:
+ 114:Core/Src/LCD.c ****   if(row > 3U) return;
+ 591              		.loc 1 114 32 view .LVU130
+ 592 0006 38B5     		push	{r3, r4, r5, lr}
+ 593              	.LCFI16:
+ 594              		.cfi_def_cfa_offset 16
+ 595              		.cfi_offset 3, -16
+ 596              		.cfi_offset 4, -12
+ 597              		.cfi_offset 5, -8
+ 598              		.cfi_offset 14, -4
+ 599 0008 0546     		mov	r5, r0
+ 116:Core/Src/LCD.c **** 
+ 117:Core/Src/LCD.c ****   LCD_SetCursor(0, row);
+ 600              		.loc 1 117 3 is_stmt 1 view .LVU131
+ 601 000a 0146     		mov	r1, r0
+ 602 000c 0020     		movs	r0, #0
+ 603              	.LVL41:
+ 604              		.loc 1 117 3 is_stmt 0 view .LVU132
+ 605 000e FFF7FEFF 		bl	LCD_SetCursor
+ 606              	.LVL42:
+ 118:Core/Src/LCD.c ****   for(uint8_t i = 0; i < 20U; i++) LCD_SendChar(' ');
+ 607              		.loc 1 118 3 is_stmt 1 view .LVU133
+ 608              	.LBB6:
+ 609              		.loc 1 118 7 view .LVU134
+ 610              		.loc 1 118 15 is_stmt 0 view .LVU135
+ 611 0012 0024     		movs	r4, #0
+ 612              	.LVL43:
+ 613              	.L55:
+ 614              		.loc 1 118 24 is_stmt 1 discriminator 3 view .LVU136
+ 615 0014 132C     		cmp	r4, #19
+ 616 0016 05D8     		bhi	.L62
+ 617              		.loc 1 118 36 discriminator 4 view .LVU137
+ 618 0018 2020     		movs	r0, #32
+ 619 001a FFF7FEFF 		bl	LCD_SendChar
+ 620              	.LVL44:
+ 621              		.loc 1 118 32 discriminator 4 view .LVU138
+ 622 001e 0134     		adds	r4, r4, #1
+ 623              	.LVL45:
+ 624              		.loc 1 118 32 is_stmt 0 discriminator 4 view .LVU139
+ 625 0020 E4B2     		uxtb	r4, r4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 14
+
+
+ 626              	.LVL46:
+ 627              		.loc 1 118 32 discriminator 4 view .LVU140
+ 628 0022 F7E7     		b	.L55
+ 629              	.LVL47:
+ 630              	.L62:
+ 631              		.loc 1 118 32 discriminator 4 view .LVU141
+ 632              	.LBE6:
+ 119:Core/Src/LCD.c ****   LCD_SetCursor(0, row);
+ 633              		.loc 1 119 3 is_stmt 1 view .LVU142
+ 634 0024 2946     		mov	r1, r5
+ 635 0026 0020     		movs	r0, #0
+ 636 0028 FFF7FEFF 		bl	LCD_SetCursor
+ 637              	.LVL48:
+ 120:Core/Src/LCD.c **** }
+ 638              		.loc 1 120 1 is_stmt 0 view .LVU143
+ 639 002c 38BD     		pop	{r3, r4, r5, pc}
+ 640              		.loc 1 120 1 view .LVU144
+ 641              		.cfi_endproc
+ 642              	.LFE77:
+ 644              		.section	.text.LCD_ScrollText,"ax",%progbits
+ 645              		.align	1
+ 646              		.global	LCD_ScrollText
+ 647              		.syntax unified
+ 648              		.thumb
+ 649              		.thumb_func
+ 651              	LCD_ScrollText:
+ 652              	.LVL49:
+ 653              	.LFB78:
+ 121:Core/Src/LCD.c **** 
+ 122:Core/Src/LCD.c **** void LCD_ScrollText(const char *text){
+ 654              		.loc 1 122 38 is_stmt 1 view -0
+ 655              		.cfi_startproc
+ 656              		@ args = 0, pretend = 0, frame = 24
+ 657              		@ frame_needed = 0, uses_anonymous_args = 0
+ 123:Core/Src/LCD.c ****   char window[21];
+ 658              		.loc 1 123 3 view .LVU146
+ 124:Core/Src/LCD.c ****   size_t len;
+ 659              		.loc 1 124 3 view .LVU147
+ 125:Core/Src/LCD.c ****   size_t stream_len;
+ 660              		.loc 1 125 3 view .LVU148
+ 126:Core/Src/LCD.c **** 
+ 127:Core/Src/LCD.c ****   if(text == NULL) return;
+ 661              		.loc 1 127 3 view .LVU149
+ 662              		.loc 1 127 5 is_stmt 0 view .LVU150
+ 663 0000 0028     		cmp	r0, #0
+ 664 0002 4AD0     		beq	.L76
+ 122:Core/Src/LCD.c ****   char window[21];
+ 665              		.loc 1 122 38 view .LVU151
+ 666 0004 70B5     		push	{r4, r5, r6, lr}
+ 667              	.LCFI17:
+ 668              		.cfi_def_cfa_offset 16
+ 669              		.cfi_offset 4, -16
+ 670              		.cfi_offset 5, -12
+ 671              		.cfi_offset 6, -8
+ 672              		.cfi_offset 14, -4
+ 673 0006 86B0     		sub	sp, sp, #24
+ 674              	.LCFI18:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 15
+
+
+ 675              		.cfi_def_cfa_offset 40
+ 676 0008 0546     		mov	r5, r0
+ 128:Core/Src/LCD.c **** 
+ 129:Core/Src/LCD.c ****   len = strlen(text);
+ 677              		.loc 1 129 3 is_stmt 1 view .LVU152
+ 678              		.loc 1 129 9 is_stmt 0 view .LVU153
+ 679 000a FFF7FEFF 		bl	strlen
+ 680              	.LVL50:
+ 130:Core/Src/LCD.c ****   stream_len = len + 40U; // 20 espaces avant + texte + 20 espaces apres
+ 681              		.loc 1 130 3 is_stmt 1 view .LVU154
+ 131:Core/Src/LCD.c ****   if(len == 0U){
+ 682              		.loc 1 131 3 view .LVU155
+ 683              		.loc 1 131 5 is_stmt 0 view .LVU156
+ 684 000e 0646     		mov	r6, r0
+ 685 0010 18B1     		cbz	r0, .L79
+ 132:Core/Src/LCD.c ****     LCD_ClearLine(0);
+ 133:Core/Src/LCD.c ****     return;
+ 134:Core/Src/LCD.c ****   }
+ 135:Core/Src/LCD.c **** 
+ 136:Core/Src/LCD.c ****   if(len <= 20U){
+ 686              		.loc 1 136 3 is_stmt 1 view .LVU157
+ 687              		.loc 1 136 5 is_stmt 0 view .LVU158
+ 688 0012 1428     		cmp	r0, #20
+ 689 0014 05D9     		bls	.L80
+ 690              	.LBB7:
+ 137:Core/Src/LCD.c ****     LCD_ClearLine(0);
+ 138:Core/Src/LCD.c ****     LCD_SetCursor(0, 0);
+ 139:Core/Src/LCD.c ****     LCD_SendString(text);
+ 140:Core/Src/LCD.c ****     return;
+ 141:Core/Src/LCD.c ****   }
+ 142:Core/Src/LCD.c **** 
+ 143:Core/Src/LCD.c ****   for(size_t step = 0; step <= (stream_len - 20U); step++){
+ 691              		.loc 1 143 14 view .LVU159
+ 692 0016 0024     		movs	r4, #0
+ 693 0018 39E0     		b	.L66
+ 694              	.L79:
+ 695              	.LBE7:
+ 132:Core/Src/LCD.c ****     LCD_ClearLine(0);
+ 696              		.loc 1 132 5 is_stmt 1 view .LVU160
+ 697 001a FFF7FEFF 		bl	LCD_ClearLine
+ 698              	.LVL51:
+ 133:Core/Src/LCD.c ****   }
+ 699              		.loc 1 133 5 view .LVU161
+ 700              	.L63:
+ 144:Core/Src/LCD.c ****     for(uint8_t i = 0; i < 20U; i++){
+ 145:Core/Src/LCD.c ****       size_t idx = step + i;
+ 146:Core/Src/LCD.c ****       if(idx < 20U){
+ 147:Core/Src/LCD.c ****         window[i] = ' ';
+ 148:Core/Src/LCD.c ****       } else if(idx < (20U + len)){
+ 149:Core/Src/LCD.c ****         window[i] = text[idx - 20U];
+ 150:Core/Src/LCD.c ****       } else {
+ 151:Core/Src/LCD.c ****         window[i] = ' ';
+ 152:Core/Src/LCD.c ****       }
+ 153:Core/Src/LCD.c ****     }
+ 154:Core/Src/LCD.c ****     window[20] = '\0';
+ 155:Core/Src/LCD.c **** 
+ 156:Core/Src/LCD.c ****     LCD_SetCursor(0, 0);
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 16
+
+
+ 157:Core/Src/LCD.c ****     LCD_SendString(window);
+ 158:Core/Src/LCD.c ****     LCD_DelayMs(250U);
+ 159:Core/Src/LCD.c ****   }
+ 160:Core/Src/LCD.c **** }
+ 701              		.loc 1 160 1 is_stmt 0 view .LVU162
+ 702 001e 06B0     		add	sp, sp, #24
+ 703              	.LCFI19:
+ 704              		.cfi_remember_state
+ 705              		.cfi_def_cfa_offset 16
+ 706              		@ sp needed
+ 707 0020 70BD     		pop	{r4, r5, r6, pc}
+ 708              	.LVL52:
+ 709              	.L80:
+ 710              	.LCFI20:
+ 711              		.cfi_restore_state
+ 137:Core/Src/LCD.c ****     LCD_SetCursor(0, 0);
+ 712              		.loc 1 137 5 is_stmt 1 view .LVU163
+ 713 0022 0020     		movs	r0, #0
+ 714              	.LVL53:
+ 137:Core/Src/LCD.c ****     LCD_SetCursor(0, 0);
+ 715              		.loc 1 137 5 is_stmt 0 view .LVU164
+ 716 0024 FFF7FEFF 		bl	LCD_ClearLine
+ 717              	.LVL54:
+ 138:Core/Src/LCD.c ****     LCD_SendString(text);
+ 718              		.loc 1 138 5 is_stmt 1 view .LVU165
+ 719 0028 0021     		movs	r1, #0
+ 720 002a 0846     		mov	r0, r1
+ 721 002c FFF7FEFF 		bl	LCD_SetCursor
+ 722              	.LVL55:
+ 139:Core/Src/LCD.c ****     return;
+ 723              		.loc 1 139 5 view .LVU166
+ 724 0030 2846     		mov	r0, r5
+ 725 0032 FFF7FEFF 		bl	LCD_SendString
+ 726              	.LVL56:
+ 140:Core/Src/LCD.c ****   }
+ 727              		.loc 1 140 5 view .LVU167
+ 728 0036 F2E7     		b	.L63
+ 729              	.LVL57:
+ 730              	.L67:
+ 731              	.LBB12:
+ 732              	.LBB8:
+ 733              	.LBB9:
+ 148:Core/Src/LCD.c ****         window[i] = text[idx - 20U];
+ 734              		.loc 1 148 14 view .LVU168
+ 148:Core/Src/LCD.c ****         window[i] = text[idx - 20U];
+ 735              		.loc 1 148 16 is_stmt 0 view .LVU169
+ 736 0038 9042     		cmp	r0, r2
+ 737 003a 14D9     		bls	.L69
+ 149:Core/Src/LCD.c ****       } else {
+ 738              		.loc 1 149 9 is_stmt 1 view .LVU170
+ 149:Core/Src/LCD.c ****       } else {
+ 739              		.loc 1 149 30 is_stmt 0 view .LVU171
+ 740 003c 143A     		subs	r2, r2, #20
+ 741              	.LVL58:
+ 149:Core/Src/LCD.c ****       } else {
+ 742              		.loc 1 149 25 view .LVU172
+ 743 003e A95C     		ldrb	r1, [r5, r2]	@ zero_extendqisi2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 17
+
+
+ 149:Core/Src/LCD.c ****       } else {
+ 744              		.loc 1 149 19 view .LVU173
+ 745 0040 03F11802 		add	r2, r3, #24
+ 746              	.LVL59:
+ 149:Core/Src/LCD.c ****       } else {
+ 747              		.loc 1 149 19 view .LVU174
+ 748 0044 6A44     		add	r2, sp, r2
+ 749 0046 02F8181C 		strb	r1, [r2, #-24]
+ 750              	.L68:
+ 149:Core/Src/LCD.c ****       } else {
+ 751              		.loc 1 149 19 view .LVU175
+ 752              	.LBE9:
+ 144:Core/Src/LCD.c ****       size_t idx = step + i;
+ 753              		.loc 1 144 34 is_stmt 1 discriminator 2 view .LVU176
+ 754 004a 0133     		adds	r3, r3, #1
+ 755              	.LVL60:
+ 144:Core/Src/LCD.c ****       size_t idx = step + i;
+ 756              		.loc 1 144 34 is_stmt 0 discriminator 2 view .LVU177
+ 757 004c DBB2     		uxtb	r3, r3
+ 758              	.LVL61:
+ 759              	.L71:
+ 144:Core/Src/LCD.c ****       size_t idx = step + i;
+ 760              		.loc 1 144 26 is_stmt 1 discriminator 1 view .LVU178
+ 761 004e 132B     		cmp	r3, #19
+ 762 0050 10D8     		bhi	.L81
+ 763              	.LBB10:
+ 145:Core/Src/LCD.c ****       if(idx < 20U){
+ 764              		.loc 1 145 7 view .LVU179
+ 145:Core/Src/LCD.c ****       if(idx < 20U){
+ 765              		.loc 1 145 14 is_stmt 0 view .LVU180
+ 766 0052 1A19     		adds	r2, r3, r4
+ 767              	.LVL62:
+ 146:Core/Src/LCD.c ****         window[i] = ' ';
+ 768              		.loc 1 146 7 is_stmt 1 view .LVU181
+ 146:Core/Src/LCD.c ****         window[i] = ' ';
+ 769              		.loc 1 146 9 is_stmt 0 view .LVU182
+ 770 0054 132A     		cmp	r2, #19
+ 771 0056 EFD8     		bhi	.L67
+ 147:Core/Src/LCD.c ****       } else if(idx < (20U + len)){
+ 772              		.loc 1 147 9 is_stmt 1 view .LVU183
+ 147:Core/Src/LCD.c ****       } else if(idx < (20U + len)){
+ 773              		.loc 1 147 19 is_stmt 0 view .LVU184
+ 774 0058 2021     		movs	r1, #32
+ 775 005a 03F11802 		add	r2, r3, #24
+ 776              	.LVL63:
+ 147:Core/Src/LCD.c ****       } else if(idx < (20U + len)){
+ 777              		.loc 1 147 19 view .LVU185
+ 778 005e 6A44     		add	r2, sp, r2
+ 779 0060 02F8181C 		strb	r1, [r2, #-24]
+ 780 0064 F1E7     		b	.L68
+ 781              	.LVL64:
+ 782              	.L69:
+ 151:Core/Src/LCD.c ****       }
+ 783              		.loc 1 151 9 is_stmt 1 view .LVU186
+ 151:Core/Src/LCD.c ****       }
+ 784              		.loc 1 151 19 is_stmt 0 view .LVU187
+ 785 0066 2021     		movs	r1, #32
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 18
+
+
+ 786 0068 03F11802 		add	r2, r3, #24
+ 787              	.LVL65:
+ 151:Core/Src/LCD.c ****       }
+ 788              		.loc 1 151 19 view .LVU188
+ 789 006c 6A44     		add	r2, sp, r2
+ 790 006e 02F8181C 		strb	r1, [r2, #-24]
+ 791 0072 EAE7     		b	.L68
+ 792              	.LVL66:
+ 793              	.L81:
+ 151:Core/Src/LCD.c ****       }
+ 794              		.loc 1 151 19 view .LVU189
+ 795              	.LBE10:
+ 796              	.LBE8:
+ 154:Core/Src/LCD.c **** 
+ 797              		.loc 1 154 5 is_stmt 1 view .LVU190
+ 154:Core/Src/LCD.c **** 
+ 798              		.loc 1 154 16 is_stmt 0 view .LVU191
+ 799 0074 0020     		movs	r0, #0
+ 800 0076 8DF81400 		strb	r0, [sp, #20]
+ 156:Core/Src/LCD.c ****     LCD_SendString(window);
+ 801              		.loc 1 156 5 is_stmt 1 view .LVU192
+ 802 007a 0146     		mov	r1, r0
+ 803 007c FFF7FEFF 		bl	LCD_SetCursor
+ 804              	.LVL67:
+ 157:Core/Src/LCD.c ****     LCD_DelayMs(250U);
+ 805              		.loc 1 157 5 view .LVU193
+ 806 0080 6846     		mov	r0, sp
+ 807 0082 FFF7FEFF 		bl	LCD_SendString
+ 808              	.LVL68:
+ 158:Core/Src/LCD.c ****   }
+ 809              		.loc 1 158 5 view .LVU194
+ 810 0086 FA20     		movs	r0, #250
+ 811 0088 FFF7FEFF 		bl	LCD_DelayMs
+ 812              	.LVL69:
+ 143:Core/Src/LCD.c ****     for(uint8_t i = 0; i < 20U; i++){
+ 813              		.loc 1 143 56 discriminator 2 view .LVU195
+ 814 008c 0134     		adds	r4, r4, #1
+ 815              	.LVL70:
+ 816              	.L66:
+ 143:Core/Src/LCD.c ****     for(uint8_t i = 0; i < 20U; i++){
+ 817              		.loc 1 143 29 discriminator 1 view .LVU196
+ 143:Core/Src/LCD.c ****     for(uint8_t i = 0; i < 20U; i++){
+ 818              		.loc 1 143 44 is_stmt 0 discriminator 1 view .LVU197
+ 819 008e 06F11400 		add	r0, r6, #20
+ 143:Core/Src/LCD.c ****     for(uint8_t i = 0; i < 20U; i++){
+ 820              		.loc 1 143 29 discriminator 1 view .LVU198
+ 821 0092 A042     		cmp	r0, r4
+ 822 0094 C3D3     		bcc	.L63
+ 823              	.LBB11:
+ 144:Core/Src/LCD.c ****       size_t idx = step + i;
+ 824              		.loc 1 144 17 view .LVU199
+ 825 0096 0023     		movs	r3, #0
+ 826 0098 D9E7     		b	.L71
+ 827              	.LVL71:
+ 828              	.L76:
+ 829              	.LCFI21:
+ 830              		.cfi_def_cfa_offset 0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 19
+
+
+ 831              		.cfi_restore 4
+ 832              		.cfi_restore 5
+ 833              		.cfi_restore 6
+ 834              		.cfi_restore 14
+ 144:Core/Src/LCD.c ****       size_t idx = step + i;
+ 835              		.loc 1 144 17 view .LVU200
+ 836 009a 7047     		bx	lr
+ 837              	.LBE11:
+ 838              	.LBE12:
+ 839              		.cfi_endproc
+ 840              	.LFE78:
+ 842              		.section	.text.LCD_Init,"ax",%progbits
+ 843              		.align	1
+ 844              		.global	LCD_Init
+ 845              		.syntax unified
+ 846              		.thumb
+ 847              		.thumb_func
+ 849              	LCD_Init:
+ 850              	.LFB79:
+ 161:Core/Src/LCD.c **** 
+ 162:Core/Src/LCD.c **** void LCD_Init(void){
+ 851              		.loc 1 162 20 is_stmt 1 view -0
+ 852              		.cfi_startproc
+ 853              		@ args = 0, pretend = 0, frame = 0
+ 854              		@ frame_needed = 0, uses_anonymous_args = 0
+ 855 0000 08B5     		push	{r3, lr}
+ 856              	.LCFI22:
+ 857              		.cfi_def_cfa_offset 8
+ 858              		.cfi_offset 3, -8
+ 859              		.cfi_offset 14, -4
+ 163:Core/Src/LCD.c ****   LCD_DelayMs(50U);
+ 860              		.loc 1 163 3 view .LVU202
+ 861 0002 3220     		movs	r0, #50
+ 862 0004 FFF7FEFF 		bl	LCD_DelayMs
+ 863              	.LVL72:
+ 164:Core/Src/LCD.c ****   
+ 165:Core/Src/LCD.c ****   LCD_SendCommand(0x33);
+ 864              		.loc 1 165 3 view .LVU203
+ 865 0008 3320     		movs	r0, #51
+ 866 000a FFF7FEFF 		bl	LCD_SendCommand
+ 867              	.LVL73:
+ 166:Core/Src/LCD.c ****   LCD_SendCommand(0x32);
+ 868              		.loc 1 166 3 view .LVU204
+ 869 000e 3220     		movs	r0, #50
+ 870 0010 FFF7FEFF 		bl	LCD_SendCommand
+ 871              	.LVL74:
+ 167:Core/Src/LCD.c ****   
+ 168:Core/Src/LCD.c ****   LCD_SendCommand(0x28);
+ 872              		.loc 1 168 3 view .LVU205
+ 873 0014 2820     		movs	r0, #40
+ 874 0016 FFF7FEFF 		bl	LCD_SendCommand
+ 875              	.LVL75:
+ 169:Core/Src/LCD.c ****   LCD_SendCommand(0x0C);
+ 876              		.loc 1 169 3 view .LVU206
+ 877 001a 0C20     		movs	r0, #12
+ 878 001c FFF7FEFF 		bl	LCD_SendCommand
+ 879              	.LVL76:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 20
+
+
+ 170:Core/Src/LCD.c ****   LCD_SendCommand(0x06);
+ 880              		.loc 1 170 3 view .LVU207
+ 881 0020 0620     		movs	r0, #6
+ 882 0022 FFF7FEFF 		bl	LCD_SendCommand
+ 883              	.LVL77:
+ 171:Core/Src/LCD.c ****   LCD_SendCommand(0x01);
+ 884              		.loc 1 171 3 view .LVU208
+ 885 0026 0120     		movs	r0, #1
+ 886 0028 FFF7FEFF 		bl	LCD_SendCommand
+ 887              	.LVL78:
+ 172:Core/Src/LCD.c ****   LCD_DelayMs(2U);
+ 888              		.loc 1 172 3 view .LVU209
+ 889 002c 0220     		movs	r0, #2
+ 890 002e FFF7FEFF 		bl	LCD_DelayMs
+ 891              	.LVL79:
+ 173:Core/Src/LCD.c ****  
+ 174:Core/Src/LCD.c **** }
+ 892              		.loc 1 174 1 is_stmt 0 view .LVU210
+ 893 0032 08BD     		pop	{r3, pc}
+ 894              		.cfi_endproc
+ 895              	.LFE79:
+ 897              		.section	.text.LCD_Clear,"ax",%progbits
+ 898              		.align	1
+ 899              		.global	LCD_Clear
+ 900              		.syntax unified
+ 901              		.thumb
+ 902              		.thumb_func
+ 904              	LCD_Clear:
+ 905              	.LFB80:
+ 175:Core/Src/LCD.c **** 
+ 176:Core/Src/LCD.c **** void LCD_Clear(void){
+ 906              		.loc 1 176 21 is_stmt 1 view -0
+ 907              		.cfi_startproc
+ 908              		@ args = 0, pretend = 0, frame = 0
+ 909              		@ frame_needed = 0, uses_anonymous_args = 0
+ 910 0000 08B5     		push	{r3, lr}
+ 911              	.LCFI23:
+ 912              		.cfi_def_cfa_offset 8
+ 913              		.cfi_offset 3, -8
+ 914              		.cfi_offset 14, -4
+ 177:Core/Src/LCD.c ****   LCD_SendCommand(0x01);
+ 915              		.loc 1 177 3 view .LVU212
+ 916 0002 0120     		movs	r0, #1
+ 917 0004 FFF7FEFF 		bl	LCD_SendCommand
+ 918              	.LVL80:
+ 178:Core/Src/LCD.c ****   LCD_DelayMs(2U);
+ 919              		.loc 1 178 3 view .LVU213
+ 920 0008 0220     		movs	r0, #2
+ 921 000a FFF7FEFF 		bl	LCD_DelayMs
+ 922              	.LVL81:
+ 179:Core/Src/LCD.c **** }
+ 923              		.loc 1 179 1 is_stmt 0 view .LVU214
+ 924 000e 08BD     		pop	{r3, pc}
+ 925              		.cfi_endproc
+ 926              	.LFE80:
+ 928              		.section	.text.LCD_WriteAt,"ax",%progbits
+ 929              		.align	1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 21
+
+
+ 930              		.global	LCD_WriteAt
+ 931              		.syntax unified
+ 932              		.thumb
+ 933              		.thumb_func
+ 935              	LCD_WriteAt:
+ 936              	.LVL82:
+ 937              	.LFB81:
+ 180:Core/Src/LCD.c **** 
+ 181:Core/Src/LCD.c **** void LCD_WriteAt(uint8_t col, uint8_t row, const char *str){
+ 938              		.loc 1 181 60 is_stmt 1 view -0
+ 939              		.cfi_startproc
+ 940              		@ args = 0, pretend = 0, frame = 0
+ 941              		@ frame_needed = 0, uses_anonymous_args = 0
+ 182:Core/Src/LCD.c ****   if(str == NULL) return;
+ 942              		.loc 1 182 3 view .LVU216
+ 943              		.loc 1 182 5 is_stmt 0 view .LVU217
+ 944 0000 3AB1     		cbz	r2, .L89
+ 181:Core/Src/LCD.c ****   if(str == NULL) return;
+ 945              		.loc 1 181 60 view .LVU218
+ 946 0002 10B5     		push	{r4, lr}
+ 947              	.LCFI24:
+ 948              		.cfi_def_cfa_offset 8
+ 949              		.cfi_offset 4, -8
+ 950              		.cfi_offset 14, -4
+ 951 0004 1446     		mov	r4, r2
+ 183:Core/Src/LCD.c **** 
+ 184:Core/Src/LCD.c ****   LCD_SetCursor(col, row);
+ 952              		.loc 1 184 3 is_stmt 1 view .LVU219
+ 953 0006 FFF7FEFF 		bl	LCD_SetCursor
+ 954              	.LVL83:
+ 185:Core/Src/LCD.c ****   LCD_SendString(str);
+ 955              		.loc 1 185 3 view .LVU220
+ 956 000a 2046     		mov	r0, r4
+ 957 000c FFF7FEFF 		bl	LCD_SendString
+ 958              	.LVL84:
+ 186:Core/Src/LCD.c **** }
+ 959              		.loc 1 186 1 is_stmt 0 view .LVU221
+ 960 0010 10BD     		pop	{r4, pc}
+ 961              	.LVL85:
+ 962              	.L89:
+ 963              	.LCFI25:
+ 964              		.cfi_def_cfa_offset 0
+ 965              		.cfi_restore 4
+ 966              		.cfi_restore 14
+ 967              		.loc 1 186 1 view .LVU222
+ 968 0012 7047     		bx	lr
+ 969              		.cfi_endproc
+ 970              	.LFE81:
+ 972              		.section	.text.LCD_PrintfAt,"ax",%progbits
+ 973              		.align	1
+ 974              		.global	LCD_PrintfAt
+ 975              		.syntax unified
+ 976              		.thumb
+ 977              		.thumb_func
+ 979              	LCD_PrintfAt:
+ 980              	.LVL86:
+ 981              	.LFB82:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 22
+
+
+ 187:Core/Src/LCD.c **** 
+ 188:Core/Src/LCD.c **** void LCD_PrintfAt(uint8_t col, uint8_t row, const char *fmt, ...){
+ 982              		.loc 1 188 66 is_stmt 1 view -0
+ 983              		.cfi_startproc
+ 984              		@ args = 4, pretend = 8, frame = 88
+ 985              		@ frame_needed = 0, uses_anonymous_args = 1
+ 986              		.loc 1 188 66 is_stmt 0 view .LVU224
+ 987 0000 0CB4     		push	{r2, r3}
+ 988              	.LCFI26:
+ 989              		.cfi_def_cfa_offset 8
+ 990              		.cfi_offset 2, -8
+ 991              		.cfi_offset 3, -4
+ 992 0002 30B5     		push	{r4, r5, lr}
+ 993              	.LCFI27:
+ 994              		.cfi_def_cfa_offset 20
+ 995              		.cfi_offset 4, -20
+ 996              		.cfi_offset 5, -16
+ 997              		.cfi_offset 14, -12
+ 998 0004 97B0     		sub	sp, sp, #92
+ 999              	.LCFI28:
+ 1000              		.cfi_def_cfa_offset 112
+ 1001 0006 1A9A     		ldr	r2, [sp, #104]
+ 189:Core/Src/LCD.c ****   char buffer[81];
+ 1002              		.loc 1 189 3 is_stmt 1 view .LVU225
+ 190:Core/Src/LCD.c ****   va_list args;
+ 1003              		.loc 1 190 3 view .LVU226
+ 191:Core/Src/LCD.c **** 
+ 192:Core/Src/LCD.c ****   if(fmt == NULL) return;
+ 1004              		.loc 1 192 3 view .LVU227
+ 1005              		.loc 1 192 5 is_stmt 0 view .LVU228
+ 1006 0008 72B1     		cbz	r2, .L92
+ 1007 000a 0546     		mov	r5, r0
+ 1008 000c 0C46     		mov	r4, r1
+ 193:Core/Src/LCD.c **** 
+ 194:Core/Src/LCD.c ****   va_start(args, fmt);
+ 1009              		.loc 1 194 3 is_stmt 1 view .LVU229
+ 1010 000e 1BAB     		add	r3, sp, #108
+ 1011 0010 0093     		str	r3, [sp]
+ 195:Core/Src/LCD.c ****   (void)vsnprintf(buffer, sizeof(buffer), fmt, args);
+ 1012              		.loc 1 195 3 view .LVU230
+ 1013              		.loc 1 195 9 is_stmt 0 view .LVU231
+ 1014 0012 5121     		movs	r1, #81
+ 1015              	.LVL87:
+ 1016              		.loc 1 195 9 view .LVU232
+ 1017 0014 01A8     		add	r0, sp, #4
+ 1018              	.LVL88:
+ 1019              		.loc 1 195 9 view .LVU233
+ 1020 0016 FFF7FEFF 		bl	vsnprintf
+ 1021              	.LVL89:
+ 196:Core/Src/LCD.c ****   va_end(args);
+ 1022              		.loc 1 196 3 is_stmt 1 view .LVU234
+ 197:Core/Src/LCD.c **** 
+ 198:Core/Src/LCD.c ****   LCD_SetCursor(col, row);
+ 1023              		.loc 1 198 3 view .LVU235
+ 1024 001a 2146     		mov	r1, r4
+ 1025 001c 2846     		mov	r0, r5
+ 1026 001e FFF7FEFF 		bl	LCD_SetCursor
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 23
+
+
+ 1027              	.LVL90:
+ 199:Core/Src/LCD.c ****   LCD_SendString(buffer);
+ 1028              		.loc 1 199 3 view .LVU236
+ 1029 0022 01A8     		add	r0, sp, #4
+ 1030 0024 FFF7FEFF 		bl	LCD_SendString
+ 1031              	.LVL91:
+ 1032              	.L92:
+ 200:Core/Src/LCD.c **** }
+ 1033              		.loc 1 200 1 is_stmt 0 view .LVU237
+ 1034 0028 17B0     		add	sp, sp, #92
+ 1035              	.LCFI29:
+ 1036              		.cfi_def_cfa_offset 20
+ 1037              		@ sp needed
+ 1038 002a BDE83040 		pop	{r4, r5, lr}
+ 1039              	.LCFI30:
+ 1040              		.cfi_restore 14
+ 1041              		.cfi_restore 5
+ 1042              		.cfi_restore 4
+ 1043              		.cfi_def_cfa_offset 8
+ 1044 002e 02B0     		add	sp, sp, #8
+ 1045              	.LCFI31:
+ 1046              		.cfi_restore 3
+ 1047              		.cfi_restore 2
+ 1048              		.cfi_def_cfa_offset 0
+ 1049 0030 7047     		bx	lr
+ 1050              		.cfi_endproc
+ 1051              	.LFE82:
+ 1053              		.section	.rodata.RowAddress.0,"a"
+ 1054              		.align	2
+ 1057              	RowAddress.0:
+ 1058 0000 80C094D4 		.ascii	"\200\300\224\324"
+ 1059              		.text
+ 1060              	.Letext0:
+ 1061              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
+ 1062              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
+ 1063              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 1064              		.file 5 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1/includ
+ 1065              		.file 6 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1/includ
+ 1066              		.file 7 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/string.h"
+ 1067              		.file 8 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/stdio.h"
+ 1068              		.file 9 "<built-in>"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 LCD.c
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:19     .text.LCD_DelayMs:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:24     .text.LCD_DelayMs:00000000 LCD_DelayMs
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:69     .text.LCD_DelayShort:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:74     .text.LCD_DelayShort:00000000 LCD_DelayShort
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:113    .text.LCD_EnablePulse:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:118    .text.LCD_EnablePulse:00000000 LCD_EnablePulse
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:148    .text.LCD_EnablePulse:00000018 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:153    .text.LCD_Send4Bits:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:158    .text.LCD_Send4Bits:00000000 LCD_Send4Bits
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:192    .text.LCD_Send4Bits:00000018 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:197    .text.LCD_SendCommand:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:203    .text.LCD_SendCommand:00000000 LCD_SendCommand
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:241    .text.LCD_SendCommand:00000024 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:246    .text.LCD_SendChar:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:252    .text.LCD_SendChar:00000000 LCD_SendChar
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:290    .text.LCD_SendChar:00000024 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:295    .text.LCD_SendString:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:301    .text.LCD_SendString:00000000 LCD_SendString
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:341    .text.LCD_SetCursor:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:347    .text.LCD_SetCursor:00000000 LCD_SetCursor
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:388    .text.LCD_SetCursor:0000001c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:1057   .rodata.RowAddress.0:00000000 RowAddress.0
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:393    .text.LCD_Printf:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:399    .text.LCD_Printf:00000000 LCD_Printf
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:572    .text.LCD_ClearLine:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:578    .text.LCD_ClearLine:00000000 LCD_ClearLine
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:645    .text.LCD_ScrollText:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:651    .text.LCD_ScrollText:00000000 LCD_ScrollText
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:843    .text.LCD_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:849    .text.LCD_Init:00000000 LCD_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:898    .text.LCD_Clear:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:904    .text.LCD_Clear:00000000 LCD_Clear
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:929    .text.LCD_WriteAt:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:935    .text.LCD_WriteAt:00000000 LCD_WriteAt
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:973    .text.LCD_PrintfAt:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:979    .text.LCD_PrintfAt:00000000 LCD_PrintfAt
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cciGIVND.s:1054   .rodata.RowAddress.0:00000000 $d
+
+UNDEFINED SYMBOLS
+vsnprintf
+strlen

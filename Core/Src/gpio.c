@@ -51,31 +51,42 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_BP_GPIO_Port, LED_BP_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LED_STATUS_Pin|LED_USB_Pin|LED_ERROR_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : LED_BP_Pin */
-  GPIO_InitStruct.Pin = LED_BP_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_EXTRA1_GPIO_Port, LED_EXTRA1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : LED_STATUS_Pin LED_USB_Pin LED_ERROR_Pin */
+  GPIO_InitStruct.Pin = LED_STATUS_Pin|LED_USB_Pin|LED_ERROR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_BP_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : P1_0_Pin P1_2_Pin P1_3_Pin P1_4_Pin
-                           P1_6_Pin P1_7_Pin */
-  GPIO_InitStruct.Pin = P1_0_Pin|P1_2_Pin|P1_3_Pin|P1_4_Pin
-                          |P1_6_Pin|P1_7_Pin;
+  /*Configure GPIO pin : LED_EXTRA1_Pin */
+  GPIO_InitStruct.Pin = LED_EXTRA1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_EXTRA1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : AFLC_SYNC_Pin */
+  GPIO_InitStruct.Pin = AFLC_SYNC_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(AFLC_SYNC_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : P2_0_Pin P2_6_Pin P2_3_Pin P2_1_Pin
-                           P2_2_Pin P2_5_Pin P2_4_Pin P2_7_Pin */
-  GPIO_InitStruct.Pin = P2_0_Pin|P2_6_Pin|P2_3_Pin|P2_1_Pin
-                          |P2_2_Pin|P2_5_Pin|P2_4_Pin|P2_7_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  /*Configure GPIO pins : PB9 PB10 PB11 PB12 PB13 PB14 PB15 for LCD */
+  HAL_GPIO_WritePin(GPIOB, LCD_RS_Pin|LCD_RW_Pin|LCD_EN_Pin|
+                           LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin,
+                    GPIO_PIN_RESET);
+
+  GPIO_InitStruct.Pin = LCD_RS_Pin|LCD_RW_Pin|LCD_EN_Pin|
+                        LCD_D4_Pin|LCD_D5_Pin|LCD_D6_Pin|LCD_D7_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
 }
 
 /* USER CODE BEGIN 2 */

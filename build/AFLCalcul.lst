@@ -1,0 +1,321 @@
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"AFLCalcul.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "Core/Src/AFLCalcul.c"
+  18              		.section	.text.AFLCalcul_Compute,"ax",%progbits
+  19              		.align	1
+  20              		.global	AFLCalcul_Compute
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	AFLCalcul_Compute:
+  26              	.LVL0:
+  27              	.LFB65:
+   1:Core/Src/AFLCalcul.c **** #include "AFLCalcul.h"
+   2:Core/Src/AFLCalcul.c **** 
+   3:Core/Src/AFLCalcul.c **** void AFLCalcul_Compute(const Profil_Result_t *profiles,
+   4:Core/Src/AFLCalcul.c ****                        const TemperatureSnapshot_t *temps,
+   5:Core/Src/AFLCalcul.c ****                        const TachometerSnapshot_t *tach,
+   6:Core/Src/AFLCalcul.c ****                        AFLCalcul_Output_t *out)
+   7:Core/Src/AFLCalcul.c **** {
+  28              		.loc 1 7 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+   8:Core/Src/AFLCalcul.c ****     uint8_t index;
+  32              		.loc 1 8 5 view .LVU1
+   9:Core/Src/AFLCalcul.c **** 
+  10:Core/Src/AFLCalcul.c ****     if ((profiles == NULL) || (temps == NULL) || (tach == NULL) || (out == NULL)) {
+  33              		.loc 1 10 5 view .LVU2
+  34              		.loc 1 10 8 is_stmt 0 view .LVU3
+  35 0000 0028     		cmp	r0, #0
+  36 0002 5DD0     		beq	.L12
+   7:Core/Src/AFLCalcul.c ****     uint8_t index;
+  37              		.loc 1 7 1 view .LVU4
+  38 0004 F0B5     		push	{r4, r5, r6, r7, lr}
+  39              	.LCFI0:
+  40              		.cfi_def_cfa_offset 20
+  41              		.cfi_offset 4, -20
+  42              		.cfi_offset 5, -16
+  43              		.cfi_offset 6, -12
+  44              		.cfi_offset 7, -8
+  45              		.cfi_offset 14, -4
+  46 0006 0C46     		mov	r4, r1
+  47 0008 1146     		mov	r1, r2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s 			page 2
+
+
+  48              	.LVL1:
+   7:Core/Src/AFLCalcul.c ****     uint8_t index;
+  49              		.loc 1 7 1 view .LVU5
+  50 000a 1D46     		mov	r5, r3
+  51 000c 8646     		mov	lr, r0
+  52              		.loc 1 10 28 discriminator 1 view .LVU6
+  53 000e 002C     		cmp	r4, #0
+  54 0010 55D0     		beq	.L1
+  55              		.loc 1 10 47 discriminator 2 view .LVU7
+  56 0012 002A     		cmp	r2, #0
+  57 0014 53D0     		beq	.L1
+  58              		.loc 1 10 65 discriminator 3 view .LVU8
+  59 0016 002B     		cmp	r3, #0
+  60 0018 51D0     		beq	.L1
+  11:Core/Src/AFLCalcul.c ****         return;
+  12:Core/Src/AFLCalcul.c ****     }
+  13:Core/Src/AFLCalcul.c **** 
+  14:Core/Src/AFLCalcul.c ****     for (index = 0U; index < PROFIL_FAN_COUNT; index++) {
+  61              		.loc 1 14 16 view .LVU9
+  62 001a 0020     		movs	r0, #0
+  63              	.LVL2:
+  64              		.loc 1 14 16 view .LVU10
+  65 001c 27E0     		b	.L3
+  66              	.LVL3:
+  67              	.L4:
+  68              	.LBB2:
+  15:Core/Src/AFLCalcul.c ****         const Profil_Params_t *profile = &profiles->fans[index];
+  16:Core/Src/AFLCalcul.c ****         uint8_t temperature = temps->values_c[index];
+  17:Core/Src/AFLCalcul.c ****         uint32_t target_rpm;
+  18:Core/Src/AFLCalcul.c **** 
+  19:Core/Src/AFLCalcul.c ****         if (temperature <= profile->temp_min_c) {
+  20:Core/Src/AFLCalcul.c ****             target_rpm = profile->min_rpm;
+  21:Core/Src/AFLCalcul.c ****         } else if (temperature >= profile->temp_max_c) {
+  69              		.loc 1 21 16 is_stmt 1 view .LVU11
+  70              		.loc 1 21 42 is_stmt 0 view .LVU12
+  71 001e C0EBC006 		rsb	r6, r0, r0, lsl #3
+  72 0022 0EEB4606 		add	r6, lr, r6, lsl #1
+  73 0026 F67A     		ldrb	r6, [r6, #11]	@ zero_extendqisi2
+  74              		.loc 1 21 19 view .LVU13
+  75 0028 9642     		cmp	r6, r2
+  76 002a 05D8     		bhi	.L6
+  22:Core/Src/AFLCalcul.c ****             target_rpm = profile->max_rpm;
+  77              		.loc 1 22 13 is_stmt 1 view .LVU14
+  78              		.loc 1 22 33 is_stmt 0 view .LVU15
+  79 002c C0EBC003 		rsb	r3, r0, r0, lsl #3
+  80 0030 0EEB4303 		add	r3, lr, r3, lsl #1
+  81 0034 1A89     		ldrh	r2, [r3, #8]
+  82              	.LVL4:
+  83              		.loc 1 22 33 view .LVU16
+  84 0036 2AE0     		b	.L5
+  85              	.LVL5:
+  86              	.L6:
+  87              	.LBB3:
+  23:Core/Src/AFLCalcul.c ****         } else {
+  24:Core/Src/AFLCalcul.c ****             uint32_t delta_temp = (uint32_t)(temperature - profile->temp_min_c);
+  88              		.loc 1 24 13 is_stmt 1 view .LVU17
+  89              		.loc 1 24 58 is_stmt 0 view .LVU18
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s 			page 3
+
+
+  90 0038 D31A     		subs	r3, r2, r3
+  91              	.LVL6:
+  25:Core/Src/AFLCalcul.c ****             target_rpm = (uint32_t)profile->min_rpm
+  92              		.loc 1 25 13 is_stmt 1 view .LVU19
+  93              		.loc 1 25 43 is_stmt 0 view .LVU20
+  94 003a C0EBC002 		rsb	r2, r0, r0, lsl #3
+  95              	.LVL7:
+  96              		.loc 1 25 43 view .LVU21
+  97 003e 0EEB4202 		add	r2, lr, r2, lsl #1
+  98 0042 9788     		ldrh	r7, [r2, #4]
+  26:Core/Src/AFLCalcul.c ****                        + ((uint32_t)profile->gain_num * delta_temp) / profile->gain_den;
+  99              		.loc 1 26 44 view .LVU22
+ 100 0044 9689     		ldrh	r6, [r2, #12]
+ 101              		.loc 1 26 55 view .LVU23
+ 102 0046 06FB03F3 		mul	r3, r6, r3
+ 103              	.LVL8:
+ 104              		.loc 1 26 78 view .LVU24
+ 105 004a D289     		ldrh	r2, [r2, #14]
+ 106              		.loc 1 26 69 view .LVU25
+ 107 004c B3FBF2F3 		udiv	r3, r3, r2
+  25:Core/Src/AFLCalcul.c ****             target_rpm = (uint32_t)profile->min_rpm
+ 108              		.loc 1 25 24 view .LVU26
+ 109 0050 3A46     		mov	r2, r7
+ 110 0052 1A44     		add	r2, r2, r3
+ 111 0054 1BE0     		b	.L5
+ 112              	.LVL9:
+ 113              	.L7:
+  25:Core/Src/AFLCalcul.c ****             target_rpm = (uint32_t)profile->min_rpm
+ 114              		.loc 1 25 24 view .LVU27
+ 115              	.LBE3:
+  27:Core/Src/AFLCalcul.c ****         }
+  28:Core/Src/AFLCalcul.c **** 
+  29:Core/Src/AFLCalcul.c ****         if (tach->fans[index].signal_present && (tach->fans[index].rpm_filtered + 200U < target_rpm
+  30:Core/Src/AFLCalcul.c ****             if (target_rpm < profile->nominal_rpm) {
+  31:Core/Src/AFLCalcul.c ****                 target_rpm = profile->nominal_rpm;
+  32:Core/Src/AFLCalcul.c ****             }
+  33:Core/Src/AFLCalcul.c ****         }
+  34:Core/Src/AFLCalcul.c **** 
+  35:Core/Src/AFLCalcul.c ****         if (target_rpm > profile->max_rpm) {
+ 116              		.loc 1 35 9 is_stmt 1 view .LVU28
+ 117              		.loc 1 35 33 is_stmt 0 view .LVU29
+ 118 0056 CCEBCC03 		rsb	r3, ip, ip, lsl #3
+ 119 005a 0EEB4303 		add	r3, lr, r3, lsl #1
+ 120 005e 1B89     		ldrh	r3, [r3, #8]
+ 121              		.loc 1 35 12 view .LVU30
+ 122 0060 9342     		cmp	r3, r2
+ 123 0062 00D3     		bcc	.L8
+ 124              		.loc 1 35 12 view .LVU31
+ 125 0064 1346     		mov	r3, r2
+ 126              	.L8:
+ 127              	.LVL10:
+  36:Core/Src/AFLCalcul.c ****             target_rpm = profile->max_rpm;
+  37:Core/Src/AFLCalcul.c ****         }
+  38:Core/Src/AFLCalcul.c **** 
+  39:Core/Src/AFLCalcul.c ****         out->target_rpm[index] = (uint16_t)target_rpm;
+ 128              		.loc 1 39 9 is_stmt 1 view .LVU32
+ 129              		.loc 1 39 32 is_stmt 0 view .LVU33
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s 			page 4
+
+
+ 130 0066 25F81C30 		strh	r3, [r5, ip, lsl #1]	@ movhi
+ 131              	.LVL11:
+ 132              		.loc 1 39 32 view .LVU34
+ 133              	.LBE2:
+  14:Core/Src/AFLCalcul.c ****         const Profil_Params_t *profile = &profiles->fans[index];
+ 134              		.loc 1 14 53 is_stmt 1 discriminator 2 view .LVU35
+ 135 006a 0130     		adds	r0, r0, #1
+ 136              	.LVL12:
+  14:Core/Src/AFLCalcul.c ****         const Profil_Params_t *profile = &profiles->fans[index];
+ 137              		.loc 1 14 53 is_stmt 0 discriminator 2 view .LVU36
+ 138 006c C0B2     		uxtb	r0, r0
+ 139              	.LVL13:
+ 140              	.L3:
+  14:Core/Src/AFLCalcul.c ****         const Profil_Params_t *profile = &profiles->fans[index];
+ 141              		.loc 1 14 28 is_stmt 1 discriminator 1 view .LVU37
+ 142 006e 0328     		cmp	r0, #3
+ 143 0070 25D8     		bhi	.L1
+ 144              	.LBB4:
+  15:Core/Src/AFLCalcul.c ****         uint8_t temperature = temps->values_c[index];
+ 145              		.loc 1 15 9 view .LVU38
+  15:Core/Src/AFLCalcul.c ****         uint8_t temperature = temps->values_c[index];
+ 146              		.loc 1 15 57 is_stmt 0 view .LVU39
+ 147 0072 8446     		mov	ip, r0
+ 148              	.LVL14:
+  16:Core/Src/AFLCalcul.c ****         uint32_t target_rpm;
+ 149              		.loc 1 16 9 is_stmt 1 view .LVU40
+  16:Core/Src/AFLCalcul.c ****         uint32_t target_rpm;
+ 150              		.loc 1 16 17 is_stmt 0 view .LVU41
+ 151 0074 225C     		ldrb	r2, [r4, r0]	@ zero_extendqisi2
+ 152              	.LVL15:
+  17:Core/Src/AFLCalcul.c **** 
+ 153              		.loc 1 17 9 is_stmt 1 view .LVU42
+  19:Core/Src/AFLCalcul.c ****             target_rpm = profile->min_rpm;
+ 154              		.loc 1 19 9 view .LVU43
+  19:Core/Src/AFLCalcul.c ****             target_rpm = profile->min_rpm;
+ 155              		.loc 1 19 35 is_stmt 0 view .LVU44
+ 156 0076 C0EBC003 		rsb	r3, r0, r0, lsl #3
+ 157 007a 0EEB4303 		add	r3, lr, r3, lsl #1
+ 158 007e 9B7A     		ldrb	r3, [r3, #10]	@ zero_extendqisi2
+  19:Core/Src/AFLCalcul.c ****             target_rpm = profile->min_rpm;
+ 159              		.loc 1 19 12 view .LVU45
+ 160 0080 9342     		cmp	r3, r2
+ 161 0082 CCD3     		bcc	.L4
+  20:Core/Src/AFLCalcul.c ****         } else if (temperature >= profile->temp_max_c) {
+ 162              		.loc 1 20 13 is_stmt 1 view .LVU46
+  20:Core/Src/AFLCalcul.c ****         } else if (temperature >= profile->temp_max_c) {
+ 163              		.loc 1 20 33 is_stmt 0 view .LVU47
+ 164 0084 C0EBC003 		rsb	r3, r0, r0, lsl #3
+ 165 0088 0EEB4303 		add	r3, lr, r3, lsl #1
+ 166 008c 9A88     		ldrh	r2, [r3, #4]
+ 167              	.LVL16:
+ 168              	.L5:
+  29:Core/Src/AFLCalcul.c ****             if (target_rpm < profile->nominal_rpm) {
+ 169              		.loc 1 29 9 is_stmt 1 view .LVU48
+  29:Core/Src/AFLCalcul.c ****             if (target_rpm < profile->nominal_rpm) {
+ 170              		.loc 1 29 30 is_stmt 0 view .LVU49
+ 171 008e 0CEB4C03 		add	r3, ip, ip, lsl #1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s 			page 5
+
+
+ 172 0092 01EB4303 		add	r3, r1, r3, lsl #1
+ 173 0096 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+  29:Core/Src/AFLCalcul.c ****             if (target_rpm < profile->nominal_rpm) {
+ 174              		.loc 1 29 12 view .LVU50
+ 175 0098 002B     		cmp	r3, #0
+ 176 009a DCD0     		beq	.L7
+  29:Core/Src/AFLCalcul.c ****             if (target_rpm < profile->nominal_rpm) {
+ 177              		.loc 1 29 67 discriminator 1 view .LVU51
+ 178 009c 0CEB4C03 		add	r3, ip, ip, lsl #1
+ 179 00a0 01EB4303 		add	r3, r1, r3, lsl #1
+ 180 00a4 5B88     		ldrh	r3, [r3, #2]
+  29:Core/Src/AFLCalcul.c ****             if (target_rpm < profile->nominal_rpm) {
+ 181              		.loc 1 29 81 discriminator 1 view .LVU52
+ 182 00a6 C833     		adds	r3, r3, #200
+  29:Core/Src/AFLCalcul.c ****             if (target_rpm < profile->nominal_rpm) {
+ 183              		.loc 1 29 46 discriminator 1 view .LVU53
+ 184 00a8 9342     		cmp	r3, r2
+ 185 00aa D4D2     		bcs	.L7
+  30:Core/Src/AFLCalcul.c ****                 target_rpm = profile->nominal_rpm;
+ 186              		.loc 1 30 13 is_stmt 1 view .LVU54
+  30:Core/Src/AFLCalcul.c ****                 target_rpm = profile->nominal_rpm;
+ 187              		.loc 1 30 37 is_stmt 0 view .LVU55
+ 188 00ac CCEBCC03 		rsb	r3, ip, ip, lsl #3
+ 189 00b0 0EEB4303 		add	r3, lr, r3, lsl #1
+ 190 00b4 DB88     		ldrh	r3, [r3, #6]
+  30:Core/Src/AFLCalcul.c ****                 target_rpm = profile->nominal_rpm;
+ 191              		.loc 1 30 16 view .LVU56
+ 192 00b6 9342     		cmp	r3, r2
+ 193 00b8 CDD9     		bls	.L7
+  31:Core/Src/AFLCalcul.c ****             }
+ 194              		.loc 1 31 28 view .LVU57
+ 195 00ba 1A46     		mov	r2, r3
+ 196              	.LVL17:
+  31:Core/Src/AFLCalcul.c ****             }
+ 197              		.loc 1 31 28 view .LVU58
+ 198 00bc CBE7     		b	.L7
+ 199              	.LVL18:
+ 200              	.L1:
+  31:Core/Src/AFLCalcul.c ****             }
+ 201              		.loc 1 31 28 view .LVU59
+ 202              	.LBE4:
+  40:Core/Src/AFLCalcul.c ****     }
+  41:Core/Src/AFLCalcul.c **** }
+ 203              		.loc 1 41 1 view .LVU60
+ 204 00be F0BD     		pop	{r4, r5, r6, r7, pc}
+ 205              	.LVL19:
+ 206              	.L12:
+ 207              	.LCFI1:
+ 208              		.cfi_def_cfa_offset 0
+ 209              		.cfi_restore 4
+ 210              		.cfi_restore 5
+ 211              		.cfi_restore 6
+ 212              		.cfi_restore 7
+ 213              		.cfi_restore 14
+ 214              		.loc 1 41 1 view .LVU61
+ 215 00c0 7047     		bx	lr
+ 216              		.cfi_endproc
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s 			page 6
+
+
+ 217              	.LFE65:
+ 219              		.text
+ 220              	.Letext0:
+ 221              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
+ 222              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
+ 223              		.file 4 "Core/Inc/Profil.h"
+ 224              		.file 5 "Core/Inc/tachometer.h"
+ 225              		.file 6 "Core/Inc/temperature_stub.h"
+ 226              		.file 7 "Core/Inc/AFLCalcul.h"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s 			page 7
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 AFLCalcul.c
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s:19     .text.AFLCalcul_Compute:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccujVjBy.s:25     .text.AFLCalcul_Compute:00000000 AFLCalcul_Compute
+
+NO UNDEFINED SYMBOLS
