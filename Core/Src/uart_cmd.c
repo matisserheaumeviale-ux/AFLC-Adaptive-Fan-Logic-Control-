@@ -15,6 +15,7 @@ static void UART_Cmd_PrintTachStatus(void);
 
 void UART_Cmd_Init(void)
 {
+    // Au boot, on montre tout de suite les commandes.
     UART_Cmd_PrintHelp();
 }
 
@@ -22,6 +23,7 @@ void UART_Cmd_Task(void)
 {
     uint8_t rx;
 
+    // Lecture non bloquante.
     if (HAL_UART_Receive(&huart1, &rx, 1U, 0U) != HAL_OK) {
         return;
     }
@@ -69,6 +71,8 @@ void UART_Cmd_Task(void)
 
         default:
             if ((rx >= '1') && (rx <= '9')) {
+                // Exemple :
+                // '5' -> 500 pour-mille -> 50 %
                 uint16_t duty_permille = (uint16_t)(rx - '0') * 100U;
                 FanControl_SetDutyPermilleAll(duty_permille);
                 printf("Duty set to %u%% on all fans\r\n", (unsigned int)(rx - '0') * 10U);
@@ -83,6 +87,7 @@ int __io_putchar(int ch)
 {
     uint8_t byte = (uint8_t)ch;
 
+    // Redirige printf vers USART1.
     (void)HAL_UART_Transmit(&huart1, &byte, 1U, HAL_MAX_DELAY);
     return ch;
 }
@@ -100,6 +105,7 @@ int __io_getchar(void)
 
 static void UART_Cmd_PrintHelp(void)
 {
+    // Menu minimal.
     printf("\r\nCommands:\r\n");
     printf("  h : help\r\n");
     printf("  s : system status\r\n");
@@ -116,6 +122,7 @@ static void UART_Cmd_PrintSystemStatus(void)
     uint16_t duty_permille = FanControl_GetDutyPermille();
     uint8_t index;
 
+    // Premiere ligne = vue globale.
     printf("System status | Duty=%u.%u%% | Fault=%s | Ramp=%s\r\n",
            (unsigned int)(duty_permille / 10U),
            (unsigned int)(duty_permille % 10U),
@@ -136,6 +143,7 @@ static void UART_Cmd_PrintTachStatus(void)
 {
     uint8_t index;
 
+    // Une ligne par tach.
     for (index = 0U; index < TACHOMETER_CHANNEL_COUNT; index++) {
         const TachometerReading_t *tach = Tachometer_GetReading(index);
 

@@ -5,9 +5,11 @@
 #include <stdio.h>
 #include <string.h>
 
+// On limite le rafraichissement pour garder un LCD stable.
 #define UI_LCD_REFRESH_MS     250UL
 #define UI_LCD_PROFILE_PAGE_MS 1500UL
 
+// Liste des ecrans applicatifs.
 typedef enum {
     UI_SCREEN_NONE = 0,
     UI_SCREEN_PROFILES_READY,
@@ -17,6 +19,7 @@ typedef enum {
     UI_SCREEN_SAFE_STATE
 } UI_LCD_Screen_t;
 
+// Contexte complet du LCD.
 typedef struct {
     UI_LCD_Screen_t screen;
     uint32_t next_refresh_ms;
@@ -48,6 +51,8 @@ void UI_LCD_Init(void)
     LCD_Init();
     LCD_Clear();
     UI_LCD_ClearCache();
+
+    // Ecran vide au boot.
     g_ui.screen = UI_SCREEN_NONE;
     g_ui.next_refresh_ms = HAL_GetTick();
     g_ui.page_started_ms = HAL_GetTick();
@@ -57,10 +62,12 @@ void UI_LCD_Init(void)
 
 void UI_LCD_Task(uint32_t now_ms)
 {
+    // Si rien n'a change et qu'on est avant le prochain refresh, on sort.
     if ((now_ms < g_ui.next_refresh_ms) && (g_ui.dirty == 0U)) {
         return;
     }
 
+    // On alterne entre page 1 et page 2 pour afficher 4 fans sur 20x4.
     if ((g_ui.screen == UI_SCREEN_PROFILES_READY) || (g_ui.screen == UI_SCREEN_WAIT_CONFIRM) || (g_ui.screen == UI_SCREEN_RUNTIME)) {
         if ((now_ms - g_ui.page_started_ms) >= UI_LCD_PROFILE_PAGE_MS) {
             g_ui.page_started_ms = now_ms;
@@ -133,6 +140,7 @@ static void UI_LCD_ClearCache(void)
 {
     uint8_t row;
 
+    // Le cache evite de reecrire la meme ligne.
     for (row = 0U; row < 4U; row++) {
         memset(g_ui.cache[row], 0, sizeof(g_ui.cache[row]));
     }
@@ -147,6 +155,8 @@ static void UI_LCD_WriteLine(uint8_t row, const char *text)
         return;
     }
 
+    // Le LCD est 20 colonnes.
+    // On tronque ou on remplit avec des espaces.
     memset(fixed, ' ', 20U);
     fixed[20] = '\0';
     len = strlen(text);
@@ -163,6 +173,7 @@ static void UI_LCD_WriteLine(uint8_t row, const char *text)
 
 static void UI_LCD_Render(void)
 {
+    // Routeur principal d'ecran.
     switch (g_ui.screen) {
         case UI_SCREEN_PROFILES_READY:
             UI_LCD_RenderProfileScreen("Profiles Ready");
@@ -202,6 +213,7 @@ static void UI_LCD_RenderProfileScreen(const char *header)
     uint8_t first_index = (uint8_t)(page * 2U);
     uint8_t row;
 
+    // Une page montre 2 ventilateurs.
     UI_LCD_WriteLine(0U, header);
 
     for (row = 0U; row < 2U; row++) {
@@ -236,6 +248,8 @@ static void UI_LCD_RenderStartupTest(void)
     uint8_t index;
     char summary[21];
 
+    // Deux premieres lignes : F1/F2.
+    // Derniere ligne : resume F3/F4.
     UI_LCD_WriteLine(0U, g_ui.complete ? "Startup Test Done" : "Startup Test");
 
     for (index = 0U; index < 2U; index++) {
@@ -267,6 +281,9 @@ static void UI_LCD_RenderRuntime(void)
     uint8_t first_index = (uint8_t)(page * 2U);
     uint8_t row;
 
+    // Pour chaque fan :
+    // ligne 1/2 = RPM reel vs cible
+    // ligne 3/4 = temperature et duty
     for (row = 0U; row < 2U; row++) {
         char line[21];
         uint8_t fan_index = (uint8_t)(first_index + row);

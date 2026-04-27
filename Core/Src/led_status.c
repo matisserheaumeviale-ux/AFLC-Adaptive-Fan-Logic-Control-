@@ -2,9 +2,11 @@
 
 #include "main.h"
 
+// Rythme des LEDs de statut.
 #define LED_HEARTBEAT_PERIOD_MS 500UL
 #define LED_ACTIVITY_HOLD_MS    100UL
 
+// Petit runtime local.
 typedef struct {
     uint32_t heartbeat_ms;
     uint32_t comm_activity_ms;
@@ -18,6 +20,7 @@ static void LedStatus_Write(GPIO_TypeDef *port, uint16_t pin, bool is_on);
 
 void LedStatus_Init(void)
 {
+    // Tout part a OFF. Ensuite le mode choisit quoi allumer.
     g_leds.heartbeat_ms = HAL_GetTick();
     g_leds.comm_activity_ms = 0UL;
     g_leds.heartbeat_on = false;
@@ -45,6 +48,7 @@ void LedStatus_Task(uint32_t now_ms)
         g_leds.heartbeat_on = !g_leds.heartbeat_on;
     }
 
+    // Chaque mode traduit un etat applicatif.
     switch (g_leds.mode) {
         case LED_STATUS_MODE_BOOT:
             led_status_on = true;
@@ -84,5 +88,6 @@ void LedStatus_NotifyCommActivity(uint32_t now_ms)
 
 static void LedStatus_Write(GPIO_TypeDef *port, uint16_t pin, bool is_on)
 {
+    // Helper unique pour eviter de repeter HAL_GPIO_WritePin partout.
     HAL_GPIO_WritePin(port, pin, is_on ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }

@@ -1963,7 +1963,7 @@ LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
 .iplt           0x08004a54        0x0
  .iplt          0x08004a54        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
 
-.rodata         0x08004a54      0x418
+.rodata         0x08004a54      0x41c
                 0x08004a54                        . = ALIGN (0x4)
  *(.rodata)
  *(.rodata*)
@@ -1983,89 +1983,89 @@ LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
  .rodata.pwm_channels.0
                 0x08004a84       0x10 build/fan_control.o
  .rodata.UI_LCD_RenderProfileScreen.str1.4
-                0x08004a94      0x37c build/ui_lcd.o
+                0x08004a94      0x380 build/ui_lcd.o
                                  0x3a (size before relaxing)
  .rodata.UI_LCD_RenderStartupTest.str1.4
-                0x08004e10        0x0 build/ui_lcd.o
+                0x08004e14        0x0 build/ui_lcd.o
                                  0x42 (size before relaxing)
  .rodata.UI_LCD_RenderRuntime.str1.4
-                0x08004e10        0x0 build/ui_lcd.o
+                0x08004e14        0x0 build/ui_lcd.o
                                  0x1f (size before relaxing)
  .rodata.UI_LCD_Render.str1.4
-                0x08004e10        0x0 build/ui_lcd.o
+                0x08004e14        0x0 build/ui_lcd.o
                                  0x7d (size before relaxing)
  .rodata.UART_Cmd_PrintHelp.str1.4
-                0x08004e10        0x0 build/uart_cmd.o
+                0x08004e14        0x0 build/uart_cmd.o
                                  0xca (size before relaxing)
  .rodata.UART_Cmd_PrintSystemStatus.str1.4
-                0x08004e10        0x0 build/uart_cmd.o
+                0x08004e14        0x0 build/uart_cmd.o
                                  0x6d (size before relaxing)
  .rodata.UART_Cmd_PrintTachStatus.str1.4
-                0x08004e10        0x0 build/uart_cmd.o
+                0x08004e14        0x0 build/uart_cmd.o
                                  0x33 (size before relaxing)
  .rodata.UART_Cmd_Task.str1.4
-                0x08004e10        0x0 build/uart_cmd.o
+                0x08004e14        0x0 build/uart_cmd.o
                                  0xcf (size before relaxing)
  .rodata.Profil_GetName.str1.4
-                0x08004e10        0x0 build/Profil.o
-                                 0x20 (size before relaxing)
+                0x08004e14        0x0 build/Profil.o
+                                 0x24 (size before relaxing)
  .rodata.g_profile_defaults
-                0x08004e10       0x28 build/Profil.o
+                0x08004e14       0x28 build/Profil.o
  .rodata._svfprintf_r.str1.1
-                0x08004e38       0x33 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-nano-svfprintf.o)
+                0x08004e3c       0x33 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-nano-svfprintf.o)
                                  0x11 (size before relaxing)
  .rodata._vfprintf_r.str1.1
-                0x08004e6b        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-nano-vfprintf.o)
+                0x08004e6f        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-nano-vfprintf.o)
                                  0x11 (size before relaxing)
  .rodata._printf_i.str1.1
-                0x08004e6b        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-nano-vfprintf_i.o)
+                0x08004e6f        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-nano-vfprintf_i.o)
                                  0x22 (size before relaxing)
-                0x08004e6c                        . = ALIGN (0x4)
- *fill*         0x08004e6b        0x1 
+                0x08004e70                        . = ALIGN (0x4)
+ *fill*         0x08004e6f        0x1 
 
-.ARM.extab      0x08004e6c        0x0
-                0x08004e6c                        . = ALIGN (0x4)
+.ARM.extab      0x08004e70        0x0
+                0x08004e70                        . = ALIGN (0x4)
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x08004e6c                        . = ALIGN (0x4)
+                0x08004e70                        . = ALIGN (0x4)
 
-.ARM            0x08004e6c        0x8
-                0x08004e6c                        . = ALIGN (0x4)
-                0x08004e6c                        __exidx_start = .
+.ARM            0x08004e70        0x8
+                0x08004e70                        . = ALIGN (0x4)
+                0x08004e70                        __exidx_start = .
  *(.ARM.exidx*)
- .ARM.exidx     0x08004e6c        0x8 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-strlen.o)
-                0x08004e74                        __exidx_end = .
-                0x08004e74                        . = ALIGN (0x4)
+ .ARM.exidx     0x08004e70        0x8 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc_nano.a(libc_a-strlen.o)
+                0x08004e78                        __exidx_end = .
+                0x08004e78                        . = ALIGN (0x4)
 
-.preinit_array  0x08004e74        0x0
-                0x08004e74                        . = ALIGN (0x4)
-                0x08004e74                        PROVIDE (__preinit_array_start = .)
+.preinit_array  0x08004e78        0x0
+                0x08004e78                        . = ALIGN (0x4)
+                0x08004e78                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array*)
-                0x08004e74                        PROVIDE (__preinit_array_end = .)
-                0x08004e74                        . = ALIGN (0x4)
+                0x08004e78                        PROVIDE (__preinit_array_end = .)
+                0x08004e78                        . = ALIGN (0x4)
 
-.init_array     0x08004e74        0x4
-                0x08004e74                        . = ALIGN (0x4)
-                0x08004e74                        PROVIDE (__init_array_start = .)
+.init_array     0x08004e78        0x4
+                0x08004e78                        . = ALIGN (0x4)
+                0x08004e78                        PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  *(.init_array*)
- .init_array    0x08004e74        0x4 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
-                0x08004e78                        PROVIDE (__init_array_end = .)
-                0x08004e78                        . = ALIGN (0x4)
+ .init_array    0x08004e78        0x4 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
+                0x08004e7c                        PROVIDE (__init_array_end = .)
+                0x08004e7c                        . = ALIGN (0x4)
 
-.fini_array     0x08004e78        0x4
-                0x08004e78                        . = ALIGN (0x4)
+.fini_array     0x08004e7c        0x4
+                0x08004e7c                        . = ALIGN (0x4)
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x08004e78        0x4 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
+ .fini_array    0x08004e7c        0x4 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end = .)
-                0x08004e7c                        . = ALIGN (0x4)
-                0x08004e7c                        _sidata = LOADADDR (.data)
+                0x08004e80                        . = ALIGN (0x4)
+                0x08004e80                        _sidata = LOADADDR (.data)
 
-.rel.dyn        0x08004e7c        0x0
- .rel.iplt      0x08004e7c        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
+.rel.dyn        0x08004e80        0x0
+ .rel.iplt      0x08004e80        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
 
-.data           0x20000000       0x68 load address 0x08004e7c
+.data           0x20000000       0x68 load address 0x08004e80
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data)
@@ -2094,17 +2094,17 @@ LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
                 0x20000068                        _edata = .
 
 .tm_clone_table
-                0x20000068        0x0 load address 0x08004ee4
+                0x20000068        0x0 load address 0x08004ee8
  .tm_clone_table
                 0x20000068        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
  .tm_clone_table
                 0x20000068        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtend.o
 
-.igot.plt       0x20000068        0x0 load address 0x08004ee4
+.igot.plt       0x20000068        0x0 load address 0x08004ee8
  .igot.plt      0x20000068        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7-m/nofp/crtbegin.o
                 0x20000068                        . = ALIGN (0x4)
 
-.bss            0x20000068      0x450 load address 0x08004ee4
+.bss            0x20000068      0x450 load address 0x08004ee8
                 0x20000068                        _sbss = .
                 0x20000068                        __bss_start__ = _sbss
  *(.bss)
@@ -2173,7 +2173,7 @@ LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
                 0x200004b8                        __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x200004b8      0x600 load address 0x08004ee4
+                0x200004b8      0x600 load address 0x08004ee8
                 0x200004b8                        . = ALIGN (0x8)
                 [!provide]                        PROVIDE (end = .)
                 0x200004b8                        PROVIDE (_end = .)
@@ -2384,7 +2384,7 @@ LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
  .comment       0x00000045        0x0 build/temperature_stub.o
                                  0x46 (size before relaxing)
 
-.debug_info     0x00000000    0x16160
+.debug_info     0x00000000    0x16163
  .debug_info    0x00000000     0x1818 build/main.o
  .debug_info    0x00001818      0x40b build/gpio.o
  .debug_info    0x00001c23     0x11e0 build/tim.o
@@ -2405,13 +2405,13 @@ LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
  .debug_info    0x00011e1c      0xb77 build/tachometer.o
  .debug_info    0x00012993      0xe6a build/fan_control.o
  .debug_info    0x000137fd      0x4a1 build/led_status.o
- .debug_info    0x00013c9e      0xe41 build/ui_lcd.o
- .debug_info    0x00014adf      0xcf4 build/uart_cmd.o
- .debug_info    0x000157d3      0x366 build/Profil.o
- .debug_info    0x00015b39      0x3dd build/AFLCalcul.o
- .debug_info    0x00015f16       0xb5 build/button.o
- .debug_info    0x00015fcb      0x165 build/temperature_stub.o
- .debug_info    0x00016130       0x30 build/startup_stm32f103xb.o
+ .debug_info    0x00013c9e      0xe44 build/ui_lcd.o
+ .debug_info    0x00014ae2      0xcf4 build/uart_cmd.o
+ .debug_info    0x000157d6      0x366 build/Profil.o
+ .debug_info    0x00015b3c      0x3dd build/AFLCalcul.o
+ .debug_info    0x00015f19       0xb5 build/button.o
+ .debug_info    0x00015fce      0x165 build/temperature_stub.o
+ .debug_info    0x00016133       0x30 build/startup_stm32f103xb.o
 
 .debug_abbrev   0x00000000     0x3590
  .debug_abbrev  0x00000000      0x32e build/main.o
@@ -2554,89 +2554,89 @@ LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
  .debug_ranges  0x00000f30       0x20 build/temperature_stub.o
  .debug_ranges  0x00000f50       0x20 build/startup_stm32f103xb.o
 
-.debug_line     0x00000000     0xf93a
- .debug_line    0x00000000      0x808 build/main.o
- .debug_line    0x00000808      0x21f build/gpio.o
- .debug_line    0x00000a27      0x540 build/tim.o
- .debug_line    0x00000f67      0x2e1 build/usart.o
- .debug_line    0x00001248      0x29b build/stm32f1xx_it.o
- .debug_line    0x000014e3      0x166 build/stm32f1xx_hal_msp.o
- .debug_line    0x00001649     0x45e6 build/stm32f1xx_hal_tim.o
- .debug_line    0x00005c2f     0x1963 build/stm32f1xx_hal_tim_ex.o
- .debug_line    0x00007592      0x51a build/stm32f1xx_hal.o
- .debug_line    0x00007aac      0xc9d build/stm32f1xx_hal_rcc.o
- .debug_line    0x00008749      0x5d1 build/stm32f1xx_hal_gpio.o
- .debug_line    0x00008d1a      0x6a0 build/stm32f1xx_hal_cortex.o
- .debug_line    0x000093ba     0x337f build/stm32f1xx_hal_uart.o
- .debug_line    0x0000c739      0x22f build/system_stm32f1xx.o
- .debug_line    0x0000c968      0x1cf build/sysmem.o
- .debug_line    0x0000cb37      0x3e2 build/syscalls.o
- .debug_line    0x0000cf19      0x5f5 build/LCD.o
- .debug_line    0x0000d50e      0x58d build/tachometer.o
- .debug_line    0x0000da9b      0x7b7 build/fan_control.o
- .debug_line    0x0000e252      0x30f build/led_status.o
- .debug_line    0x0000e561      0x7e3 build/ui_lcd.o
- .debug_line    0x0000ed44      0x49a build/uart_cmd.o
- .debug_line    0x0000f1de      0x258 build/Profil.o
- .debug_line    0x0000f436      0x235 build/AFLCalcul.o
- .debug_line    0x0000f66b       0xab build/button.o
- .debug_line    0x0000f716      0x1b3 build/temperature_stub.o
- .debug_line    0x0000f8c9       0x71 build/startup_stm32f103xb.o
+.debug_line     0x00000000     0xf94a
+ .debug_line    0x00000000      0x80c build/main.o
+ .debug_line    0x0000080c      0x21f build/gpio.o
+ .debug_line    0x00000a2b      0x540 build/tim.o
+ .debug_line    0x00000f6b      0x2e1 build/usart.o
+ .debug_line    0x0000124c      0x29b build/stm32f1xx_it.o
+ .debug_line    0x000014e7      0x166 build/stm32f1xx_hal_msp.o
+ .debug_line    0x0000164d     0x45e6 build/stm32f1xx_hal_tim.o
+ .debug_line    0x00005c33     0x1963 build/stm32f1xx_hal_tim_ex.o
+ .debug_line    0x00007596      0x51a build/stm32f1xx_hal.o
+ .debug_line    0x00007ab0      0xc9d build/stm32f1xx_hal_rcc.o
+ .debug_line    0x0000874d      0x5d1 build/stm32f1xx_hal_gpio.o
+ .debug_line    0x00008d1e      0x6a0 build/stm32f1xx_hal_cortex.o
+ .debug_line    0x000093be     0x337f build/stm32f1xx_hal_uart.o
+ .debug_line    0x0000c73d      0x22f build/system_stm32f1xx.o
+ .debug_line    0x0000c96c      0x1cf build/sysmem.o
+ .debug_line    0x0000cb3b      0x3e2 build/syscalls.o
+ .debug_line    0x0000cf1d      0x5f5 build/LCD.o
+ .debug_line    0x0000d512      0x593 build/tachometer.o
+ .debug_line    0x0000daa5      0x7bb build/fan_control.o
+ .debug_line    0x0000e260      0x30f build/led_status.o
+ .debug_line    0x0000e56f      0x7e3 build/ui_lcd.o
+ .debug_line    0x0000ed52      0x49a build/uart_cmd.o
+ .debug_line    0x0000f1ec      0x258 build/Profil.o
+ .debug_line    0x0000f444      0x237 build/AFLCalcul.o
+ .debug_line    0x0000f67b       0xab build/button.o
+ .debug_line    0x0000f726      0x1b3 build/temperature_stub.o
+ .debug_line    0x0000f8d9       0x71 build/startup_stm32f103xb.o
 
-.debug_str      0x00000000     0x473c
- .debug_str     0x00000000     0x473c build/main.o
-                               0x10ec (size before relaxing)
- .debug_str     0x0000473c        0x0 build/gpio.o
+.debug_str      0x00000000     0x473a
+ .debug_str     0x00000000     0x473a build/main.o
+                               0x10ea (size before relaxing)
+ .debug_str     0x0000473a        0x0 build/gpio.o
                                 0x263 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/tim.o
+ .debug_str     0x0000473a        0x0 build/tim.o
                                 0xcb5 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/usart.o
+ .debug_str     0x0000473a        0x0 build/usart.o
                                 0x6aa (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_it.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_it.o
                                 0x6eb (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal_msp.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal_msp.o
                                 0x1f7 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal_tim.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal_tim.o
                                0x165d (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal_tim_ex.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal_tim_ex.o
                                 0xe69 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal.o
                                 0x806 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal_rcc.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal_rcc.o
                                 0x603 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal_gpio.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal_gpio.o
                                 0x3d8 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal_cortex.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal_cortex.o
                                 0x8ab (size before relaxing)
- .debug_str     0x0000473c        0x0 build/stm32f1xx_hal_uart.o
+ .debug_str     0x0000473a        0x0 build/stm32f1xx_hal_uart.o
                                 0xccc (size before relaxing)
- .debug_str     0x0000473c        0x0 build/system_stm32f1xx.o
+ .debug_str     0x0000473a        0x0 build/system_stm32f1xx.o
                                 0x22c (size before relaxing)
- .debug_str     0x0000473c        0x0 build/sysmem.o
+ .debug_str     0x0000473a        0x0 build/sysmem.o
                                 0x1f0 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/syscalls.o
+ .debug_str     0x0000473a        0x0 build/syscalls.o
                                 0x3c4 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/LCD.o
+ .debug_str     0x0000473a        0x0 build/LCD.o
                                 0x2e8 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/tachometer.o
+ .debug_str     0x0000473a        0x0 build/tachometer.o
                                 0x873 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/fan_control.o
+ .debug_str     0x0000473a        0x0 build/fan_control.o
                                 0xa2f (size before relaxing)
- .debug_str     0x0000473c        0x0 build/led_status.o
+ .debug_str     0x0000473a        0x0 build/led_status.o
                                 0x377 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/ui_lcd.o
-                                0x6e4 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/uart_cmd.o
+ .debug_str     0x0000473a        0x0 build/ui_lcd.o
+                                0x6e2 (size before relaxing)
+ .debug_str     0x0000473a        0x0 build/uart_cmd.o
                                 0x8f0 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/Profil.o
-                                0x2f7 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/AFLCalcul.o
-                                0x36d (size before relaxing)
- .debug_str     0x0000473c        0x0 build/button.o
+ .debug_str     0x0000473a        0x0 build/Profil.o
+                                0x2f5 (size before relaxing)
+ .debug_str     0x0000473a        0x0 build/AFLCalcul.o
+                                0x36b (size before relaxing)
+ .debug_str     0x0000473a        0x0 build/button.o
                                 0x140 (size before relaxing)
- .debug_str     0x0000473c        0x0 build/temperature_stub.o
+ .debug_str     0x0000473a        0x0 build/temperature_stub.o
                                 0x1fd (size before relaxing)
- .debug_str     0x0000473c        0x0 build/startup_stm32f103xb.o
+ .debug_str     0x0000473a        0x0 build/startup_stm32f103xb.o
                                  0x63 (size before relaxing)
 
 .debug_frame    0x00000000     0x31f8

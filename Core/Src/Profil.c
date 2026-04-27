@@ -1,5 +1,7 @@
 #include "Profil.h"
 
+// Valeurs usine.
+// Une ligne = un profil de ventilateur.
 typedef struct {
     Profil_ProfileId_t profile_id;
     uint16_t min_rpm;
@@ -20,6 +22,7 @@ static Profil_Result_t g_result;
 
 void Profil_Init(void)
 {
+    // Au boot, rien n'est pret.
     g_result.ready = false;
     g_result.valid = false;
 }
@@ -33,16 +36,21 @@ void Profil_CalculateAll(void)
         Profil_Params_t *dest = &g_result.fans[index];
         uint16_t temp_span = (uint16_t)(source->temp_max_c - source->temp_min_c);
 
+        // Copie des bornes utiles.
         dest->profile_id = source->profile_id;
         dest->min_rpm = source->min_rpm;
         dest->nominal_rpm = source->nominal_rpm;
         dest->max_rpm = source->max_rpm;
         dest->temp_min_c = source->temp_min_c;
         dest->temp_max_c = source->temp_max_c;
+
+        // Preparation du gain pour l'interpolation lineaire.
+        // On evite la division par zero.
         dest->gain_num = (uint16_t)(source->max_rpm - source->min_rpm);
         dest->gain_den = (temp_span == 0U) ? 1U : temp_span;
     }
 
+    // Le bloc est maintenant exploitable.
     g_result.ready = true;
     g_result.valid = true;
 }
@@ -54,6 +62,7 @@ const Profil_Result_t *Profil_GetResult(void)
 
 const char *Profil_GetName(Profil_ProfileId_t id)
 {
+    // Nom court pour LCD/UART.
     switch (id) {
         case PROFIL_PROFILE_SILENT:
             return "SILENT";

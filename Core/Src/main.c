@@ -37,6 +37,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+// Machine a etats de l'application.
 typedef enum {
   AFLC_APP_BOOT = 0,
   AFLC_APP_PROFILES_CALCULATING,
@@ -49,6 +50,8 @@ typedef enum {
   AFLC_APP_SAFE_STATE
 } AflcAppState_t;
 
+// Contexte global de l'application.
+// On centralise ici ce que l'etat principal doit retenir.
 typedef struct {
   AflcAppState_t state;
   uint32_t state_entered_ms;
@@ -63,6 +66,7 @@ typedef struct {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+// Periodes des taches cooperatives.
 #define TASK_BUTTON_PERIOD_MS         20UL
 #define TASK_TACH_PERIOD_MS           50UL
 #define TASK_FAN_PERIOD_MS            100UL
@@ -83,6 +87,7 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+// Horloges logicielles des taches.
 static uint32_t g_next_button_task_ms;
 static uint32_t g_next_tach_task_ms;
 static uint32_t g_next_fan_task_ms;
@@ -140,6 +145,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  // On demarre les peripheriques utiles au projet.
   MX_AFLC_StartPeripherals();
   Tachometer_Init();
   FanControl_Init(&htim3);
@@ -169,6 +175,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // Scheduler cooperatif tres simple.
+    // Chaque bloc teste son prochain deadline.
     uint32_t now_ms = HAL_GetTick();
 
     UART_Cmd_Task();
@@ -263,6 +271,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 static void MX_AFLC_StartPeripherals(void)
 {
+  // TIM2 = input capture tach.
   if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
@@ -280,6 +289,7 @@ static void MX_AFLC_StartPeripherals(void)
     Error_Handler();
   }
 
+  // TIM3 = PWM fans.
   if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
@@ -300,6 +310,8 @@ static void MX_AFLC_StartPeripherals(void)
 
 static void AFLC_AppTask(uint32_t now_ms)
 {
+  // Machine a etats principale.
+  // Une seule source de verite pour le flux de demarrage.
   switch (g_app.state)
   {
     case AFLC_APP_BOOT:
@@ -307,6 +319,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_PROFILES_CALCULATING:
+      // On calcule les profils une seule fois.
       Profil_CalculateAll();
       g_app.profiles = Profil_GetResult();
       if ((g_app.profiles != NULL) && g_app.profiles->ready && g_app.profiles->valid)
@@ -321,6 +334,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_PROFILES_READY:
+      // On laisse le temps de voir l'ecran.
       if ((now_ms - g_app.state_entered_ms) >= PROFILES_READY_SHOW_MS)
       {
         AFLC_AppEnterState(AFLC_APP_WAIT_CONFIRM, now_ms);
@@ -328,6 +342,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_WAIT_CONFIRM:
+      // Le systeme attend un GO utilisateur.
       if (Button_IsConfirmPressed())
       {
         Button_ClearConfirm();
@@ -336,6 +351,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_STARTUP_TEST_INIT:
+      // Test simple : on force un petit duty puis on observe les tachs.
       g_app.startup_passed_mask = 0U;
       g_app.startup_fail_mask = 0U;
       FanControl_SetDutyPermilleAll(STARTUP_TEST_DUTY_PERMILLE);
@@ -344,6 +360,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_STARTUP_TEST_RUN:
+      // Tant qu'on n'a pas vu les 4 fans, on continue.
       AFLC_UpdateStartupPassMask();
       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, 0U, 0U);
 
@@ -359,6 +376,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_STARTUP_TEST_EVAL:
+      // Si un fan manque, on bascule en safe state.
       UI_LCD_ShowStartupTest(g_app.startup_passed_mask, g_app.startup_fail_mask, 1U);
       if (g_app.startup_fail_mask == 0U)
       {
@@ -371,6 +389,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_RUNTIME_CONTROL:
+      // En runtime, on rafraichit l'ecran avec les donnees courantes.
       UI_LCD_ShowRuntime(g_app.profiles,
                          g_app.temperatures,
                          &g_app.control_output,
@@ -378,6 +397,7 @@ static void AFLC_AppTask(uint32_t now_ms)
       break;
 
     case AFLC_APP_SAFE_STATE:
+      // Etat de securite verrouille.
       FanControl_EnterSafeState();
       UI_LCD_ShowSafeState(g_app.startup_fail_mask);
       break;
@@ -389,6 +409,7 @@ static void AFLC_AppTask(uint32_t now_ms)
 
 static void AFLC_AppEnterState(AflcAppState_t next_state, uint32_t now_ms)
 {
+  // Changement d'etat centralise.
   g_app.state = next_state;
   g_app.state_entered_ms = now_ms;
 
@@ -435,12 +456,17 @@ static void AFLC_RuntimeStep(void)
 {
   uint16_t max_rpm[PROFIL_FAN_COUNT];
 
+  // On ne regule qu'en vrai mode runtime.
   if ((g_app.state != AFLC_APP_RUNTIME_CONTROL) || (g_app.profiles == NULL) || (g_app.temperatures == NULL))
   {
     return;
   }
 
   Tachometer_GetSnapshot(&g_app.tach_snapshot);
+
+  // 1. Lire le RPM reel
+  // 2. Calculer la cible
+  // 3. Convertir la cible en PWM
   AFLCalcul_Compute(g_app.profiles, g_app.temperatures, &g_app.tach_snapshot, &g_app.control_output);
   AFLC_BuildMaxRpmArray(max_rpm);
   FanControl_SetTargetRpmArray(g_app.control_output.target_rpm, max_rpm);
@@ -452,6 +478,7 @@ static void AFLC_UpdateStartupPassMask(void)
 
   Tachometer_GetSnapshot(&g_app.tach_snapshot);
 
+  // Un bit par fan.
   for (index = 0U; index < PROFIL_FAN_COUNT; index++)
   {
     if (g_app.tach_snapshot.fans[index].rpm_filtered >= STARTUP_TEST_PASS_RPM)
@@ -470,6 +497,7 @@ static void AFLC_BuildMaxRpmArray(uint16_t max_rpm[PROFIL_FAN_COUNT])
     return;
   }
 
+  // On extrait seulement le max_rpm de chaque profil.
   for (index = 0U; index < PROFIL_FAN_COUNT; index++)
   {
     max_rpm[index] = g_app.profiles->fans[index].max_rpm;

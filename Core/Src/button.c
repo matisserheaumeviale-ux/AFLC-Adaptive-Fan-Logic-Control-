@@ -1,5 +1,7 @@
 #include "button.h"
 
+// Latch logiciel.
+// Ici on simule le bouton avec une commande UART.
 static bool g_confirm_latched;
 
 void Button_Init(void)
@@ -9,6 +11,7 @@ void Button_Init(void)
 
 void Button_Task(void)
 {
+    // Reserve pour un vrai polling GPIO plus tard.
 }
 
 bool Button_IsConfirmPressed(void)
@@ -23,5 +26,6 @@ void Button_ClearConfirm(void)
 
 void Button_NotifyConfirmCommand(void)
 {
+    // On memorise l'evenement jusqu'a ce que l'app le consomme.
     g_confirm_latched = true;
 }

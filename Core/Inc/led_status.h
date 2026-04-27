@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Modes d'affichage LED selon l'etat applicatif.
 typedef enum {
     LED_STATUS_MODE_BOOT = 0,
     LED_STATUS_MODE_PROFILES_READY,
@@ -14,5 +15,9 @@ typedef enum {
 
 void LedStatus_Init(void);
 void LedStatus_SetMode(LedStatus_Mode_t mode);
+
+// Fait clignoter / maintenir les LEDs selon le mode.
 void LedStatus_Task(uint32_t now_ms);
+
+// Signale une activite de communication UART.
 void LedStatus_NotifyCommActivity(uint32_t now_ms);

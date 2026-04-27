@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+// Petit runtime pour les animations texte.
 static UI_Anim_t g_ui_anim = {0U, 0U};
 static char g_line_cache[4][21];
 static uint8_t g_line_valid[4];
@@ -13,6 +14,7 @@ static void UI_FormatFanLine(char out[21], uint8_t fan_index, const FanStatus_t 
 static void UI_WriteLineCached(uint8_t row, const char *line);
 
 const char* UI_FanStateToStr(FanState_t state){
+    // Retourne un texte court fixe pour garder l'alignement LCD.
     switch(state){
         case FAN_STATE_OFF:     return "Off ";
         case FAN_STATE_STARTING:return "Strt";
@@ -23,6 +25,7 @@ const char* UI_FanStateToStr(FanState_t state){
 }
 
 const char* UI_FanActionToStr(FanAction_t action){
+    // Symboles visuels tres compacts.
     switch(action){
         case FAN_ACTION_ACCEL:    return "+++";
         case FAN_ACTION_DETECT:   return "@@@";
@@ -47,6 +50,8 @@ const char* UI_GetAnimatedAction(FanAction_t action){
     static const char *accel_frames[3] = {"+  ", "++ ", "+++"};
     static const char *decel_frames[3] = {"---", " --", "  -"};
 
+    // On anime juste la queue de ligne.
+    // Le but est de garder le reste stable.
     switch(action){
         case FAN_ACTION_ACCEL:
             return accel_frames[g_ui_anim.tick % 3U];
@@ -73,6 +78,8 @@ const char* UI_GetAnimatedAlert(FanAlert_t alert){
 }
 
 void UI_AnimUpdate(void){
+    // tick sert aux frames.
+    // blink sert aux clignotements binaires.
     g_ui_anim.tick++;
     g_ui_anim.blink ^= 1U;
 }
@@ -111,6 +118,7 @@ static void UI_FormatFanLine(char out[21], uint8_t fan_index, const FanStatus_t 
     uint16_t rpm;
     uint8_t percent;
 
+    // On borne l'affichage pour ne jamais casser le format 20 colonnes.
     state = UI_FanStateToStr(fan->state);
     rpm = (fan->rpm > 9999U) ? 9999U : fan->rpm;
     percent = (fan->percent > 99U) ? 99U : fan->percent;
@@ -145,6 +153,8 @@ static void UI_WriteLineCached(uint8_t row, const char *line){
 
     (void)memcpy(fixed, line, len);
 
+    // Re-ecrire le LCD inutilement fait clignoter.
+    // Donc on compare avant d'envoyer.
     if((g_line_valid[row] == 0U) || (strncmp(g_line_cache[row], fixed, 20) != 0)){
         LCD_WriteAt(0, row, fixed);
         (void)memcpy(g_line_cache[row], fixed, sizeof(fixed));

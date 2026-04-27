@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -30,320 +30,337 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
    2:Core/Src/fan_control.c **** 
    3:Core/Src/fan_control.c **** #include <stddef.h>
    4:Core/Src/fan_control.c **** 
-   5:Core/Src/fan_control.c **** #define FAN_PWM_PERIOD             319UL
-   6:Core/Src/fan_control.c **** #define FAN_DUTY_MAX_PERMILLE      1000U
-   7:Core/Src/fan_control.c **** #define FAN_RUNNING_MIN_RPM        200U
-   8:Core/Src/fan_control.c **** #define FAN_STARTUP_TIMEOUT_MS     1500UL
-   9:Core/Src/fan_control.c **** #define FAN_RAMP_STEP_PERMILLE     50U
-  10:Core/Src/fan_control.c **** #define FAN_RAMP_STEP_MS           250UL
-  11:Core/Src/fan_control.c **** 
-  12:Core/Src/fan_control.c **** typedef struct {
-  13:Core/Src/fan_control.c ****     TIM_HandleTypeDef *htim_pwm;
-  14:Core/Src/fan_control.c ****     uint32_t pwm_channel;
-  15:Core/Src/fan_control.c ****     uint16_t duty_permille;
-  16:Core/Src/fan_control.c ****     uint16_t last_rpm;
-  17:Core/Src/fan_control.c ****     uint32_t command_ms;
-  18:Core/Src/fan_control.c ****     bool ever_detected;
-  19:Core/Src/fan_control.c ****     FanStatus_t status;
-  20:Core/Src/fan_control.c **** } FanChannel_t;
-  21:Core/Src/fan_control.c **** 
-  22:Core/Src/fan_control.c **** typedef struct {
-  23:Core/Src/fan_control.c ****     bool active;
-  24:Core/Src/fan_control.c ****     uint16_t current_permille;
-  25:Core/Src/fan_control.c ****     uint32_t next_step_ms;
-  26:Core/Src/fan_control.c **** } RampControl_t;
-  27:Core/Src/fan_control.c **** 
-  28:Core/Src/fan_control.c **** static FanChannel_t g_fans[FAN_CONTROL_CHANNEL_COUNT];
-  29:Core/Src/fan_control.c **** static RampControl_t g_ramp;
+   5:Core/Src/fan_control.c **** // PWM configure sur TIM3.
+   6:Core/Src/fan_control.c **** #define FAN_PWM_PERIOD             319UL
+   7:Core/Src/fan_control.c **** #define FAN_DUTY_MAX_PERMILLE      1000U
+   8:Core/Src/fan_control.c **** #define FAN_RUNNING_MIN_RPM        200U
+   9:Core/Src/fan_control.c **** #define FAN_STARTUP_TIMEOUT_MS     1500UL
+  10:Core/Src/fan_control.c **** #define FAN_RAMP_STEP_PERMILLE     50U
+  11:Core/Src/fan_control.c **** #define FAN_RAMP_STEP_MS           250UL
+  12:Core/Src/fan_control.c **** 
+  13:Core/Src/fan_control.c **** // Etat interne d'un ventilateur.
+  14:Core/Src/fan_control.c **** typedef struct {
+  15:Core/Src/fan_control.c ****     TIM_HandleTypeDef *htim_pwm;
+  16:Core/Src/fan_control.c ****     uint32_t pwm_channel;
+  17:Core/Src/fan_control.c ****     uint16_t duty_permille;
+  18:Core/Src/fan_control.c ****     uint16_t last_rpm;
+  19:Core/Src/fan_control.c ****     uint32_t command_ms;
+  20:Core/Src/fan_control.c ****     bool ever_detected;
+  21:Core/Src/fan_control.c ****     FanStatus_t status;
+  22:Core/Src/fan_control.c **** } FanChannel_t;
+  23:Core/Src/fan_control.c **** 
+  24:Core/Src/fan_control.c **** // Controle de la rampe de test.
+  25:Core/Src/fan_control.c **** typedef struct {
+  26:Core/Src/fan_control.c ****     bool active;
+  27:Core/Src/fan_control.c ****     uint16_t current_permille;
+  28:Core/Src/fan_control.c ****     uint32_t next_step_ms;
+  29:Core/Src/fan_control.c **** } RampControl_t;
   30:Core/Src/fan_control.c **** 
-  31:Core/Src/fan_control.c **** static void FanControl_ApplyDuty(FanChannel_t *fan);
-  32:Core/Src/fan_control.c **** static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_ms);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 2
+  31:Core/Src/fan_control.c **** static FanChannel_t g_fans[FAN_CONTROL_CHANNEL_COUNT];
+  32:Core/Src/fan_control.c **** static RampControl_t g_ramp;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 2
 
 
-  33:Core/Src/fan_control.c **** static uint8_t FanControl_DutyToPercent(uint16_t duty_permille);
-  34:Core/Src/fan_control.c **** 
-  35:Core/Src/fan_control.c **** void FanControl_Init(TIM_HandleTypeDef *htim_pwm)
-  36:Core/Src/fan_control.c **** {
-  37:Core/Src/fan_control.c ****     static const uint32_t pwm_channels[FAN_CONTROL_CHANNEL_COUNT] = {
-  38:Core/Src/fan_control.c ****         TIM_CHANNEL_1,
-  39:Core/Src/fan_control.c ****         TIM_CHANNEL_2,
-  40:Core/Src/fan_control.c ****         TIM_CHANNEL_3,
-  41:Core/Src/fan_control.c ****         TIM_CHANNEL_4
-  42:Core/Src/fan_control.c ****     };
-  43:Core/Src/fan_control.c ****     uint8_t index;
-  44:Core/Src/fan_control.c **** 
-  45:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
-  46:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
-  47:Core/Src/fan_control.c ****         g_fans[index].pwm_channel = pwm_channels[index];
-  48:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
-  49:Core/Src/fan_control.c ****         g_fans[index].last_rpm = 0U;
-  50:Core/Src/fan_control.c ****         g_fans[index].command_ms = HAL_GetTick();
-  51:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
-  52:Core/Src/fan_control.c ****         g_fans[index].status.state = FAN_STATE_OFF;
-  53:Core/Src/fan_control.c ****         g_fans[index].status.action = FAN_ACTION_NONE;
-  54:Core/Src/fan_control.c ****         g_fans[index].status.alert = FAN_ALERT_NONE;
-  55:Core/Src/fan_control.c ****         g_fans[index].status.rpm = 0U;
-  56:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
-  57:Core/Src/fan_control.c ****         g_fans[index].status.percent = 0U;
-  58:Core/Src/fan_control.c ****         FanControl_ApplyDuty(&g_fans[index]);
-  59:Core/Src/fan_control.c ****     }
-  60:Core/Src/fan_control.c **** 
-  61:Core/Src/fan_control.c ****     g_ramp.active = false;
-  62:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
-  63:Core/Src/fan_control.c ****     g_ramp.next_step_ms = 0UL;
-  64:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
-  65:Core/Src/fan_control.c **** }
-  66:Core/Src/fan_control.c **** 
-  67:Core/Src/fan_control.c **** void FanControl_Task(uint32_t now_ms)
-  68:Core/Src/fan_control.c **** {
-  69:Core/Src/fan_control.c ****     uint8_t index;
-  70:Core/Src/fan_control.c **** 
-  71:Core/Src/fan_control.c ****     if (g_ramp.active && (now_ms >= g_ramp.next_step_ms)) {
-  72:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
-  73:Core/Src/fan_control.c ****         if (g_ramp.current_permille >= FAN_DUTY_MAX_PERMILLE) {
-  74:Core/Src/fan_control.c ****             g_ramp.active = false;
-  75:Core/Src/fan_control.c ****         } else {
-  76:Core/Src/fan_control.c ****             g_ramp.current_permille = (uint16_t)(g_ramp.current_permille + FAN_RAMP_STEP_PERMILLE);
-  77:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
-  78:Core/Src/fan_control.c ****         }
-  79:Core/Src/fan_control.c ****     }
-  80:Core/Src/fan_control.c **** 
-  81:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
-  82:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
-  83:Core/Src/fan_control.c ****     }
-  84:Core/Src/fan_control.c **** }
-  85:Core/Src/fan_control.c **** 
-  86:Core/Src/fan_control.c **** void FanControl_SetDutyPermille(uint8_t index, uint16_t duty_permille)
-  87:Core/Src/fan_control.c **** {
-  88:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
-  89:Core/Src/fan_control.c ****         return;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 3
+  33:Core/Src/fan_control.c **** 
+  34:Core/Src/fan_control.c **** static void FanControl_ApplyDuty(FanChannel_t *fan);
+  35:Core/Src/fan_control.c **** static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_ms);
+  36:Core/Src/fan_control.c **** static uint8_t FanControl_DutyToPercent(uint16_t duty_permille);
+  37:Core/Src/fan_control.c **** 
+  38:Core/Src/fan_control.c **** void FanControl_Init(TIM_HandleTypeDef *htim_pwm)
+  39:Core/Src/fan_control.c **** {
+  40:Core/Src/fan_control.c ****     static const uint32_t pwm_channels[FAN_CONTROL_CHANNEL_COUNT] = {
+  41:Core/Src/fan_control.c ****         TIM_CHANNEL_1,
+  42:Core/Src/fan_control.c ****         TIM_CHANNEL_2,
+  43:Core/Src/fan_control.c ****         TIM_CHANNEL_3,
+  44:Core/Src/fan_control.c ****         TIM_CHANNEL_4
+  45:Core/Src/fan_control.c ****     };
+  46:Core/Src/fan_control.c ****     uint8_t index;
+  47:Core/Src/fan_control.c **** 
+  48:Core/Src/fan_control.c ****     // On initialise les 4 sorties de la meme facon.
+  49:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+  50:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
+  51:Core/Src/fan_control.c ****         g_fans[index].pwm_channel = pwm_channels[index];
+  52:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
+  53:Core/Src/fan_control.c ****         g_fans[index].last_rpm = 0U;
+  54:Core/Src/fan_control.c ****         g_fans[index].command_ms = HAL_GetTick();
+  55:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
+  56:Core/Src/fan_control.c ****         g_fans[index].status.state = FAN_STATE_OFF;
+  57:Core/Src/fan_control.c ****         g_fans[index].status.action = FAN_ACTION_NONE;
+  58:Core/Src/fan_control.c ****         g_fans[index].status.alert = FAN_ALERT_NONE;
+  59:Core/Src/fan_control.c ****         g_fans[index].status.rpm = 0U;
+  60:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+  61:Core/Src/fan_control.c ****         g_fans[index].status.percent = 0U;
+  62:Core/Src/fan_control.c ****         FanControl_ApplyDuty(&g_fans[index]);
+  63:Core/Src/fan_control.c ****     }
+  64:Core/Src/fan_control.c **** 
+  65:Core/Src/fan_control.c ****     // La rampe est inactive au depart.
+  66:Core/Src/fan_control.c ****     g_ramp.active = false;
+  67:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
+  68:Core/Src/fan_control.c ****     g_ramp.next_step_ms = 0UL;
+  69:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
+  70:Core/Src/fan_control.c **** }
+  71:Core/Src/fan_control.c **** 
+  72:Core/Src/fan_control.c **** void FanControl_Task(uint32_t now_ms)
+  73:Core/Src/fan_control.c **** {
+  74:Core/Src/fan_control.c ****     uint8_t index;
+  75:Core/Src/fan_control.c **** 
+  76:Core/Src/fan_control.c ****     // Test de rampe progressif.
+  77:Core/Src/fan_control.c ****     // Non bloquant. Avance par petits pas.
+  78:Core/Src/fan_control.c ****     if (g_ramp.active && (now_ms >= g_ramp.next_step_ms)) {
+  79:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
+  80:Core/Src/fan_control.c ****         if (g_ramp.current_permille >= FAN_DUTY_MAX_PERMILLE) {
+  81:Core/Src/fan_control.c ****             g_ramp.active = false;
+  82:Core/Src/fan_control.c ****         } else {
+  83:Core/Src/fan_control.c ****             g_ramp.current_permille = (uint16_t)(g_ramp.current_permille + FAN_RAMP_STEP_PERMILLE);
+  84:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
+  85:Core/Src/fan_control.c ****         }
+  86:Core/Src/fan_control.c ****     }
+  87:Core/Src/fan_control.c **** 
+  88:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+  89:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 3
 
 
   90:Core/Src/fan_control.c ****     }
-  91:Core/Src/fan_control.c **** 
-  92:Core/Src/fan_control.c ****     if (duty_permille > FAN_DUTY_MAX_PERMILLE) {
-  93:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
-  94:Core/Src/fan_control.c ****     }
-  95:Core/Src/fan_control.c **** 
-  96:Core/Src/fan_control.c ****     g_fans[index].duty_permille = duty_permille;
-  97:Core/Src/fan_control.c ****     g_fans[index].command_ms = HAL_GetTick();
-  98:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
-  99:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
- 100:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+  91:Core/Src/fan_control.c **** }
+  92:Core/Src/fan_control.c **** 
+  93:Core/Src/fan_control.c **** void FanControl_SetDutyPermille(uint8_t index, uint16_t duty_permille)
+  94:Core/Src/fan_control.c **** {
+  95:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
+  96:Core/Src/fan_control.c ****         return;
+  97:Core/Src/fan_control.c ****     }
+  98:Core/Src/fan_control.c **** 
+  99:Core/Src/fan_control.c ****     if (duty_permille > FAN_DUTY_MAX_PERMILLE) {
+ 100:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
  101:Core/Src/fan_control.c ****     }
- 102:Core/Src/fan_control.c ****     FanControl_ApplyDuty(&g_fans[index]);
- 103:Core/Src/fan_control.c **** }
- 104:Core/Src/fan_control.c **** 
- 105:Core/Src/fan_control.c **** void FanControl_SetDutyPermilleAll(uint16_t duty_permille)
- 106:Core/Src/fan_control.c **** {
- 107:Core/Src/fan_control.c ****     uint8_t index;
- 108:Core/Src/fan_control.c **** 
- 109:Core/Src/fan_control.c ****     if (duty_permille > FAN_DUTY_MAX_PERMILLE) {
- 110:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
- 111:Core/Src/fan_control.c ****     }
+ 102:Core/Src/fan_control.c **** 
+ 103:Core/Src/fan_control.c ****     // Une nouvelle commande remet le chrono de demarrage.
+ 104:Core/Src/fan_control.c ****     g_fans[index].duty_permille = duty_permille;
+ 105:Core/Src/fan_control.c ****     g_fans[index].command_ms = HAL_GetTick();
+ 106:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
+ 107:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
+ 108:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 109:Core/Src/fan_control.c ****     }
+ 110:Core/Src/fan_control.c ****     FanControl_ApplyDuty(&g_fans[index]);
+ 111:Core/Src/fan_control.c **** }
  112:Core/Src/fan_control.c **** 
- 113:Core/Src/fan_control.c ****     if (g_ramp.active && (duty_permille != g_ramp.current_permille)) {
- 114:Core/Src/fan_control.c ****         g_ramp.active = false;
- 115:Core/Src/fan_control.c ****     }
+ 113:Core/Src/fan_control.c **** void FanControl_SetDutyPermilleAll(uint16_t duty_permille)
+ 114:Core/Src/fan_control.c **** {
+ 115:Core/Src/fan_control.c ****     uint8_t index;
  116:Core/Src/fan_control.c **** 
- 117:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
- 118:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
+ 117:Core/Src/fan_control.c ****     if (duty_permille > FAN_DUTY_MAX_PERMILLE) {
+ 118:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
  119:Core/Src/fan_control.c ****     }
- 120:Core/Src/fan_control.c **** }
- 121:Core/Src/fan_control.c **** 
- 122:Core/Src/fan_control.c **** void FanControl_SetTargetRpm(uint8_t index, uint16_t target_rpm, uint16_t max_rpm)
- 123:Core/Src/fan_control.c **** {
- 124:Core/Src/fan_control.c ****     uint32_t duty_permille;
- 125:Core/Src/fan_control.c **** 
- 126:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
- 127:Core/Src/fan_control.c ****         return;
- 128:Core/Src/fan_control.c ****     }
+ 120:Core/Src/fan_control.c **** 
+ 121:Core/Src/fan_control.c ****     if (g_ramp.active && (duty_permille != g_ramp.current_permille)) {
+ 122:Core/Src/fan_control.c ****         g_ramp.active = false;
+ 123:Core/Src/fan_control.c ****     }
+ 124:Core/Src/fan_control.c **** 
+ 125:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+ 126:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
+ 127:Core/Src/fan_control.c ****     }
+ 128:Core/Src/fan_control.c **** }
  129:Core/Src/fan_control.c **** 
- 130:Core/Src/fan_control.c ****     g_fans[index].status.target_rpm = target_rpm;
- 131:Core/Src/fan_control.c **** 
- 132:Core/Src/fan_control.c ****     if ((target_rpm == 0U) || (max_rpm == 0U)) {
- 133:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
- 134:Core/Src/fan_control.c ****         return;
- 135:Core/Src/fan_control.c ****     }
- 136:Core/Src/fan_control.c **** 
- 137:Core/Src/fan_control.c ****     duty_permille = ((uint32_t)target_rpm * 1000UL) / max_rpm;
- 138:Core/Src/fan_control.c ****     if (duty_permille < 150UL) {
- 139:Core/Src/fan_control.c ****         duty_permille = 150UL;
- 140:Core/Src/fan_control.c ****     }
- 141:Core/Src/fan_control.c ****     if (duty_permille > 1000UL) {
- 142:Core/Src/fan_control.c ****         duty_permille = 1000UL;
+ 130:Core/Src/fan_control.c **** void FanControl_SetTargetRpm(uint8_t index, uint16_t target_rpm, uint16_t max_rpm)
+ 131:Core/Src/fan_control.c **** {
+ 132:Core/Src/fan_control.c ****     uint32_t duty_permille;
+ 133:Core/Src/fan_control.c **** 
+ 134:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
+ 135:Core/Src/fan_control.c ****         return;
+ 136:Core/Src/fan_control.c ****     }
+ 137:Core/Src/fan_control.c **** 
+ 138:Core/Src/fan_control.c ****     g_fans[index].status.target_rpm = target_rpm;
+ 139:Core/Src/fan_control.c **** 
+ 140:Core/Src/fan_control.c ****     if ((target_rpm == 0U) || (max_rpm == 0U)) {
+ 141:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
+ 142:Core/Src/fan_control.c ****         return;
  143:Core/Src/fan_control.c ****     }
  144:Core/Src/fan_control.c **** 
- 145:Core/Src/fan_control.c ****     FanControl_SetDutyPermille(index, (uint16_t)duty_permille);
- 146:Core/Src/fan_control.c **** }
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 4
+ 145:Core/Src/fan_control.c ****     // Conversion simple RPM cible -> duty PWM.
+ 146:Core/Src/fan_control.c ****     duty_permille = ((uint32_t)target_rpm * 1000UL) / max_rpm;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 4
 
 
  147:Core/Src/fan_control.c **** 
- 148:Core/Src/fan_control.c **** void FanControl_SetTargetRpmArray(const uint16_t target_rpm[FAN_CONTROL_CHANNEL_COUNT],
- 149:Core/Src/fan_control.c ****                                   const uint16_t max_rpm[FAN_CONTROL_CHANNEL_COUNT])
- 150:Core/Src/fan_control.c **** {
- 151:Core/Src/fan_control.c ****     uint8_t index;
- 152:Core/Src/fan_control.c **** 
- 153:Core/Src/fan_control.c ****     if ((target_rpm == NULL) || (max_rpm == NULL)) {
- 154:Core/Src/fan_control.c ****         return;
+ 148:Core/Src/fan_control.c ****     // On impose un plancher pratique.
+ 149:Core/Src/fan_control.c ****     // Trop bas et le fan ne demarre pas.
+ 150:Core/Src/fan_control.c ****     if (duty_permille < 150UL) {
+ 151:Core/Src/fan_control.c ****         duty_permille = 150UL;
+ 152:Core/Src/fan_control.c ****     }
+ 153:Core/Src/fan_control.c ****     if (duty_permille > 1000UL) {
+ 154:Core/Src/fan_control.c ****         duty_permille = 1000UL;
  155:Core/Src/fan_control.c ****     }
  156:Core/Src/fan_control.c **** 
- 157:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
- 158:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
- 159:Core/Src/fan_control.c ****     }
- 160:Core/Src/fan_control.c **** }
- 161:Core/Src/fan_control.c **** 
- 162:Core/Src/fan_control.c **** void FanControl_StartRampTest(uint32_t now_ms)
- 163:Core/Src/fan_control.c **** {
- 164:Core/Src/fan_control.c ****     g_ramp.active = true;
- 165:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
- 166:Core/Src/fan_control.c ****     g_ramp.next_step_ms = now_ms;
- 167:Core/Src/fan_control.c **** }
+ 157:Core/Src/fan_control.c ****     FanControl_SetDutyPermille(index, (uint16_t)duty_permille);
+ 158:Core/Src/fan_control.c **** }
+ 159:Core/Src/fan_control.c **** 
+ 160:Core/Src/fan_control.c **** void FanControl_SetTargetRpmArray(const uint16_t target_rpm[FAN_CONTROL_CHANNEL_COUNT],
+ 161:Core/Src/fan_control.c ****                                   const uint16_t max_rpm[FAN_CONTROL_CHANNEL_COUNT])
+ 162:Core/Src/fan_control.c **** {
+ 163:Core/Src/fan_control.c ****     uint8_t index;
+ 164:Core/Src/fan_control.c **** 
+ 165:Core/Src/fan_control.c ****     if ((target_rpm == NULL) || (max_rpm == NULL)) {
+ 166:Core/Src/fan_control.c ****         return;
+ 167:Core/Src/fan_control.c ****     }
  168:Core/Src/fan_control.c **** 
- 169:Core/Src/fan_control.c **** bool FanControl_IsRampActive(void)
- 170:Core/Src/fan_control.c **** {
- 171:Core/Src/fan_control.c ****     return g_ramp.active;
+ 169:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+ 170:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
+ 171:Core/Src/fan_control.c ****     }
  172:Core/Src/fan_control.c **** }
  173:Core/Src/fan_control.c **** 
- 174:Core/Src/fan_control.c **** void FanControl_EnterSafeState(void)
+ 174:Core/Src/fan_control.c **** void FanControl_StartRampTest(uint32_t now_ms)
  175:Core/Src/fan_control.c **** {
- 176:Core/Src/fan_control.c ****     uint8_t index;
- 177:Core/Src/fan_control.c **** 
- 178:Core/Src/fan_control.c ****     g_ramp.active = false;
- 179:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
- 180:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 181:Core/Src/fan_control.c ****     }
- 182:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
- 183:Core/Src/fan_control.c **** }
- 184:Core/Src/fan_control.c **** 
- 185:Core/Src/fan_control.c **** bool FanControl_HasAnyFault(void)
- 186:Core/Src/fan_control.c **** {
- 187:Core/Src/fan_control.c ****     uint8_t index;
- 188:Core/Src/fan_control.c **** 
- 189:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
- 190:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
- 191:Core/Src/fan_control.c ****             return true;
- 192:Core/Src/fan_control.c ****         }
- 193:Core/Src/fan_control.c ****     }
- 194:Core/Src/fan_control.c **** 
- 195:Core/Src/fan_control.c ****     return false;
+ 176:Core/Src/fan_control.c ****     g_ramp.active = true;
+ 177:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
+ 178:Core/Src/fan_control.c ****     g_ramp.next_step_ms = now_ms;
+ 179:Core/Src/fan_control.c **** }
+ 180:Core/Src/fan_control.c **** 
+ 181:Core/Src/fan_control.c **** bool FanControl_IsRampActive(void)
+ 182:Core/Src/fan_control.c **** {
+ 183:Core/Src/fan_control.c ****     return g_ramp.active;
+ 184:Core/Src/fan_control.c **** }
+ 185:Core/Src/fan_control.c **** 
+ 186:Core/Src/fan_control.c **** void FanControl_EnterSafeState(void)
+ 187:Core/Src/fan_control.c **** {
+ 188:Core/Src/fan_control.c ****     uint8_t index;
+ 189:Core/Src/fan_control.c **** 
+ 190:Core/Src/fan_control.c ****     // Safe state = tout arreter proprement.
+ 191:Core/Src/fan_control.c ****     g_ramp.active = false;
+ 192:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+ 193:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 194:Core/Src/fan_control.c ****     }
+ 195:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
  196:Core/Src/fan_control.c **** }
  197:Core/Src/fan_control.c **** 
- 198:Core/Src/fan_control.c **** const FanStatus_t *FanControl_GetStatuses(void)
+ 198:Core/Src/fan_control.c **** bool FanControl_HasAnyFault(void)
  199:Core/Src/fan_control.c **** {
- 200:Core/Src/fan_control.c ****     return &g_fans[0].status;
- 201:Core/Src/fan_control.c **** }
- 202:Core/Src/fan_control.c **** 
- 203:Core/Src/fan_control.c **** uint16_t FanControl_GetDutyPermille(void)
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 5
+ 200:Core/Src/fan_control.c ****     uint8_t index;
+ 201:Core/Src/fan_control.c **** 
+ 202:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+ 203:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 5
 
 
- 204:Core/Src/fan_control.c **** {
- 205:Core/Src/fan_control.c ****     return g_fans[0].duty_permille;
- 206:Core/Src/fan_control.c **** }
+ 204:Core/Src/fan_control.c ****             return true;
+ 205:Core/Src/fan_control.c ****         }
+ 206:Core/Src/fan_control.c ****     }
  207:Core/Src/fan_control.c **** 
- 208:Core/Src/fan_control.c **** uint16_t FanControl_GetDutyPermilleForFan(uint8_t index)
- 209:Core/Src/fan_control.c **** {
- 210:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
- 211:Core/Src/fan_control.c ****         return 0U;
- 212:Core/Src/fan_control.c ****     }
- 213:Core/Src/fan_control.c **** 
- 214:Core/Src/fan_control.c ****     return g_fans[index].duty_permille;
- 215:Core/Src/fan_control.c **** }
- 216:Core/Src/fan_control.c **** 
- 217:Core/Src/fan_control.c **** static void FanControl_ApplyDuty(FanChannel_t *fan)
- 218:Core/Src/fan_control.c **** {
-  27              		.loc 1 218 1 view -0
+ 208:Core/Src/fan_control.c ****     return false;
+ 209:Core/Src/fan_control.c **** }
+ 210:Core/Src/fan_control.c **** 
+ 211:Core/Src/fan_control.c **** const FanStatus_t *FanControl_GetStatuses(void)
+ 212:Core/Src/fan_control.c **** {
+ 213:Core/Src/fan_control.c ****     return &g_fans[0].status;
+ 214:Core/Src/fan_control.c **** }
+ 215:Core/Src/fan_control.c **** 
+ 216:Core/Src/fan_control.c **** uint16_t FanControl_GetDutyPermille(void)
+ 217:Core/Src/fan_control.c **** {
+ 218:Core/Src/fan_control.c ****     return g_fans[0].duty_permille;
+ 219:Core/Src/fan_control.c **** }
+ 220:Core/Src/fan_control.c **** 
+ 221:Core/Src/fan_control.c **** uint16_t FanControl_GetDutyPermilleForFan(uint8_t index)
+ 222:Core/Src/fan_control.c **** {
+ 223:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
+ 224:Core/Src/fan_control.c ****         return 0U;
+ 225:Core/Src/fan_control.c ****     }
+ 226:Core/Src/fan_control.c **** 
+ 227:Core/Src/fan_control.c ****     return g_fans[index].duty_permille;
+ 228:Core/Src/fan_control.c **** }
+ 229:Core/Src/fan_control.c **** 
+ 230:Core/Src/fan_control.c **** static void FanControl_ApplyDuty(FanChannel_t *fan)
+ 231:Core/Src/fan_control.c **** {
+  27              		.loc 1 231 1 view -0
   28              		.cfi_startproc
   29              		@ args = 0, pretend = 0, frame = 0
   30              		@ frame_needed = 0, uses_anonymous_args = 0
   31              		@ link register save eliminated.
- 219:Core/Src/fan_control.c ****     uint32_t compare;
-  32              		.loc 1 219 5 view .LVU1
- 220:Core/Src/fan_control.c **** 
- 221:Core/Src/fan_control.c ****     if ((fan == NULL) || (fan->htim_pwm == NULL)) {
-  33              		.loc 1 221 5 view .LVU2
-  34              		.loc 1 221 8 is_stmt 0 view .LVU3
+ 232:Core/Src/fan_control.c ****     uint32_t compare;
+  32              		.loc 1 232 5 view .LVU1
+ 233:Core/Src/fan_control.c **** 
+ 234:Core/Src/fan_control.c ****     if ((fan == NULL) || (fan->htim_pwm == NULL)) {
+  33              		.loc 1 234 5 view .LVU2
+  34              		.loc 1 234 8 is_stmt 0 view .LVU3
   35 0000 0146     		mov	r1, r0
   36 0002 D0B1     		cbz	r0, .L1
-  37              		.loc 1 221 30 discriminator 1 view .LVU4
+  37              		.loc 1 234 30 discriminator 1 view .LVU4
   38 0004 0068     		ldr	r0, [r0]
   39              	.LVL1:
-  40              		.loc 1 221 23 discriminator 1 view .LVU5
+  40              		.loc 1 234 23 discriminator 1 view .LVU5
   41 0006 C0B1     		cbz	r0, .L1
- 222:Core/Src/fan_control.c ****         return;
- 223:Core/Src/fan_control.c ****     }
- 224:Core/Src/fan_control.c **** 
- 225:Core/Src/fan_control.c ****     compare = ((FAN_PWM_PERIOD + 1UL) * fan->duty_permille) / FAN_DUTY_MAX_PERMILLE;
-  42              		.loc 1 225 5 is_stmt 1 view .LVU6
-  43              		.loc 1 225 44 is_stmt 0 view .LVU7
+ 235:Core/Src/fan_control.c ****         return;
+ 236:Core/Src/fan_control.c ****     }
+ 237:Core/Src/fan_control.c **** 
+ 238:Core/Src/fan_control.c ****     // Convertit le pour-mille en valeur de compare timer.
+ 239:Core/Src/fan_control.c ****     compare = ((FAN_PWM_PERIOD + 1UL) * fan->duty_permille) / FAN_DUTY_MAX_PERMILLE;
+  42              		.loc 1 239 5 is_stmt 1 view .LVU6
+  43              		.loc 1 239 44 is_stmt 0 view .LVU7
   44 0008 0B89     		ldrh	r3, [r1, #8]
-  45              		.loc 1 225 39 view .LVU8
+  45              		.loc 1 239 39 view .LVU8
   46 000a 03EB8303 		add	r3, r3, r3, lsl #2
   47 000e 9B01     		lsls	r3, r3, #6
-  48              		.loc 1 225 13 view .LVU9
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 6
+
+
+  48              		.loc 1 239 13 view .LVU9
   49 0010 0D4A     		ldr	r2, .L10
   50 0012 A2FB03C2 		umull	ip, r2, r2, r3
   51 0016 9209     		lsrs	r2, r2, #6
   52              	.LVL2:
- 226:Core/Src/fan_control.c ****     if (compare > FAN_PWM_PERIOD) {
-  53              		.loc 1 226 5 is_stmt 1 view .LVU10
-  54              		.loc 1 226 8 is_stmt 0 view .LVU11
+ 240:Core/Src/fan_control.c ****     if (compare > FAN_PWM_PERIOD) {
+  53              		.loc 1 240 5 is_stmt 1 view .LVU10
+  54              		.loc 1 240 8 is_stmt 0 view .LVU11
   55 0018 DFF830C0 		ldr	ip, .L10+4
   56 001c 6345     		cmp	r3, ip
   57 001e 01D9     		bls	.L3
- 227:Core/Src/fan_control.c ****         compare = FAN_PWM_PERIOD;
-  58              		.loc 1 227 17 view .LVU12
+ 241:Core/Src/fan_control.c ****         compare = FAN_PWM_PERIOD;
+  58              		.loc 1 241 17 view .LVU12
   59 0020 40F23F12 		movw	r2, #319
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 6
-
-
   60              	.LVL3:
   61              	.L3:
- 228:Core/Src/fan_control.c ****     }
- 229:Core/Src/fan_control.c **** 
- 230:Core/Src/fan_control.c ****     __HAL_TIM_SET_COMPARE(fan->htim_pwm, fan->pwm_channel, compare);
-  62              		.loc 1 230 5 is_stmt 1 view .LVU13
+ 242:Core/Src/fan_control.c ****     }
+ 243:Core/Src/fan_control.c **** 
+ 244:Core/Src/fan_control.c ****     __HAL_TIM_SET_COMPARE(fan->htim_pwm, fan->pwm_channel, compare);
+  62              		.loc 1 244 5 is_stmt 1 view .LVU13
   63 0024 4B68     		ldr	r3, [r1, #4]
   64 0026 13B9     		cbnz	r3, .L4
-  65              		.loc 1 230 5 is_stmt 0 discriminator 1 view .LVU14
+  65              		.loc 1 244 5 is_stmt 0 discriminator 1 view .LVU14
   66 0028 0368     		ldr	r3, [r0]
   67 002a 5A63     		str	r2, [r3, #52]
   68 002c 7047     		bx	lr
   69              	.L4:
-  70              		.loc 1 230 5 discriminator 2 view .LVU15
+  70              		.loc 1 244 5 discriminator 2 view .LVU15
   71 002e 042B     		cmp	r3, #4
   72 0030 04D0     		beq	.L8
-  73              		.loc 1 230 5 discriminator 4 view .LVU16
+  73              		.loc 1 244 5 discriminator 4 view .LVU16
   74 0032 082B     		cmp	r3, #8
   75 0034 05D0     		beq	.L9
-  76              		.loc 1 230 5 discriminator 6 view .LVU17
+  76              		.loc 1 244 5 discriminator 6 view .LVU17
   77 0036 0368     		ldr	r3, [r0]
   78 0038 1A64     		str	r2, [r3, #64]
   79              	.LVL4:
   80              	.L1:
- 231:Core/Src/fan_control.c **** }
-  81              		.loc 1 231 1 view .LVU18
+ 245:Core/Src/fan_control.c **** }
+  81              		.loc 1 245 1 view .LVU18
   82 003a 7047     		bx	lr
   83              	.LVL5:
   84              	.L8:
- 230:Core/Src/fan_control.c **** }
-  85              		.loc 1 230 5 discriminator 3 view .LVU19
+ 244:Core/Src/fan_control.c **** }
+  85              		.loc 1 244 5 discriminator 3 view .LVU19
   86 003c 0368     		ldr	r3, [r0]
   87 003e 9A63     		str	r2, [r3, #56]
   88 0040 7047     		bx	lr
   89              	.L9:
- 230:Core/Src/fan_control.c **** }
-  90              		.loc 1 230 5 discriminator 5 view .LVU20
+ 244:Core/Src/fan_control.c **** }
+  90              		.loc 1 244 5 discriminator 5 view .LVU20
   91 0042 0368     		ldr	r3, [r0]
   92 0044 DA63     		str	r2, [r3, #60]
   93 0046 7047     		bx	lr
   94              	.L11:
   95              		.align	2
   96              	.L10:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 7
+
+
   97 0048 D34D6210 		.word	274877907
   98 004c FFE10400 		.word	319999
   99              		.cfi_endproc
@@ -356,99 +373,103 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  108              	FanControl_DutyToPercent:
  109              	.LVL6:
  110              	.LFB80:
- 232:Core/Src/fan_control.c **** 
- 233:Core/Src/fan_control.c **** static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_ms)
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 7
-
-
- 234:Core/Src/fan_control.c **** {
- 235:Core/Src/fan_control.c ****     const TachometerReading_t *tach;
- 236:Core/Src/fan_control.c **** 
- 237:Core/Src/fan_control.c ****     tach = Tachometer_GetReading(index);
- 238:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
- 239:Core/Src/fan_control.c ****         return;
- 240:Core/Src/fan_control.c ****     }
- 241:Core/Src/fan_control.c **** 
- 242:Core/Src/fan_control.c ****     fan->status.percent = FanControl_DutyToPercent(fan->duty_permille);
- 243:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
- 244:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
- 245:Core/Src/fan_control.c ****     fan->status.action = FAN_ACTION_IDLE;
  246:Core/Src/fan_control.c **** 
- 247:Core/Src/fan_control.c ****     if (fan->duty_permille == 0U) {
- 248:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_OFF;
- 249:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_NONE;
- 250:Core/Src/fan_control.c ****         fan->status.rpm = 0U;
- 251:Core/Src/fan_control.c ****         fan->status.target_rpm = 0U;
- 252:Core/Src/fan_control.c ****         fan->last_rpm = 0U;
+ 247:Core/Src/fan_control.c **** static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_ms)
+ 248:Core/Src/fan_control.c **** {
+ 249:Core/Src/fan_control.c ****     const TachometerReading_t *tach;
+ 250:Core/Src/fan_control.c **** 
+ 251:Core/Src/fan_control.c ****     tach = Tachometer_GetReading(index);
+ 252:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
  253:Core/Src/fan_control.c ****         return;
  254:Core/Src/fan_control.c ****     }
  255:Core/Src/fan_control.c **** 
- 256:Core/Src/fan_control.c ****     if (tach->signal_present && (tach->rpm_filtered >= FAN_RUNNING_MIN_RPM)) {
- 257:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
- 258:Core/Src/fan_control.c ****         fan->ever_detected = true;
- 259:Core/Src/fan_control.c ****         if (tach->rpm_filtered > (uint16_t)(fan->last_rpm + 50U)) {
- 260:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
- 261:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
- 262:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
- 263:Core/Src/fan_control.c ****         } else {
- 264:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_IDLE;
- 265:Core/Src/fan_control.c ****         }
- 266:Core/Src/fan_control.c ****     } else if ((now_ms - fan->command_ms) <= FAN_STARTUP_TIMEOUT_MS) {
- 267:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
- 268:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
- 269:Core/Src/fan_control.c ****     } else {
- 270:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_ERROR;
- 271:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
- 272:Core/Src/fan_control.c ****         fan->status.alert = fan->ever_detected ? FAN_ALERT_FAULT : FAN_ALERT_WARN;
- 273:Core/Src/fan_control.c ****     }
- 274:Core/Src/fan_control.c **** 
- 275:Core/Src/fan_control.c ****     fan->last_rpm = tach->rpm_filtered;
- 276:Core/Src/fan_control.c **** }
- 277:Core/Src/fan_control.c **** 
- 278:Core/Src/fan_control.c **** static uint8_t FanControl_DutyToPercent(uint16_t duty_permille)
- 279:Core/Src/fan_control.c **** {
- 111              		.loc 1 279 1 is_stmt 1 view -0
+ 256:Core/Src/fan_control.c ****     fan->status.percent = FanControl_DutyToPercent(fan->duty_permille);
+ 257:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
+ 258:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
+ 259:Core/Src/fan_control.c ****     fan->status.action = FAN_ACTION_IDLE;
+ 260:Core/Src/fan_control.c **** 
+ 261:Core/Src/fan_control.c ****     // Duty a zero = fan considere OFF.
+ 262:Core/Src/fan_control.c ****     if (fan->duty_permille == 0U) {
+ 263:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_OFF;
+ 264:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_NONE;
+ 265:Core/Src/fan_control.c ****         fan->status.rpm = 0U;
+ 266:Core/Src/fan_control.c ****         fan->status.target_rpm = 0U;
+ 267:Core/Src/fan_control.c ****         fan->last_rpm = 0U;
+ 268:Core/Src/fan_control.c ****         return;
+ 269:Core/Src/fan_control.c ****     }
+ 270:Core/Src/fan_control.c **** 
+ 271:Core/Src/fan_control.c ****     // Cas normal : on voit un signal tach stable.
+ 272:Core/Src/fan_control.c ****     if (tach->signal_present && (tach->rpm_filtered >= FAN_RUNNING_MIN_RPM)) {
+ 273:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
+ 274:Core/Src/fan_control.c ****         fan->ever_detected = true;
+ 275:Core/Src/fan_control.c **** 
+ 276:Core/Src/fan_control.c ****         // On determine la tendance pour l'affichage.
+ 277:Core/Src/fan_control.c ****         if (tach->rpm_filtered > (uint16_t)(fan->last_rpm + 50U)) {
+ 278:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
+ 279:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
+ 280:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
+ 281:Core/Src/fan_control.c ****         } else {
+ 282:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_IDLE;
+ 283:Core/Src/fan_control.c ****         }
+ 284:Core/Src/fan_control.c ****     // Delai normal apres une commande PWM.
+ 285:Core/Src/fan_control.c ****     } else if ((now_ms - fan->command_ms) <= FAN_STARTUP_TIMEOUT_MS) {
+ 286:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
+ 287:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
+ 288:Core/Src/fan_control.c ****     // Apres timeout, on declare une erreur.
+ 289:Core/Src/fan_control.c ****     } else {
+ 290:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_ERROR;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 8
+
+
+ 291:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
+ 292:Core/Src/fan_control.c ****         fan->status.alert = fan->ever_detected ? FAN_ALERT_FAULT : FAN_ALERT_WARN;
+ 293:Core/Src/fan_control.c ****     }
+ 294:Core/Src/fan_control.c **** 
+ 295:Core/Src/fan_control.c ****     fan->last_rpm = tach->rpm_filtered;
+ 296:Core/Src/fan_control.c **** }
+ 297:Core/Src/fan_control.c **** 
+ 298:Core/Src/fan_control.c **** static uint8_t FanControl_DutyToPercent(uint16_t duty_permille)
+ 299:Core/Src/fan_control.c **** {
+ 111              		.loc 1 299 1 is_stmt 1 view -0
  112              		.cfi_startproc
  113              		@ args = 0, pretend = 0, frame = 0
  114              		@ frame_needed = 0, uses_anonymous_args = 0
  115              		@ link register save eliminated.
- 280:Core/Src/fan_control.c ****     uint32_t percent;
- 116              		.loc 1 280 5 view .LVU22
- 281:Core/Src/fan_control.c **** 
- 282:Core/Src/fan_control.c ****     percent = (duty_permille + 5U) / 10U;
- 117              		.loc 1 282 5 view .LVU23
- 118              		.loc 1 282 30 is_stmt 0 view .LVU24
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 8
-
-
+ 300:Core/Src/fan_control.c ****     uint32_t percent;
+ 116              		.loc 1 300 5 view .LVU22
+ 301:Core/Src/fan_control.c **** 
+ 302:Core/Src/fan_control.c ****     // Arrondi simple du pour-mille vers le pourcentage.
+ 303:Core/Src/fan_control.c ****     percent = (duty_permille + 5U) / 10U;
+ 117              		.loc 1 303 5 view .LVU23
+ 118              		.loc 1 303 30 is_stmt 0 view .LVU24
  119 0000 431D     		adds	r3, r0, #5
- 120              		.loc 1 282 13 view .LVU25
+ 120              		.loc 1 303 13 view .LVU25
  121 0002 0548     		ldr	r0, .L15
  122              	.LVL7:
- 123              		.loc 1 282 13 view .LVU26
+ 123              		.loc 1 303 13 view .LVU26
  124 0004 A0FB0320 		umull	r2, r0, r0, r3
  125 0008 C008     		lsrs	r0, r0, #3
  126              	.LVL8:
- 283:Core/Src/fan_control.c ****     if (percent > 100U) {
- 127              		.loc 1 283 5 is_stmt 1 view .LVU27
- 128              		.loc 1 283 8 is_stmt 0 view .LVU28
+ 304:Core/Src/fan_control.c ****     if (percent > 100U) {
+ 127              		.loc 1 304 5 is_stmt 1 view .LVU27
+ 128              		.loc 1 304 8 is_stmt 0 view .LVU28
  129 000a 40F2F132 		movw	r2, #1009
  130 000e 9342     		cmp	r3, r2
  131 0010 00D9     		bls	.L13
- 284:Core/Src/fan_control.c ****         percent = 100U;
- 132              		.loc 1 284 17 view .LVU29
+ 305:Core/Src/fan_control.c ****         percent = 100U;
+ 132              		.loc 1 305 17 view .LVU29
  133 0012 6420     		movs	r0, #100
  134              	.LVL9:
  135              	.L13:
- 285:Core/Src/fan_control.c ****     }
- 286:Core/Src/fan_control.c **** 
- 287:Core/Src/fan_control.c ****     return (uint8_t)percent;
- 136              		.loc 1 287 5 is_stmt 1 view .LVU30
- 288:Core/Src/fan_control.c **** }
- 137              		.loc 1 288 1 is_stmt 0 view .LVU31
+ 306:Core/Src/fan_control.c ****     }
+ 307:Core/Src/fan_control.c **** 
+ 308:Core/Src/fan_control.c ****     return (uint8_t)percent;
+ 136              		.loc 1 308 5 is_stmt 1 view .LVU30
+ 309:Core/Src/fan_control.c **** }
+ 137              		.loc 1 309 1 is_stmt 0 view .LVU31
  138 0014 C0B2     		uxtb	r0, r0
  139              	.LVL10:
- 140              		.loc 1 288 1 view .LVU32
+ 140              		.loc 1 309 1 view .LVU32
  141 0016 7047     		bx	lr
  142              	.L16:
  143              		.align	2
@@ -457,6 +478,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  146              		.cfi_endproc
  147              	.LFE80:
  149              		.section	.text.FanControl_UpdateFan,"ax",%progbits
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 9
+
+
  150              		.align	1
  151              		.syntax unified
  152              		.thumb
@@ -464,13 +488,13 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  155              	FanControl_UpdateFan:
  156              	.LVL11:
  157              	.LFB79:
- 234:Core/Src/fan_control.c ****     const TachometerReading_t *tach;
- 158              		.loc 1 234 1 is_stmt 1 view -0
+ 248:Core/Src/fan_control.c ****     const TachometerReading_t *tach;
+ 158              		.loc 1 248 1 is_stmt 1 view -0
  159              		.cfi_startproc
  160              		@ args = 0, pretend = 0, frame = 0
  161              		@ frame_needed = 0, uses_anonymous_args = 0
- 234:Core/Src/fan_control.c ****     const TachometerReading_t *tach;
- 162              		.loc 1 234 1 is_stmt 0 view .LVU34
+ 248:Core/Src/fan_control.c ****     const TachometerReading_t *tach;
+ 162              		.loc 1 248 1 is_stmt 0 view .LVU34
  163 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
  164              	.LCFI0:
  165              		.cfi_def_cfa_offset 24
@@ -478,275 +502,272 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  167              		.cfi_offset 4, -20
  168              		.cfi_offset 5, -16
  169              		.cfi_offset 6, -12
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 9
-
-
  170              		.cfi_offset 7, -8
  171              		.cfi_offset 14, -4
  172 0002 0446     		mov	r4, r0
  173 0004 1746     		mov	r7, r2
- 235:Core/Src/fan_control.c **** 
- 174              		.loc 1 235 5 is_stmt 1 view .LVU35
- 237:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
- 175              		.loc 1 237 5 view .LVU36
- 237:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
- 176              		.loc 1 237 12 is_stmt 0 view .LVU37
+ 249:Core/Src/fan_control.c **** 
+ 174              		.loc 1 249 5 is_stmt 1 view .LVU35
+ 251:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
+ 175              		.loc 1 251 5 view .LVU36
+ 251:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
+ 176              		.loc 1 251 12 is_stmt 0 view .LVU37
  177 0006 0846     		mov	r0, r1
  178              	.LVL12:
- 237:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
- 179              		.loc 1 237 12 view .LVU38
+ 251:Core/Src/fan_control.c ****     if ((fan == NULL) || (tach == NULL)) {
+ 179              		.loc 1 251 12 view .LVU38
  180 0008 FFF7FEFF 		bl	Tachometer_GetReading
  181              	.LVL13:
- 238:Core/Src/fan_control.c ****         return;
- 182              		.loc 1 238 5 is_stmt 1 view .LVU39
- 238:Core/Src/fan_control.c ****         return;
- 183              		.loc 1 238 8 is_stmt 0 view .LVU40
+ 252:Core/Src/fan_control.c ****         return;
+ 182              		.loc 1 252 5 is_stmt 1 view .LVU39
+ 252:Core/Src/fan_control.c ****         return;
+ 183              		.loc 1 252 8 is_stmt 0 view .LVU40
  184 000c 002C     		cmp	r4, #0
  185 000e 40D0     		beq	.L17
  186 0010 0546     		mov	r5, r0
- 238:Core/Src/fan_control.c ****         return;
- 187              		.loc 1 238 23 discriminator 1 view .LVU41
+ 252:Core/Src/fan_control.c ****         return;
+ 187              		.loc 1 252 23 discriminator 1 view .LVU41
  188 0012 0028     		cmp	r0, #0
  189 0014 3DD0     		beq	.L17
- 242:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
- 190              		.loc 1 242 5 is_stmt 1 view .LVU42
- 242:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
- 191              		.loc 1 242 27 is_stmt 0 view .LVU43
+ 256:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
+ 190              		.loc 1 256 5 is_stmt 1 view .LVU42
+ 256:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
+ 191              		.loc 1 256 27 is_stmt 0 view .LVU43
  192 0016 2689     		ldrh	r6, [r4, #8]
  193 0018 3046     		mov	r0, r6
  194              	.LVL14:
- 242:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
- 195              		.loc 1 242 27 view .LVU44
+ 256:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
+ 195              		.loc 1 256 27 view .LVU44
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 10
+
+
  196 001a FFF7FEFF 		bl	FanControl_DutyToPercent
  197              	.LVL15:
- 242:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
- 198              		.loc 1 242 25 discriminator 1 view .LVU45
+ 256:Core/Src/fan_control.c ****     fan->status.rpm = tach->rpm_filtered;
+ 198              		.loc 1 256 25 discriminator 1 view .LVU45
  199 001e A076     		strb	r0, [r4, #26]
- 243:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
- 200              		.loc 1 243 5 is_stmt 1 view .LVU46
- 243:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
- 201              		.loc 1 243 27 is_stmt 0 view .LVU47
+ 257:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
+ 200              		.loc 1 257 5 is_stmt 1 view .LVU46
+ 257:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
+ 201              		.loc 1 257 27 is_stmt 0 view .LVU47
  202 0020 6B88     		ldrh	r3, [r5, #2]
- 243:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
- 203              		.loc 1 243 21 view .LVU48
+ 257:Core/Src/fan_control.c ****     fan->status.alert = FAN_ALERT_NONE;
+ 203              		.loc 1 257 21 view .LVU48
  204 0022 E382     		strh	r3, [r4, #22]	@ movhi
- 244:Core/Src/fan_control.c ****     fan->status.action = FAN_ACTION_IDLE;
- 205              		.loc 1 244 5 is_stmt 1 view .LVU49
- 244:Core/Src/fan_control.c ****     fan->status.action = FAN_ACTION_IDLE;
- 206              		.loc 1 244 23 is_stmt 0 view .LVU50
+ 258:Core/Src/fan_control.c ****     fan->status.action = FAN_ACTION_IDLE;
+ 205              		.loc 1 258 5 is_stmt 1 view .LVU49
+ 258:Core/Src/fan_control.c ****     fan->status.action = FAN_ACTION_IDLE;
+ 206              		.loc 1 258 23 is_stmt 0 view .LVU50
  207 0024 0023     		movs	r3, #0
  208 0026 2375     		strb	r3, [r4, #20]
- 245:Core/Src/fan_control.c **** 
- 209              		.loc 1 245 5 is_stmt 1 view .LVU51
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 10
-
-
- 245:Core/Src/fan_control.c **** 
- 210              		.loc 1 245 24 is_stmt 0 view .LVU52
+ 259:Core/Src/fan_control.c **** 
+ 209              		.loc 1 259 5 is_stmt 1 view .LVU51
+ 259:Core/Src/fan_control.c **** 
+ 210              		.loc 1 259 24 is_stmt 0 view .LVU52
  211 0028 0423     		movs	r3, #4
  212 002a E374     		strb	r3, [r4, #19]
- 247:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_OFF;
- 213              		.loc 1 247 5 is_stmt 1 view .LVU53
- 247:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_OFF;
- 214              		.loc 1 247 8 is_stmt 0 view .LVU54
+ 262:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_OFF;
+ 213              		.loc 1 262 5 is_stmt 1 view .LVU53
+ 262:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_OFF;
+ 214              		.loc 1 262 8 is_stmt 0 view .LVU54
  215 002c AEB1     		cbz	r6, .L29
- 256:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
- 216              		.loc 1 256 5 is_stmt 1 view .LVU55
- 256:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
- 217              		.loc 1 256 13 is_stmt 0 view .LVU56
+ 272:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
+ 216              		.loc 1 272 5 is_stmt 1 view .LVU55
+ 272:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
+ 217              		.loc 1 272 13 is_stmt 0 view .LVU56
  218 002e 2B79     		ldrb	r3, [r5, #4]	@ zero_extendqisi2
- 256:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
- 219              		.loc 1 256 8 view .LVU57
+ 272:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
+ 219              		.loc 1 272 8 view .LVU57
  220 0030 1BB3     		cbz	r3, .L20
- 256:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
- 221              		.loc 1 256 38 discriminator 1 view .LVU58
+ 272:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
+ 221              		.loc 1 272 38 discriminator 1 view .LVU58
  222 0032 6B88     		ldrh	r3, [r5, #2]
- 256:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
- 223              		.loc 1 256 30 discriminator 1 view .LVU59
+ 272:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_RUNNING;
+ 223              		.loc 1 272 30 discriminator 1 view .LVU59
  224 0034 C72B     		cmp	r3, #199
  225 0036 20D9     		bls	.L20
- 257:Core/Src/fan_control.c ****         fan->ever_detected = true;
- 226              		.loc 1 257 9 is_stmt 1 view .LVU60
- 257:Core/Src/fan_control.c ****         fan->ever_detected = true;
- 227              		.loc 1 257 27 is_stmt 0 view .LVU61
+ 273:Core/Src/fan_control.c ****         fan->ever_detected = true;
+ 226              		.loc 1 273 9 is_stmt 1 view .LVU60
+ 273:Core/Src/fan_control.c ****         fan->ever_detected = true;
+ 227              		.loc 1 273 27 is_stmt 0 view .LVU61
  228 0038 0223     		movs	r3, #2
  229 003a A374     		strb	r3, [r4, #18]
- 258:Core/Src/fan_control.c ****         if (tach->rpm_filtered > (uint16_t)(fan->last_rpm + 50U)) {
- 230              		.loc 1 258 9 is_stmt 1 view .LVU62
- 258:Core/Src/fan_control.c ****         if (tach->rpm_filtered > (uint16_t)(fan->last_rpm + 50U)) {
- 231              		.loc 1 258 28 is_stmt 0 view .LVU63
+ 274:Core/Src/fan_control.c **** 
+ 230              		.loc 1 274 9 is_stmt 1 view .LVU62
+ 274:Core/Src/fan_control.c **** 
+ 231              		.loc 1 274 28 is_stmt 0 view .LVU63
  232 003c 0123     		movs	r3, #1
  233 003e 2374     		strb	r3, [r4, #16]
- 259:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
- 234              		.loc 1 259 9 is_stmt 1 view .LVU64
- 259:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
- 235              		.loc 1 259 17 is_stmt 0 view .LVU65
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 11
+
+
+ 277:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
+ 234              		.loc 1 277 9 is_stmt 1 view .LVU64
+ 277:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
+ 235              		.loc 1 277 17 is_stmt 0 view .LVU65
  236 0040 6988     		ldrh	r1, [r5, #2]
- 259:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
- 237              		.loc 1 259 48 view .LVU66
+ 277:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
+ 237              		.loc 1 277 48 view .LVU66
  238 0042 6289     		ldrh	r2, [r4, #10]
- 259:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
- 239              		.loc 1 259 34 view .LVU67
+ 277:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
+ 239              		.loc 1 277 34 view .LVU67
  240 0044 02F13203 		add	r3, r2, #50
  241 0048 9BB2     		uxth	r3, r3
- 259:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
- 242              		.loc 1 259 12 view .LVU68
+ 277:Core/Src/fan_control.c ****             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
+ 242              		.loc 1 277 12 view .LVU68
  243 004a 9942     		cmp	r1, r3
  244 004c 0DD9     		bls	.L21
- 260:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
- 245              		.loc 1 260 13 is_stmt 1 view .LVU69
- 260:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
- 246              		.loc 1 260 40 is_stmt 0 view .LVU70
+ 278:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
+ 245              		.loc 1 278 13 is_stmt 1 view .LVU69
+ 278:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
+ 246              		.loc 1 278 40 is_stmt 0 view .LVU70
  247 004e 174B     		ldr	r3, .L30
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 11
-
-
  248 0050 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
- 260:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
- 249              		.loc 1 260 66 view .LVU71
+ 278:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
+ 249              		.loc 1 278 66 view .LVU71
  250 0052 43B1     		cbz	r3, .L26
- 260:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
- 251              		.loc 1 260 66 discriminator 1 view .LVU72
+ 278:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
+ 251              		.loc 1 278 66 discriminator 1 view .LVU72
  252 0054 0523     		movs	r3, #5
  253              	.L22:
- 260:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
- 254              		.loc 1 260 32 discriminator 4 view .LVU73
+ 278:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
+ 254              		.loc 1 278 32 discriminator 4 view .LVU73
  255 0056 E374     		strb	r3, [r4, #19]
  256 0058 19E0     		b	.L23
  257              	.L29:
- 248:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_NONE;
- 258              		.loc 1 248 9 is_stmt 1 view .LVU74
- 248:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_NONE;
- 259              		.loc 1 248 27 is_stmt 0 view .LVU75
+ 263:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_NONE;
+ 258              		.loc 1 263 9 is_stmt 1 view .LVU74
+ 263:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_NONE;
+ 259              		.loc 1 263 27 is_stmt 0 view .LVU75
  260 005a A674     		strb	r6, [r4, #18]
- 249:Core/Src/fan_control.c ****         fan->status.rpm = 0U;
- 261              		.loc 1 249 9 is_stmt 1 view .LVU76
- 249:Core/Src/fan_control.c ****         fan->status.rpm = 0U;
- 262              		.loc 1 249 28 is_stmt 0 view .LVU77
+ 264:Core/Src/fan_control.c ****         fan->status.rpm = 0U;
+ 261              		.loc 1 264 9 is_stmt 1 view .LVU76
+ 264:Core/Src/fan_control.c ****         fan->status.rpm = 0U;
+ 262              		.loc 1 264 28 is_stmt 0 view .LVU77
  263 005c E674     		strb	r6, [r4, #19]
- 250:Core/Src/fan_control.c ****         fan->status.target_rpm = 0U;
- 264              		.loc 1 250 9 is_stmt 1 view .LVU78
- 250:Core/Src/fan_control.c ****         fan->status.target_rpm = 0U;
- 265              		.loc 1 250 25 is_stmt 0 view .LVU79
+ 265:Core/Src/fan_control.c ****         fan->status.target_rpm = 0U;
+ 264              		.loc 1 265 9 is_stmt 1 view .LVU78
+ 265:Core/Src/fan_control.c ****         fan->status.target_rpm = 0U;
+ 265              		.loc 1 265 25 is_stmt 0 view .LVU79
  266 005e E682     		strh	r6, [r4, #22]	@ movhi
- 251:Core/Src/fan_control.c ****         fan->last_rpm = 0U;
- 267              		.loc 1 251 9 is_stmt 1 view .LVU80
- 251:Core/Src/fan_control.c ****         fan->last_rpm = 0U;
- 268              		.loc 1 251 32 is_stmt 0 view .LVU81
+ 266:Core/Src/fan_control.c ****         fan->last_rpm = 0U;
+ 267              		.loc 1 266 9 is_stmt 1 view .LVU80
+ 266:Core/Src/fan_control.c ****         fan->last_rpm = 0U;
+ 268              		.loc 1 266 32 is_stmt 0 view .LVU81
  269 0060 2683     		strh	r6, [r4, #24]	@ movhi
- 252:Core/Src/fan_control.c ****         return;
- 270              		.loc 1 252 9 is_stmt 1 view .LVU82
- 252:Core/Src/fan_control.c ****         return;
- 271              		.loc 1 252 23 is_stmt 0 view .LVU83
+ 267:Core/Src/fan_control.c ****         return;
+ 270              		.loc 1 267 9 is_stmt 1 view .LVU82
+ 267:Core/Src/fan_control.c ****         return;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 12
+
+
+ 271              		.loc 1 267 23 is_stmt 0 view .LVU83
  272 0062 6681     		strh	r6, [r4, #10]	@ movhi
- 253:Core/Src/fan_control.c ****     }
- 273              		.loc 1 253 9 is_stmt 1 view .LVU84
+ 268:Core/Src/fan_control.c ****     }
+ 273              		.loc 1 268 9 is_stmt 1 view .LVU84
  274 0064 15E0     		b	.L17
  275              	.L26:
- 260:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
- 276              		.loc 1 260 66 is_stmt 0 discriminator 2 view .LVU85
+ 278:Core/Src/fan_control.c ****         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
+ 276              		.loc 1 278 66 is_stmt 0 discriminator 2 view .LVU85
  277 0066 0123     		movs	r3, #1
  278 0068 F5E7     		b	.L22
  279              	.L21:
- 261:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
- 280              		.loc 1 261 16 is_stmt 1 view .LVU86
- 261:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
- 281              		.loc 1 261 19 is_stmt 0 view .LVU87
+ 279:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
+ 280              		.loc 1 279 16 is_stmt 1 view .LVU86
+ 279:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
+ 281              		.loc 1 279 19 is_stmt 0 view .LVU87
  282 006a 322A     		cmp	r2, #50
  283 006c 0FD9     		bls	.L23
- 261:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
- 284              		.loc 1 261 65 discriminator 1 view .LVU88
+ 279:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
+ 284              		.loc 1 279 65 discriminator 1 view .LVU88
  285 006e 3231     		adds	r1, r1, #50
- 261:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 12
-
-
- 286              		.loc 1 261 42 discriminator 1 view .LVU89
+ 279:Core/Src/fan_control.c ****             fan->status.action = FAN_ACTION_DECEL;
+ 286              		.loc 1 279 42 discriminator 1 view .LVU89
  287 0070 9142     		cmp	r1, r2
  288 0072 0CD2     		bcs	.L23
- 262:Core/Src/fan_control.c ****         } else {
- 289              		.loc 1 262 13 is_stmt 1 view .LVU90
- 262:Core/Src/fan_control.c ****         } else {
- 290              		.loc 1 262 32 is_stmt 0 view .LVU91
+ 280:Core/Src/fan_control.c ****         } else {
+ 289              		.loc 1 280 13 is_stmt 1 view .LVU90
+ 280:Core/Src/fan_control.c ****         } else {
+ 290              		.loc 1 280 32 is_stmt 0 view .LVU91
  291 0074 0323     		movs	r3, #3
  292 0076 E374     		strb	r3, [r4, #19]
  293 0078 09E0     		b	.L23
  294              	.L20:
- 266:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
- 295              		.loc 1 266 12 is_stmt 1 view .LVU92
- 266:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
- 296              		.loc 1 266 29 is_stmt 0 view .LVU93
+ 285:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
+ 295              		.loc 1 285 12 is_stmt 1 view .LVU92
+ 285:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
+ 296              		.loc 1 285 29 is_stmt 0 view .LVU93
  297 007a E368     		ldr	r3, [r4, #12]
- 266:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
- 298              		.loc 1 266 24 view .LVU94
+ 285:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
+ 298              		.loc 1 285 24 view .LVU94
  299 007c FA1A     		subs	r2, r7, r3
- 266:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
- 300              		.loc 1 266 15 view .LVU95
+ 285:Core/Src/fan_control.c ****         fan->status.state = FAN_STATE_STARTING;
+ 300              		.loc 1 285 15 view .LVU95
  301 007e 40F2DC53 		movw	r3, #1500
  302 0082 9A42     		cmp	r2, r3
  303 0084 06D8     		bhi	.L24
- 267:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
- 304              		.loc 1 267 9 is_stmt 1 view .LVU96
- 267:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
- 305              		.loc 1 267 27 is_stmt 0 view .LVU97
+ 286:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
+ 304              		.loc 1 286 9 is_stmt 1 view .LVU96
+ 286:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
+ 305              		.loc 1 286 27 is_stmt 0 view .LVU97
  306 0086 0123     		movs	r3, #1
  307 0088 A374     		strb	r3, [r4, #18]
- 268:Core/Src/fan_control.c ****     } else {
- 308              		.loc 1 268 9 is_stmt 1 view .LVU98
- 268:Core/Src/fan_control.c ****     } else {
- 309              		.loc 1 268 28 is_stmt 0 view .LVU99
+ 287:Core/Src/fan_control.c ****     // Apres timeout, on declare une erreur.
+ 308              		.loc 1 287 9 is_stmt 1 view .LVU98
+ 287:Core/Src/fan_control.c ****     // Apres timeout, on declare une erreur.
+ 309              		.loc 1 287 28 is_stmt 0 view .LVU99
  310 008a 0223     		movs	r3, #2
  311 008c E374     		strb	r3, [r4, #19]
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 13
+
+
  312              	.L23:
- 275:Core/Src/fan_control.c **** }
- 313              		.loc 1 275 5 is_stmt 1 view .LVU100
- 275:Core/Src/fan_control.c **** }
- 314              		.loc 1 275 25 is_stmt 0 view .LVU101
+ 295:Core/Src/fan_control.c **** }
+ 313              		.loc 1 295 5 is_stmt 1 view .LVU100
+ 295:Core/Src/fan_control.c **** }
+ 314              		.loc 1 295 25 is_stmt 0 view .LVU101
  315 008e 6B88     		ldrh	r3, [r5, #2]
- 275:Core/Src/fan_control.c **** }
- 316              		.loc 1 275 19 view .LVU102
+ 295:Core/Src/fan_control.c **** }
+ 316              		.loc 1 295 19 view .LVU102
  317 0090 6381     		strh	r3, [r4, #10]	@ movhi
  318              	.LVL16:
  319              	.L17:
- 276:Core/Src/fan_control.c **** 
- 320              		.loc 1 276 1 view .LVU103
+ 296:Core/Src/fan_control.c **** 
+ 320              		.loc 1 296 1 view .LVU103
  321 0092 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
  322              	.LVL17:
  323              	.L24:
- 270:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
- 324              		.loc 1 270 9 is_stmt 1 view .LVU104
- 270:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
- 325              		.loc 1 270 27 is_stmt 0 view .LVU105
+ 290:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
+ 324              		.loc 1 290 9 is_stmt 1 view .LVU104
+ 290:Core/Src/fan_control.c ****         fan->status.action = FAN_ACTION_DETECT;
+ 325              		.loc 1 290 27 is_stmt 0 view .LVU105
  326 0094 0323     		movs	r3, #3
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 13
-
-
  327 0096 A374     		strb	r3, [r4, #18]
- 271:Core/Src/fan_control.c ****         fan->status.alert = fan->ever_detected ? FAN_ALERT_FAULT : FAN_ALERT_WARN;
- 328              		.loc 1 271 9 is_stmt 1 view .LVU106
- 271:Core/Src/fan_control.c ****         fan->status.alert = fan->ever_detected ? FAN_ALERT_FAULT : FAN_ALERT_WARN;
- 329              		.loc 1 271 28 is_stmt 0 view .LVU107
+ 291:Core/Src/fan_control.c ****         fan->status.alert = fan->ever_detected ? FAN_ALERT_FAULT : FAN_ALERT_WARN;
+ 328              		.loc 1 291 9 is_stmt 1 view .LVU106
+ 291:Core/Src/fan_control.c ****         fan->status.alert = fan->ever_detected ? FAN_ALERT_FAULT : FAN_ALERT_WARN;
+ 329              		.loc 1 291 28 is_stmt 0 view .LVU107
  330 0098 0223     		movs	r3, #2
  331 009a E374     		strb	r3, [r4, #19]
- 272:Core/Src/fan_control.c ****     }
- 332              		.loc 1 272 9 is_stmt 1 view .LVU108
- 272:Core/Src/fan_control.c ****     }
- 333              		.loc 1 272 32 is_stmt 0 view .LVU109
+ 292:Core/Src/fan_control.c ****     }
+ 332              		.loc 1 292 9 is_stmt 1 view .LVU108
+ 292:Core/Src/fan_control.c ****     }
+ 333              		.loc 1 292 32 is_stmt 0 view .LVU109
  334 009c 237C     		ldrb	r3, [r4, #16]	@ zero_extendqisi2
- 272:Core/Src/fan_control.c ****     }
- 335              		.loc 1 272 66 view .LVU110
+ 292:Core/Src/fan_control.c ****     }
+ 335              		.loc 1 292 66 view .LVU110
  336 009e 13B1     		cbz	r3, .L27
- 272:Core/Src/fan_control.c ****     }
- 337              		.loc 1 272 66 discriminator 1 view .LVU111
+ 292:Core/Src/fan_control.c ****     }
+ 337              		.loc 1 292 66 discriminator 1 view .LVU111
  338 00a0 0223     		movs	r3, #2
  339              	.L25:
- 272:Core/Src/fan_control.c ****     }
- 340              		.loc 1 272 27 discriminator 4 view .LVU112
+ 292:Core/Src/fan_control.c ****     }
+ 340              		.loc 1 292 27 discriminator 4 view .LVU112
  341 00a2 2375     		strb	r3, [r4, #20]
  342 00a4 F3E7     		b	.L23
  343              	.L27:
- 272:Core/Src/fan_control.c ****     }
- 344              		.loc 1 272 66 discriminator 2 view .LVU113
+ 292:Core/Src/fan_control.c ****     }
+ 344              		.loc 1 292 66 discriminator 2 view .LVU113
  345 00a6 0123     		movs	r3, #1
  346 00a8 FBE7     		b	.L25
  347              	.L31:
@@ -757,6 +778,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  352              	.LFE79:
  354              		.section	.text.FanControl_SetDutyPermille,"ax",%progbits
  355              		.align	1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 14
+
+
  356              		.global	FanControl_SetDutyPermille
  357              		.syntax unified
  358              		.thumb
@@ -764,23 +788,20 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  361              	FanControl_SetDutyPermille:
  362              	.LVL18:
  363              	.LFB67:
-  87:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
- 364              		.loc 1 87 1 is_stmt 1 view -0
+  94:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
+ 364              		.loc 1 94 1 is_stmt 1 view -0
  365              		.cfi_startproc
  366              		@ args = 0, pretend = 0, frame = 0
  367              		@ frame_needed = 0, uses_anonymous_args = 0
-  88:Core/Src/fan_control.c ****         return;
- 368              		.loc 1 88 5 view .LVU115
-  88:Core/Src/fan_control.c ****         return;
- 369              		.loc 1 88 8 is_stmt 0 view .LVU116
+  95:Core/Src/fan_control.c ****         return;
+ 368              		.loc 1 95 5 view .LVU115
+  95:Core/Src/fan_control.c ****         return;
+ 369              		.loc 1 95 8 is_stmt 0 view .LVU116
  370 0000 0328     		cmp	r0, #3
  371 0002 1BD8     		bhi	.L38
-  87:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
- 372              		.loc 1 87 1 view .LVU117
+  94:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
+ 372              		.loc 1 94 1 view .LVU117
  373 0004 70B5     		push	{r4, r5, r6, lr}
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 14
-
-
  374              	.LCFI1:
  375              		.cfi_def_cfa_offset 16
  376              		.cfi_offset 4, -16
@@ -789,65 +810,65 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  379              		.cfi_offset 14, -4
  380 0006 0446     		mov	r4, r0
  381 0008 0D46     		mov	r5, r1
-  92:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
- 382              		.loc 1 92 5 is_stmt 1 view .LVU118
-  92:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
- 383              		.loc 1 92 8 is_stmt 0 view .LVU119
+  99:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
+ 382              		.loc 1 99 5 is_stmt 1 view .LVU118
+  99:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
+ 383              		.loc 1 99 8 is_stmt 0 view .LVU119
  384 000a B1F57A7F 		cmp	r1, #1000
  385 000e 01D9     		bls	.L34
-  93:Core/Src/fan_control.c ****     }
- 386              		.loc 1 93 23 view .LVU120
+ 100:Core/Src/fan_control.c ****     }
+ 386              		.loc 1 100 23 view .LVU120
  387 0010 4FF47A75 		mov	r5, #1000
  388              	.L34:
  389              	.LVL19:
-  96:Core/Src/fan_control.c ****     g_fans[index].command_ms = HAL_GetTick();
- 390              		.loc 1 96 5 is_stmt 1 view .LVU121
-  96:Core/Src/fan_control.c ****     g_fans[index].command_ms = HAL_GetTick();
- 391              		.loc 1 96 33 is_stmt 0 view .LVU122
+ 104:Core/Src/fan_control.c ****     g_fans[index].command_ms = HAL_GetTick();
+ 390              		.loc 1 104 5 is_stmt 1 view .LVU121
+ 104:Core/Src/fan_control.c ****     g_fans[index].command_ms = HAL_GetTick();
+ 391              		.loc 1 104 33 is_stmt 0 view .LVU122
  392 0014 C4EBC403 		rsb	r3, r4, r4, lsl #3
  393 0018 094E     		ldr	r6, .L41
  394 001a 06EB8306 		add	r6, r6, r3, lsl #2
  395 001e 3581     		strh	r5, [r6, #8]	@ movhi
-  97:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
- 396              		.loc 1 97 5 is_stmt 1 view .LVU123
-  97:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
- 397              		.loc 1 97 32 is_stmt 0 view .LVU124
+ 105:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
+ 396              		.loc 1 105 5 is_stmt 1 view .LVU123
+ 105:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
+ 397              		.loc 1 105 32 is_stmt 0 view .LVU124
  398 0020 FFF7FEFF 		bl	HAL_GetTick
  399              	.LVL20:
-  97:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
- 400              		.loc 1 97 30 discriminator 1 view .LVU125
+ 105:Core/Src/fan_control.c ****     if (duty_permille == 0U) {
+ 400              		.loc 1 105 30 discriminator 1 view .LVU125
  401 0024 F060     		str	r0, [r6, #12]
-  98:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
- 402              		.loc 1 98 5 is_stmt 1 view .LVU126
-  98:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
- 403              		.loc 1 98 8 is_stmt 0 view .LVU127
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 15
+
+
+ 106:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
+ 402              		.loc 1 106 5 is_stmt 1 view .LVU126
+ 106:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
+ 403              		.loc 1 106 8 is_stmt 0 view .LVU127
  404 0026 0DB9     		cbnz	r5, .L35
-  99:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 405              		.loc 1 99 9 is_stmt 1 view .LVU128
-  99:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 406              		.loc 1 99 37 is_stmt 0 view .LVU129
+ 107:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 405              		.loc 1 107 9 is_stmt 1 view .LVU128
+ 107:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 406              		.loc 1 107 37 is_stmt 0 view .LVU129
  407 0028 3574     		strb	r5, [r6, #16]
- 100:Core/Src/fan_control.c ****     }
- 408              		.loc 1 100 9 is_stmt 1 view .LVU130
- 100:Core/Src/fan_control.c ****     }
- 409              		.loc 1 100 41 is_stmt 0 view .LVU131
+ 108:Core/Src/fan_control.c ****     }
+ 408              		.loc 1 108 9 is_stmt 1 view .LVU130
+ 108:Core/Src/fan_control.c ****     }
+ 409              		.loc 1 108 41 is_stmt 0 view .LVU131
  410 002a 3583     		strh	r5, [r6, #24]	@ movhi
  411              	.L35:
- 102:Core/Src/fan_control.c **** }
- 412              		.loc 1 102 5 is_stmt 1 view .LVU132
+ 110:Core/Src/fan_control.c **** }
+ 412              		.loc 1 110 5 is_stmt 1 view .LVU132
  413 002c C4EBC404 		rsb	r4, r4, r4, lsl #3
  414              	.LVL21:
- 102:Core/Src/fan_control.c **** }
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 15
-
-
- 415              		.loc 1 102 5 is_stmt 0 view .LVU133
+ 110:Core/Src/fan_control.c **** }
+ 415              		.loc 1 110 5 is_stmt 0 view .LVU133
  416 0030 0348     		ldr	r0, .L41
  417 0032 00EB8400 		add	r0, r0, r4, lsl #2
  418 0036 FFF7FEFF 		bl	FanControl_ApplyDuty
  419              	.LVL22:
- 103:Core/Src/fan_control.c **** 
- 420              		.loc 1 103 1 view .LVU134
+ 111:Core/Src/fan_control.c **** 
+ 420              		.loc 1 111 1 view .LVU134
  421 003a 70BD     		pop	{r4, r5, r6, pc}
  422              	.LVL23:
  423              	.L38:
@@ -857,8 +878,8 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  427              		.cfi_restore 5
  428              		.cfi_restore 6
  429              		.cfi_restore 14
- 103:Core/Src/fan_control.c **** 
- 430              		.loc 1 103 1 view .LVU135
+ 111:Core/Src/fan_control.c **** 
+ 430              		.loc 1 111 1 view .LVU135
  431 003c 7047     		bx	lr
  432              	.L42:
  433 003e 00BF     		.align	2
@@ -875,13 +896,16 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  446              	FanControl_SetDutyPermilleAll:
  447              	.LVL24:
  448              	.LFB68:
- 106:Core/Src/fan_control.c ****     uint8_t index;
- 449              		.loc 1 106 1 is_stmt 1 view -0
+ 114:Core/Src/fan_control.c ****     uint8_t index;
+ 449              		.loc 1 114 1 is_stmt 1 view -0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 16
+
+
  450              		.cfi_startproc
  451              		@ args = 0, pretend = 0, frame = 0
  452              		@ frame_needed = 0, uses_anonymous_args = 0
- 106:Core/Src/fan_control.c ****     uint8_t index;
- 453              		.loc 1 106 1 is_stmt 0 view .LVU137
+ 114:Core/Src/fan_control.c ****     uint8_t index;
+ 453              		.loc 1 114 1 is_stmt 0 view .LVU137
  454 0000 38B5     		push	{r3, r4, r5, lr}
  455              	.LCFI3:
  456              		.cfi_def_cfa_offset 16
@@ -890,82 +914,79 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  459              		.cfi_offset 5, -8
  460              		.cfi_offset 14, -4
  461 0002 0546     		mov	r5, r0
- 107:Core/Src/fan_control.c **** 
- 462              		.loc 1 107 5 is_stmt 1 view .LVU138
- 109:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
- 463              		.loc 1 109 5 view .LVU139
- 109:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
- 464              		.loc 1 109 8 is_stmt 0 view .LVU140
+ 115:Core/Src/fan_control.c **** 
+ 462              		.loc 1 115 5 is_stmt 1 view .LVU138
+ 117:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
+ 463              		.loc 1 117 5 view .LVU139
+ 117:Core/Src/fan_control.c ****         duty_permille = FAN_DUTY_MAX_PERMILLE;
+ 464              		.loc 1 117 8 is_stmt 0 view .LVU140
  465 0004 B0F57A7F 		cmp	r0, #1000
  466 0008 01D9     		bls	.L44
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 16
-
-
- 110:Core/Src/fan_control.c ****     }
- 467              		.loc 1 110 23 view .LVU141
+ 118:Core/Src/fan_control.c ****     }
+ 467              		.loc 1 118 23 view .LVU141
  468 000a 4FF47A75 		mov	r5, #1000
  469              	.L44:
  470              	.LVL25:
- 113:Core/Src/fan_control.c ****         g_ramp.active = false;
- 471              		.loc 1 113 5 is_stmt 1 view .LVU142
- 113:Core/Src/fan_control.c ****         g_ramp.active = false;
- 472              		.loc 1 113 15 is_stmt 0 view .LVU143
+ 121:Core/Src/fan_control.c ****         g_ramp.active = false;
+ 471              		.loc 1 121 5 is_stmt 1 view .LVU142
+ 121:Core/Src/fan_control.c ****         g_ramp.active = false;
+ 472              		.loc 1 121 15 is_stmt 0 view .LVU143
  473 000e 0A4B     		ldr	r3, .L50
  474 0010 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
- 113:Core/Src/fan_control.c ****         g_ramp.active = false;
- 475              		.loc 1 113 8 view .LVU144
+ 121:Core/Src/fan_control.c ****         g_ramp.active = false;
+ 475              		.loc 1 121 8 view .LVU144
  476 0012 33B1     		cbz	r3, .L45
- 113:Core/Src/fan_control.c ****         g_ramp.active = false;
- 477              		.loc 1 113 50 discriminator 1 view .LVU145
+ 121:Core/Src/fan_control.c ****         g_ramp.active = false;
+ 477              		.loc 1 121 50 discriminator 1 view .LVU145
  478 0014 084B     		ldr	r3, .L50
  479 0016 5B88     		ldrh	r3, [r3, #2]
- 113:Core/Src/fan_control.c ****         g_ramp.active = false;
- 480              		.loc 1 113 23 discriminator 1 view .LVU146
+ 121:Core/Src/fan_control.c ****         g_ramp.active = false;
+ 480              		.loc 1 121 23 discriminator 1 view .LVU146
  481 0018 AB42     		cmp	r3, r5
  482 001a 02D0     		beq	.L45
- 114:Core/Src/fan_control.c ****     }
- 483              		.loc 1 114 9 is_stmt 1 view .LVU147
- 114:Core/Src/fan_control.c ****     }
- 484              		.loc 1 114 23 is_stmt 0 view .LVU148
+ 122:Core/Src/fan_control.c ****     }
+ 483              		.loc 1 122 9 is_stmt 1 view .LVU147
+ 122:Core/Src/fan_control.c ****     }
+ 484              		.loc 1 122 23 is_stmt 0 view .LVU148
  485 001c 064B     		ldr	r3, .L50
  486 001e 0022     		movs	r2, #0
  487 0020 1A70     		strb	r2, [r3]
  488              	.L45:
- 110:Core/Src/fan_control.c ****     }
- 489              		.loc 1 110 23 view .LVU149
+ 118:Core/Src/fan_control.c ****     }
+ 489              		.loc 1 118 23 view .LVU149
  490 0022 0024     		movs	r4, #0
  491 0024 05E0     		b	.L46
  492              	.LVL26:
  493              	.L47:
- 118:Core/Src/fan_control.c ****     }
- 494              		.loc 1 118 9 is_stmt 1 view .LVU150
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 17
+
+
+ 126:Core/Src/fan_control.c ****     }
+ 494              		.loc 1 126 9 is_stmt 1 view .LVU150
  495 0026 2946     		mov	r1, r5
  496 0028 2046     		mov	r0, r4
  497 002a FFF7FEFF 		bl	FanControl_SetDutyPermille
  498              	.LVL27:
- 117:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
- 499              		.loc 1 117 62 discriminator 3 view .LVU151
+ 125:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
+ 499              		.loc 1 125 62 discriminator 3 view .LVU151
  500 002e 0134     		adds	r4, r4, #1
  501              	.LVL28:
- 117:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
- 502              		.loc 1 117 62 is_stmt 0 discriminator 3 view .LVU152
+ 125:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
+ 502              		.loc 1 125 62 is_stmt 0 discriminator 3 view .LVU152
  503 0030 E4B2     		uxtb	r4, r4
  504              	.LVL29:
  505              	.L46:
- 117:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
- 506              		.loc 1 117 28 is_stmt 1 discriminator 1 view .LVU153
+ 125:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, duty_permille);
+ 506              		.loc 1 125 28 is_stmt 1 discriminator 1 view .LVU153
  507 0032 032C     		cmp	r4, #3
  508 0034 F7D9     		bls	.L47
- 120:Core/Src/fan_control.c **** 
- 509              		.loc 1 120 1 is_stmt 0 view .LVU154
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 17
-
-
+ 128:Core/Src/fan_control.c **** 
+ 509              		.loc 1 128 1 is_stmt 0 view .LVU154
  510 0036 38BD     		pop	{r3, r4, r5, pc}
  511              	.LVL30:
  512              	.L51:
- 120:Core/Src/fan_control.c **** 
- 513              		.loc 1 120 1 view .LVU155
+ 128:Core/Src/fan_control.c **** 
+ 513              		.loc 1 128 1 view .LVU155
  514              		.align	2
  515              	.L50:
  516 0038 00000000 		.word	g_ramp
@@ -980,13 +1001,13 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  527              	FanControl_Init:
  528              	.LVL31:
  529              	.LFB65:
-  36:Core/Src/fan_control.c ****     static const uint32_t pwm_channels[FAN_CONTROL_CHANNEL_COUNT] = {
- 530              		.loc 1 36 1 is_stmt 1 view -0
+  39:Core/Src/fan_control.c ****     static const uint32_t pwm_channels[FAN_CONTROL_CHANNEL_COUNT] = {
+ 530              		.loc 1 39 1 is_stmt 1 view -0
  531              		.cfi_startproc
  532              		@ args = 0, pretend = 0, frame = 0
  533              		@ frame_needed = 0, uses_anonymous_args = 0
-  36:Core/Src/fan_control.c ****     static const uint32_t pwm_channels[FAN_CONTROL_CHANNEL_COUNT] = {
- 534              		.loc 1 36 1 is_stmt 0 view .LVU157
+  39:Core/Src/fan_control.c ****     static const uint32_t pwm_channels[FAN_CONTROL_CHANNEL_COUNT] = {
+ 534              		.loc 1 39 1 is_stmt 0 view .LVU157
  535 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
  536              	.LCFI4:
  537              		.cfi_def_cfa_offset 32
@@ -997,151 +1018,151 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  542              		.cfi_offset 8, -16
  543              		.cfi_offset 9, -12
  544              		.cfi_offset 10, -8
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 18
+
+
  545              		.cfi_offset 14, -4
  546 0004 8246     		mov	r10, r0
-  37:Core/Src/fan_control.c ****         TIM_CHANNEL_1,
- 547              		.loc 1 37 5 is_stmt 1 view .LVU158
-  43:Core/Src/fan_control.c **** 
- 548              		.loc 1 43 5 view .LVU159
-  45:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
- 549              		.loc 1 45 5 view .LVU160
+  40:Core/Src/fan_control.c ****         TIM_CHANNEL_1,
+ 547              		.loc 1 40 5 is_stmt 1 view .LVU158
+  46:Core/Src/fan_control.c **** 
+ 548              		.loc 1 46 5 view .LVU159
+  49:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
+ 549              		.loc 1 49 5 view .LVU160
  550              	.LVL32:
-  45:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
- 551              		.loc 1 45 16 is_stmt 0 view .LVU161
+  49:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
+ 551              		.loc 1 49 16 is_stmt 0 view .LVU161
  552 0006 0025     		movs	r5, #0
-  45:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
- 553              		.loc 1 45 5 view .LVU162
+  49:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
+ 553              		.loc 1 49 5 view .LVU162
  554 0008 1FE0     		b	.L53
  555              	.LVL33:
  556              	.L54:
-  46:Core/Src/fan_control.c ****         g_fans[index].pwm_channel = pwm_channels[index];
- 557              		.loc 1 46 9 is_stmt 1 view .LVU163
-  46:Core/Src/fan_control.c ****         g_fans[index].pwm_channel = pwm_channels[index];
- 558              		.loc 1 46 32 is_stmt 0 view .LVU164
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 18
-
-
+  50:Core/Src/fan_control.c ****         g_fans[index].pwm_channel = pwm_channels[index];
+ 557              		.loc 1 50 9 is_stmt 1 view .LVU163
+  50:Core/Src/fan_control.c ****         g_fans[index].pwm_channel = pwm_channels[index];
+ 558              		.loc 1 50 32 is_stmt 0 view .LVU164
  559 000a DFF85480 		ldr	r8, .L56
  560 000e C5EBC503 		rsb	r3, r5, r5, lsl #3
  561 0012 08EB8304 		add	r4, r8, r3, lsl #2
  562 0016 48F823A0 		str	r10, [r8, r3, lsl #2]
-  47:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
- 563              		.loc 1 47 9 is_stmt 1 view .LVU165
-  47:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
- 564              		.loc 1 47 49 is_stmt 0 view .LVU166
+  51:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
+ 563              		.loc 1 51 9 is_stmt 1 view .LVU165
+  51:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
+ 564              		.loc 1 51 49 is_stmt 0 view .LVU166
  565 001a 124B     		ldr	r3, .L56+4
  566 001c 53F82530 		ldr	r3, [r3, r5, lsl #2]
-  47:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
- 567              		.loc 1 47 35 view .LVU167
+  51:Core/Src/fan_control.c ****         g_fans[index].duty_permille = 0U;
+ 567              		.loc 1 51 35 view .LVU167
  568 0020 6360     		str	r3, [r4, #4]
-  48:Core/Src/fan_control.c ****         g_fans[index].last_rpm = 0U;
- 569              		.loc 1 48 9 is_stmt 1 view .LVU168
-  48:Core/Src/fan_control.c ****         g_fans[index].last_rpm = 0U;
- 570              		.loc 1 48 37 is_stmt 0 view .LVU169
+  52:Core/Src/fan_control.c ****         g_fans[index].last_rpm = 0U;
+ 569              		.loc 1 52 9 is_stmt 1 view .LVU168
+  52:Core/Src/fan_control.c ****         g_fans[index].last_rpm = 0U;
+ 570              		.loc 1 52 37 is_stmt 0 view .LVU169
  571 0022 0027     		movs	r7, #0
  572 0024 4FF00006 		mov	r6, #0	@ movhi
  573 0028 2781     		strh	r7, [r4, #8]	@ movhi
-  49:Core/Src/fan_control.c ****         g_fans[index].command_ms = HAL_GetTick();
- 574              		.loc 1 49 9 is_stmt 1 view .LVU170
-  49:Core/Src/fan_control.c ****         g_fans[index].command_ms = HAL_GetTick();
- 575              		.loc 1 49 32 is_stmt 0 view .LVU171
+  53:Core/Src/fan_control.c ****         g_fans[index].command_ms = HAL_GetTick();
+ 574              		.loc 1 53 9 is_stmt 1 view .LVU170
+  53:Core/Src/fan_control.c ****         g_fans[index].command_ms = HAL_GetTick();
+ 575              		.loc 1 53 32 is_stmt 0 view .LVU171
  576 002a 6781     		strh	r7, [r4, #10]	@ movhi
-  50:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
- 577              		.loc 1 50 9 is_stmt 1 view .LVU172
-  50:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
- 578              		.loc 1 50 36 is_stmt 0 view .LVU173
+  54:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
+ 577              		.loc 1 54 9 is_stmt 1 view .LVU172
+  54:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
+ 578              		.loc 1 54 36 is_stmt 0 view .LVU173
  579 002c FFF7FEFF 		bl	HAL_GetTick
  580              	.LVL34:
-  50:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
- 581              		.loc 1 50 34 discriminator 1 view .LVU174
+  54:Core/Src/fan_control.c ****         g_fans[index].ever_detected = false;
+ 581              		.loc 1 54 34 discriminator 1 view .LVU174
  582 0030 E060     		str	r0, [r4, #12]
-  51:Core/Src/fan_control.c ****         g_fans[index].status.state = FAN_STATE_OFF;
- 583              		.loc 1 51 9 is_stmt 1 view .LVU175
-  51:Core/Src/fan_control.c ****         g_fans[index].status.state = FAN_STATE_OFF;
- 584              		.loc 1 51 37 is_stmt 0 view .LVU176
+  55:Core/Src/fan_control.c ****         g_fans[index].status.state = FAN_STATE_OFF;
+ 583              		.loc 1 55 9 is_stmt 1 view .LVU175
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 19
+
+
+  55:Core/Src/fan_control.c ****         g_fans[index].status.state = FAN_STATE_OFF;
+ 584              		.loc 1 55 37 is_stmt 0 view .LVU176
  585 0032 2674     		strb	r6, [r4, #16]
-  52:Core/Src/fan_control.c ****         g_fans[index].status.action = FAN_ACTION_NONE;
- 586              		.loc 1 52 9 is_stmt 1 view .LVU177
-  52:Core/Src/fan_control.c ****         g_fans[index].status.action = FAN_ACTION_NONE;
- 587              		.loc 1 52 36 is_stmt 0 view .LVU178
+  56:Core/Src/fan_control.c ****         g_fans[index].status.action = FAN_ACTION_NONE;
+ 586              		.loc 1 56 9 is_stmt 1 view .LVU177
+  56:Core/Src/fan_control.c ****         g_fans[index].status.action = FAN_ACTION_NONE;
+ 587              		.loc 1 56 36 is_stmt 0 view .LVU178
  588 0034 A674     		strb	r6, [r4, #18]
-  53:Core/Src/fan_control.c ****         g_fans[index].status.alert = FAN_ALERT_NONE;
- 589              		.loc 1 53 9 is_stmt 1 view .LVU179
-  53:Core/Src/fan_control.c ****         g_fans[index].status.alert = FAN_ALERT_NONE;
- 590              		.loc 1 53 37 is_stmt 0 view .LVU180
+  57:Core/Src/fan_control.c ****         g_fans[index].status.alert = FAN_ALERT_NONE;
+ 589              		.loc 1 57 9 is_stmt 1 view .LVU179
+  57:Core/Src/fan_control.c ****         g_fans[index].status.alert = FAN_ALERT_NONE;
+ 590              		.loc 1 57 37 is_stmt 0 view .LVU180
  591 0036 E674     		strb	r6, [r4, #19]
-  54:Core/Src/fan_control.c ****         g_fans[index].status.rpm = 0U;
- 592              		.loc 1 54 9 is_stmt 1 view .LVU181
-  54:Core/Src/fan_control.c ****         g_fans[index].status.rpm = 0U;
- 593              		.loc 1 54 36 is_stmt 0 view .LVU182
+  58:Core/Src/fan_control.c ****         g_fans[index].status.rpm = 0U;
+ 592              		.loc 1 58 9 is_stmt 1 view .LVU181
+  58:Core/Src/fan_control.c ****         g_fans[index].status.rpm = 0U;
+ 593              		.loc 1 58 36 is_stmt 0 view .LVU182
  594 0038 2675     		strb	r6, [r4, #20]
-  55:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 595              		.loc 1 55 9 is_stmt 1 view .LVU183
-  55:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 19
-
-
- 596              		.loc 1 55 34 is_stmt 0 view .LVU184
+  59:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 595              		.loc 1 59 9 is_stmt 1 view .LVU183
+  59:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 596              		.loc 1 59 34 is_stmt 0 view .LVU184
  597 003a E782     		strh	r7, [r4, #22]	@ movhi
-  56:Core/Src/fan_control.c ****         g_fans[index].status.percent = 0U;
- 598              		.loc 1 56 9 is_stmt 1 view .LVU185
-  56:Core/Src/fan_control.c ****         g_fans[index].status.percent = 0U;
- 599              		.loc 1 56 41 is_stmt 0 view .LVU186
+  60:Core/Src/fan_control.c ****         g_fans[index].status.percent = 0U;
+ 598              		.loc 1 60 9 is_stmt 1 view .LVU185
+  60:Core/Src/fan_control.c ****         g_fans[index].status.percent = 0U;
+ 599              		.loc 1 60 41 is_stmt 0 view .LVU186
  600 003c 2783     		strh	r7, [r4, #24]	@ movhi
-  57:Core/Src/fan_control.c ****         FanControl_ApplyDuty(&g_fans[index]);
- 601              		.loc 1 57 9 is_stmt 1 view .LVU187
-  57:Core/Src/fan_control.c ****         FanControl_ApplyDuty(&g_fans[index]);
- 602              		.loc 1 57 38 is_stmt 0 view .LVU188
+  61:Core/Src/fan_control.c ****         FanControl_ApplyDuty(&g_fans[index]);
+ 601              		.loc 1 61 9 is_stmt 1 view .LVU187
+  61:Core/Src/fan_control.c ****         FanControl_ApplyDuty(&g_fans[index]);
+ 602              		.loc 1 61 38 is_stmt 0 view .LVU188
  603 003e A676     		strb	r6, [r4, #26]
-  58:Core/Src/fan_control.c ****     }
- 604              		.loc 1 58 9 is_stmt 1 view .LVU189
+  62:Core/Src/fan_control.c ****     }
+ 604              		.loc 1 62 9 is_stmt 1 view .LVU189
  605 0040 2046     		mov	r0, r4
  606 0042 FFF7FEFF 		bl	FanControl_ApplyDuty
  607              	.LVL35:
-  45:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
- 608              		.loc 1 45 62 discriminator 3 view .LVU190
+  49:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
+ 608              		.loc 1 49 62 discriminator 3 view .LVU190
  609 0046 0135     		adds	r5, r5, #1
  610              	.LVL36:
-  45:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
- 611              		.loc 1 45 62 is_stmt 0 discriminator 3 view .LVU191
+  49:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
+ 611              		.loc 1 49 62 is_stmt 0 discriminator 3 view .LVU191
  612 0048 EDB2     		uxtb	r5, r5
  613              	.LVL37:
  614              	.L53:
-  45:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
- 615              		.loc 1 45 28 is_stmt 1 discriminator 1 view .LVU192
+  49:Core/Src/fan_control.c ****         g_fans[index].htim_pwm = htim_pwm;
+ 615              		.loc 1 49 28 is_stmt 1 discriminator 1 view .LVU192
  616 004a 032D     		cmp	r5, #3
  617 004c DDD9     		bls	.L54
-  61:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
- 618              		.loc 1 61 5 view .LVU193
-  61:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
- 619              		.loc 1 61 19 is_stmt 0 view .LVU194
+  66:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
+ 618              		.loc 1 66 5 view .LVU193
+  66:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
+ 619              		.loc 1 66 19 is_stmt 0 view .LVU194
  620 004e 064B     		ldr	r3, .L56+8
  621 0050 0020     		movs	r0, #0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 20
+
+
  622 0052 1870     		strb	r0, [r3]
-  62:Core/Src/fan_control.c ****     g_ramp.next_step_ms = 0UL;
- 623              		.loc 1 62 5 is_stmt 1 view .LVU195
-  62:Core/Src/fan_control.c ****     g_ramp.next_step_ms = 0UL;
- 624              		.loc 1 62 29 is_stmt 0 view .LVU196
+  67:Core/Src/fan_control.c ****     g_ramp.next_step_ms = 0UL;
+ 623              		.loc 1 67 5 is_stmt 1 view .LVU195
+  67:Core/Src/fan_control.c ****     g_ramp.next_step_ms = 0UL;
+ 624              		.loc 1 67 29 is_stmt 0 view .LVU196
  625 0054 5880     		strh	r0, [r3, #2]	@ movhi
-  63:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
- 626              		.loc 1 63 5 is_stmt 1 view .LVU197
-  63:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
- 627              		.loc 1 63 25 is_stmt 0 view .LVU198
+  68:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
+ 626              		.loc 1 68 5 is_stmt 1 view .LVU197
+  68:Core/Src/fan_control.c ****     FanControl_SetDutyPermilleAll(0U);
+ 627              		.loc 1 68 25 is_stmt 0 view .LVU198
  628 0056 5860     		str	r0, [r3, #4]
-  64:Core/Src/fan_control.c **** }
- 629              		.loc 1 64 5 is_stmt 1 view .LVU199
+  69:Core/Src/fan_control.c **** }
+ 629              		.loc 1 69 5 is_stmt 1 view .LVU199
  630 0058 FFF7FEFF 		bl	FanControl_SetDutyPermilleAll
  631              	.LVL38:
-  65:Core/Src/fan_control.c **** 
- 632              		.loc 1 65 1 is_stmt 0 view .LVU200
+  70:Core/Src/fan_control.c **** 
+ 632              		.loc 1 70 1 is_stmt 0 view .LVU200
  633 005c BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
  634              	.LVL39:
  635              	.L57:
-  65:Core/Src/fan_control.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 20
-
-
- 636              		.loc 1 65 1 view .LVU201
+  70:Core/Src/fan_control.c **** 
+ 636              		.loc 1 70 1 view .LVU201
  637              		.align	2
  638              	.L56:
  639 0060 00000000 		.word	g_fans
@@ -1158,13 +1179,13 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  652              	FanControl_Task:
  653              	.LVL40:
  654              	.LFB66:
-  68:Core/Src/fan_control.c ****     uint8_t index;
- 655              		.loc 1 68 1 is_stmt 1 view -0
+  73:Core/Src/fan_control.c ****     uint8_t index;
+ 655              		.loc 1 73 1 is_stmt 1 view -0
  656              		.cfi_startproc
  657              		@ args = 0, pretend = 0, frame = 0
  658              		@ frame_needed = 0, uses_anonymous_args = 0
-  68:Core/Src/fan_control.c ****     uint8_t index;
- 659              		.loc 1 68 1 is_stmt 0 view .LVU203
+  73:Core/Src/fan_control.c ****     uint8_t index;
+ 659              		.loc 1 73 1 is_stmt 0 view .LVU203
  660 0000 38B5     		push	{r3, r4, r5, lr}
  661              	.LCFI5:
  662              		.cfi_def_cfa_offset 16
@@ -1173,84 +1194,87 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  665              		.cfi_offset 5, -8
  666              		.cfi_offset 14, -4
  667 0002 0546     		mov	r5, r0
-  69:Core/Src/fan_control.c **** 
- 668              		.loc 1 69 5 is_stmt 1 view .LVU204
-  71:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
- 669              		.loc 1 71 5 view .LVU205
-  71:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
- 670              		.loc 1 71 15 is_stmt 0 view .LVU206
+  74:Core/Src/fan_control.c **** 
+ 668              		.loc 1 74 5 is_stmt 1 view .LVU204
+  78:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
+ 669              		.loc 1 78 5 view .LVU205
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 21
+
+
+  78:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
+ 670              		.loc 1 78 15 is_stmt 0 view .LVU206
  671 0004 144B     		ldr	r3, .L65
  672 0006 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
-  71:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
- 673              		.loc 1 71 8 view .LVU207
+  78:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
+ 673              		.loc 1 78 8 view .LVU207
  674 0008 1BB1     		cbz	r3, .L59
-  71:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
- 675              		.loc 1 71 43 discriminator 1 view .LVU208
+  78:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
+ 675              		.loc 1 78 43 discriminator 1 view .LVU208
  676 000a 134B     		ldr	r3, .L65
  677 000c 5B68     		ldr	r3, [r3, #4]
-  71:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
- 678              		.loc 1 71 23 discriminator 1 view .LVU209
+  78:Core/Src/fan_control.c ****         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
+ 678              		.loc 1 78 23 discriminator 1 view .LVU209
  679 000e 8342     		cmp	r3, r0
  680 0010 01D9     		bls	.L64
  681              	.LVL41:
  682              	.L59:
-  68:Core/Src/fan_control.c ****     uint8_t index;
- 683              		.loc 1 68 1 view .LVU210
+  73:Core/Src/fan_control.c ****     uint8_t index;
+ 683              		.loc 1 73 1 view .LVU210
  684 0012 0024     		movs	r4, #0
  685 0014 1CE0     		b	.L61
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 21
-
-
  686              	.LVL42:
  687              	.L64:
-  72:Core/Src/fan_control.c ****         if (g_ramp.current_permille >= FAN_DUTY_MAX_PERMILLE) {
- 688              		.loc 1 72 9 is_stmt 1 view .LVU211
+  79:Core/Src/fan_control.c ****         if (g_ramp.current_permille >= FAN_DUTY_MAX_PERMILLE) {
+ 688              		.loc 1 79 9 is_stmt 1 view .LVU211
  689 0016 104C     		ldr	r4, .L65
  690 0018 6088     		ldrh	r0, [r4, #2]
  691              	.LVL43:
-  72:Core/Src/fan_control.c ****         if (g_ramp.current_permille >= FAN_DUTY_MAX_PERMILLE) {
- 692              		.loc 1 72 9 is_stmt 0 view .LVU212
+  79:Core/Src/fan_control.c ****         if (g_ramp.current_permille >= FAN_DUTY_MAX_PERMILLE) {
+ 692              		.loc 1 79 9 is_stmt 0 view .LVU212
  693 001a FFF7FEFF 		bl	FanControl_SetDutyPermilleAll
  694              	.LVL44:
-  73:Core/Src/fan_control.c ****             g_ramp.active = false;
- 695              		.loc 1 73 9 is_stmt 1 view .LVU213
-  73:Core/Src/fan_control.c ****             g_ramp.active = false;
- 696              		.loc 1 73 19 is_stmt 0 view .LVU214
+  80:Core/Src/fan_control.c ****             g_ramp.active = false;
+ 695              		.loc 1 80 9 is_stmt 1 view .LVU213
+  80:Core/Src/fan_control.c ****             g_ramp.active = false;
+ 696              		.loc 1 80 19 is_stmt 0 view .LVU214
  697 001e 6388     		ldrh	r3, [r4, #2]
-  73:Core/Src/fan_control.c ****             g_ramp.active = false;
- 698              		.loc 1 73 12 view .LVU215
+  80:Core/Src/fan_control.c ****             g_ramp.active = false;
+ 698              		.loc 1 80 12 view .LVU215
  699 0020 B3F57A7F 		cmp	r3, #1000
  700 0024 02D3     		bcc	.L60
-  74:Core/Src/fan_control.c ****         } else {
- 701              		.loc 1 74 13 is_stmt 1 view .LVU216
-  74:Core/Src/fan_control.c ****         } else {
- 702              		.loc 1 74 27 is_stmt 0 view .LVU217
+  81:Core/Src/fan_control.c ****         } else {
+ 701              		.loc 1 81 13 is_stmt 1 view .LVU216
+  81:Core/Src/fan_control.c ****         } else {
+ 702              		.loc 1 81 27 is_stmt 0 view .LVU217
  703 0026 0022     		movs	r2, #0
  704 0028 2270     		strb	r2, [r4]
  705 002a F2E7     		b	.L59
  706              	.L60:
-  76:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
- 707              		.loc 1 76 13 is_stmt 1 view .LVU218
-  76:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
- 708              		.loc 1 76 39 is_stmt 0 view .LVU219
+  83:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
+ 707              		.loc 1 83 13 is_stmt 1 view .LVU218
+  83:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
+ 708              		.loc 1 83 39 is_stmt 0 view .LVU219
  709 002c 3233     		adds	r3, r3, #50
-  76:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
- 710              		.loc 1 76 37 view .LVU220
+  83:Core/Src/fan_control.c ****             g_ramp.next_step_ms = now_ms + FAN_RAMP_STEP_MS;
+ 710              		.loc 1 83 37 view .LVU220
  711 002e 0A4A     		ldr	r2, .L65
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 22
+
+
  712 0030 5380     		strh	r3, [r2, #2]	@ movhi
-  77:Core/Src/fan_control.c ****         }
- 713              		.loc 1 77 13 is_stmt 1 view .LVU221
-  77:Core/Src/fan_control.c ****         }
- 714              		.loc 1 77 42 is_stmt 0 view .LVU222
+  84:Core/Src/fan_control.c ****         }
+ 713              		.loc 1 84 13 is_stmt 1 view .LVU221
+  84:Core/Src/fan_control.c ****         }
+ 714              		.loc 1 84 42 is_stmt 0 view .LVU222
  715 0032 05F1FA03 		add	r3, r5, #250
-  77:Core/Src/fan_control.c ****         }
- 716              		.loc 1 77 33 view .LVU223
+  84:Core/Src/fan_control.c ****         }
+ 716              		.loc 1 84 33 view .LVU223
  717 0036 5360     		str	r3, [r2, #4]
  718 0038 EBE7     		b	.L59
  719              	.LVL45:
  720              	.L62:
-  82:Core/Src/fan_control.c ****     }
- 721              		.loc 1 82 9 is_stmt 1 view .LVU224
+  89:Core/Src/fan_control.c ****     }
+ 721              		.loc 1 89 9 is_stmt 1 view .LVU224
  722 003a C4EBC400 		rsb	r0, r4, r4, lsl #3
  723 003e 2A46     		mov	r2, r5
  724 0040 2146     		mov	r1, r4
@@ -1258,29 +1282,26 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  726 0044 03EB8000 		add	r0, r3, r0, lsl #2
  727 0048 FFF7FEFF 		bl	FanControl_UpdateFan
  728              	.LVL46:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 22
-
-
-  81:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
- 729              		.loc 1 81 62 discriminator 3 view .LVU225
+  88:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
+ 729              		.loc 1 88 62 discriminator 3 view .LVU225
  730 004c 0134     		adds	r4, r4, #1
  731              	.LVL47:
-  81:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
- 732              		.loc 1 81 62 is_stmt 0 discriminator 3 view .LVU226
+  88:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
+ 732              		.loc 1 88 62 is_stmt 0 discriminator 3 view .LVU226
  733 004e E4B2     		uxtb	r4, r4
  734              	.LVL48:
  735              	.L61:
-  81:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
- 736              		.loc 1 81 28 is_stmt 1 discriminator 1 view .LVU227
+  88:Core/Src/fan_control.c ****         FanControl_UpdateFan(&g_fans[index], index, now_ms);
+ 736              		.loc 1 88 28 is_stmt 1 discriminator 1 view .LVU227
  737 0050 032C     		cmp	r4, #3
  738 0052 F2D9     		bls	.L62
-  84:Core/Src/fan_control.c **** 
- 739              		.loc 1 84 1 is_stmt 0 view .LVU228
+  91:Core/Src/fan_control.c **** 
+ 739              		.loc 1 91 1 is_stmt 0 view .LVU228
  740 0054 38BD     		pop	{r3, r4, r5, pc}
  741              	.LVL49:
  742              	.L66:
-  84:Core/Src/fan_control.c **** 
- 743              		.loc 1 84 1 view .LVU229
+  91:Core/Src/fan_control.c **** 
+ 743              		.loc 1 91 1 view .LVU229
  744 0056 00BF     		.align	2
  745              	.L65:
  746 0058 00000000 		.word	g_ramp
@@ -1296,109 +1317,109 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  758              	FanControl_SetTargetRpm:
  759              	.LVL50:
  760              	.LFB69:
- 123:Core/Src/fan_control.c ****     uint32_t duty_permille;
- 761              		.loc 1 123 1 is_stmt 1 view -0
+ 131:Core/Src/fan_control.c ****     uint32_t duty_permille;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 23
+
+
+ 761              		.loc 1 131 1 is_stmt 1 view -0
  762              		.cfi_startproc
  763              		@ args = 0, pretend = 0, frame = 0
  764              		@ frame_needed = 0, uses_anonymous_args = 0
- 124:Core/Src/fan_control.c **** 
- 765              		.loc 1 124 5 view .LVU231
- 126:Core/Src/fan_control.c ****         return;
- 766              		.loc 1 126 5 view .LVU232
- 126:Core/Src/fan_control.c ****         return;
- 767              		.loc 1 126 8 is_stmt 0 view .LVU233
+ 132:Core/Src/fan_control.c **** 
+ 765              		.loc 1 132 5 view .LVU231
+ 134:Core/Src/fan_control.c ****         return;
+ 766              		.loc 1 134 5 view .LVU232
+ 134:Core/Src/fan_control.c ****         return;
+ 767              		.loc 1 134 8 is_stmt 0 view .LVU233
  768 0000 0328     		cmp	r0, #3
  769 0002 1ED8     		bhi	.L75
- 123:Core/Src/fan_control.c ****     uint32_t duty_permille;
- 770              		.loc 1 123 1 view .LVU234
+ 131:Core/Src/fan_control.c ****     uint32_t duty_permille;
+ 770              		.loc 1 131 1 view .LVU234
  771 0004 08B5     		push	{r3, lr}
  772              	.LCFI6:
  773              		.cfi_def_cfa_offset 8
  774              		.cfi_offset 3, -8
  775              		.cfi_offset 14, -4
- 130:Core/Src/fan_control.c **** 
- 776              		.loc 1 130 5 is_stmt 1 view .LVU235
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 23
-
-
- 130:Core/Src/fan_control.c **** 
- 777              		.loc 1 130 37 is_stmt 0 view .LVU236
+ 138:Core/Src/fan_control.c **** 
+ 776              		.loc 1 138 5 is_stmt 1 view .LVU235
+ 138:Core/Src/fan_control.c **** 
+ 777              		.loc 1 138 37 is_stmt 0 view .LVU236
  778 0006 C0EBC00C 		rsb	ip, r0, r0, lsl #3
  779 000a 0E4B     		ldr	r3, .L78
  780 000c 03EB8C03 		add	r3, r3, ip, lsl #2
  781 0010 1983     		strh	r1, [r3, #24]	@ movhi
- 132:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
- 782              		.loc 1 132 5 is_stmt 1 view .LVU237
- 132:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
- 783              		.loc 1 132 8 is_stmt 0 view .LVU238
+ 140:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
+ 782              		.loc 1 140 5 is_stmt 1 view .LVU237
+ 140:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
+ 783              		.loc 1 140 8 is_stmt 0 view .LVU238
  784 0012 69B1     		cbz	r1, .L69
- 132:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
- 785              		.loc 1 132 28 discriminator 1 view .LVU239
+ 140:Core/Src/fan_control.c ****         FanControl_SetDutyPermille(index, 0U);
+ 785              		.loc 1 140 28 discriminator 1 view .LVU239
  786 0014 62B1     		cbz	r2, .L69
- 137:Core/Src/fan_control.c ****     if (duty_permille < 150UL) {
- 787              		.loc 1 137 5 is_stmt 1 view .LVU240
- 137:Core/Src/fan_control.c ****     if (duty_permille < 150UL) {
- 788              		.loc 1 137 43 is_stmt 0 view .LVU241
+ 146:Core/Src/fan_control.c **** 
+ 787              		.loc 1 146 5 is_stmt 1 view .LVU240
+ 146:Core/Src/fan_control.c **** 
+ 788              		.loc 1 146 43 is_stmt 0 view .LVU241
  789 0016 4FF47A73 		mov	r3, #1000
  790 001a 03FB01F1 		mul	r1, r3, r1
  791              	.LVL51:
- 137:Core/Src/fan_control.c ****     if (duty_permille < 150UL) {
- 792              		.loc 1 137 19 view .LVU242
+ 146:Core/Src/fan_control.c **** 
+ 792              		.loc 1 146 19 view .LVU242
  793 001e B1FBF2F1 		udiv	r1, r1, r2
  794              	.LVL52:
- 138:Core/Src/fan_control.c ****         duty_permille = 150UL;
- 795              		.loc 1 138 5 is_stmt 1 view .LVU243
- 138:Core/Src/fan_control.c ****         duty_permille = 150UL;
- 796              		.loc 1 138 8 is_stmt 0 view .LVU244
+ 150:Core/Src/fan_control.c ****         duty_permille = 150UL;
+ 795              		.loc 1 150 5 is_stmt 1 view .LVU243
+ 150:Core/Src/fan_control.c ****         duty_permille = 150UL;
+ 796              		.loc 1 150 8 is_stmt 0 view .LVU244
  797 0022 9529     		cmp	r1, #149
  798 0024 08D9     		bls	.L72
- 141:Core/Src/fan_control.c ****         duty_permille = 1000UL;
- 799              		.loc 1 141 5 is_stmt 1 view .LVU245
- 141:Core/Src/fan_control.c ****         duty_permille = 1000UL;
- 800              		.loc 1 141 8 is_stmt 0 view .LVU246
+ 153:Core/Src/fan_control.c ****         duty_permille = 1000UL;
+ 799              		.loc 1 153 5 is_stmt 1 view .LVU245
+ 153:Core/Src/fan_control.c ****         duty_permille = 1000UL;
+ 800              		.loc 1 153 8 is_stmt 0 view .LVU246
  801 0026 9942     		cmp	r1, r3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 24
+
+
  802 0028 07D9     		bls	.L71
- 142:Core/Src/fan_control.c ****     }
- 803              		.loc 1 142 23 view .LVU247
+ 154:Core/Src/fan_control.c ****     }
+ 803              		.loc 1 154 23 view .LVU247
  804 002a 4FF47A71 		mov	r1, #1000
  805              	.LVL53:
- 142:Core/Src/fan_control.c ****     }
- 806              		.loc 1 142 23 view .LVU248
+ 154:Core/Src/fan_control.c ****     }
+ 806              		.loc 1 154 23 view .LVU248
  807 002e 04E0     		b	.L71
  808              	.LVL54:
  809              	.L69:
- 133:Core/Src/fan_control.c ****         return;
- 810              		.loc 1 133 9 is_stmt 1 view .LVU249
+ 141:Core/Src/fan_control.c ****         return;
+ 810              		.loc 1 141 9 is_stmt 1 view .LVU249
  811 0030 0021     		movs	r1, #0
  812              	.LVL55:
- 133:Core/Src/fan_control.c ****         return;
- 813              		.loc 1 133 9 is_stmt 0 view .LVU250
+ 141:Core/Src/fan_control.c ****         return;
+ 813              		.loc 1 141 9 is_stmt 0 view .LVU250
  814 0032 FFF7FEFF 		bl	FanControl_SetDutyPermille
  815              	.LVL56:
- 134:Core/Src/fan_control.c ****     }
- 816              		.loc 1 134 9 is_stmt 1 view .LVU251
+ 142:Core/Src/fan_control.c ****     }
+ 816              		.loc 1 142 9 is_stmt 1 view .LVU251
  817 0036 03E0     		b	.L67
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 24
-
-
  818              	.LVL57:
  819              	.L72:
- 139:Core/Src/fan_control.c ****     }
- 820              		.loc 1 139 23 is_stmt 0 view .LVU252
+ 151:Core/Src/fan_control.c ****     }
+ 820              		.loc 1 151 23 is_stmt 0 view .LVU252
  821 0038 9621     		movs	r1, #150
  822              	.LVL58:
  823              	.L71:
- 145:Core/Src/fan_control.c **** }
- 824              		.loc 1 145 5 is_stmt 1 view .LVU253
+ 157:Core/Src/fan_control.c **** }
+ 824              		.loc 1 157 5 is_stmt 1 view .LVU253
  825 003a 89B2     		uxth	r1, r1
  826              	.LVL59:
- 145:Core/Src/fan_control.c **** }
- 827              		.loc 1 145 5 is_stmt 0 view .LVU254
+ 157:Core/Src/fan_control.c **** }
+ 827              		.loc 1 157 5 is_stmt 0 view .LVU254
  828 003c FFF7FEFF 		bl	FanControl_SetDutyPermille
  829              	.LVL60:
  830              	.L67:
- 146:Core/Src/fan_control.c **** 
- 831              		.loc 1 146 1 view .LVU255
+ 158:Core/Src/fan_control.c **** 
+ 831              		.loc 1 158 1 view .LVU255
  832 0040 08BD     		pop	{r3, pc}
  833              	.LVL61:
  834              	.L75:
@@ -1406,8 +1427,8 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  836              		.cfi_def_cfa_offset 0
  837              		.cfi_restore 3
  838              		.cfi_restore 14
- 146:Core/Src/fan_control.c **** 
- 839              		.loc 1 146 1 view .LVU256
+ 158:Core/Src/fan_control.c **** 
+ 839              		.loc 1 158 1 view .LVU256
  840 0042 7047     		bx	lr
  841              	.L79:
  842              		.align	2
@@ -1417,6 +1438,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  846              	.LFE69:
  848              		.section	.text.FanControl_SetTargetRpmArray,"ax",%progbits
  849              		.align	1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 25
+
+
  850              		.global	FanControl_SetTargetRpmArray
  851              		.syntax unified
  852              		.thumb
@@ -1424,23 +1448,20 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  855              	FanControl_SetTargetRpmArray:
  856              	.LVL62:
  857              	.LFB70:
- 150:Core/Src/fan_control.c ****     uint8_t index;
- 858              		.loc 1 150 1 is_stmt 1 view -0
+ 162:Core/Src/fan_control.c ****     uint8_t index;
+ 858              		.loc 1 162 1 is_stmt 1 view -0
  859              		.cfi_startproc
  860              		@ args = 0, pretend = 0, frame = 0
  861              		@ frame_needed = 0, uses_anonymous_args = 0
- 151:Core/Src/fan_control.c **** 
- 862              		.loc 1 151 5 view .LVU258
- 153:Core/Src/fan_control.c ****         return;
- 863              		.loc 1 153 5 view .LVU259
- 153:Core/Src/fan_control.c ****         return;
- 864              		.loc 1 153 8 is_stmt 0 view .LVU260
+ 163:Core/Src/fan_control.c **** 
+ 862              		.loc 1 163 5 view .LVU258
+ 165:Core/Src/fan_control.c ****         return;
+ 863              		.loc 1 165 5 view .LVU259
+ 165:Core/Src/fan_control.c ****         return;
+ 864              		.loc 1 165 8 is_stmt 0 view .LVU260
  865 0000 88B1     		cbz	r0, .L85
- 150:Core/Src/fan_control.c ****     uint8_t index;
- 866              		.loc 1 150 1 view .LVU261
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 25
-
-
+ 162:Core/Src/fan_control.c ****     uint8_t index;
+ 866              		.loc 1 162 1 view .LVU261
  867 0002 70B5     		push	{r4, r5, r6, lr}
  868              	.LCFI8:
  869              		.cfi_def_cfa_offset 16
@@ -1450,39 +1471,42 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  873              		.cfi_offset 14, -4
  874 0004 0D46     		mov	r5, r1
  875 0006 0646     		mov	r6, r0
- 153:Core/Src/fan_control.c ****         return;
- 876              		.loc 1 153 30 discriminator 1 view .LVU262
+ 165:Core/Src/fan_control.c ****         return;
+ 876              		.loc 1 165 30 discriminator 1 view .LVU262
  877 0008 61B1     		cbz	r1, .L80
- 157:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
- 878              		.loc 1 157 16 view .LVU263
+ 169:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
+ 878              		.loc 1 169 16 view .LVU263
  879 000a 0024     		movs	r4, #0
  880 000c 08E0     		b	.L82
  881              	.LVL63:
  882              	.L83:
- 158:Core/Src/fan_control.c ****     }
- 883              		.loc 1 158 9 is_stmt 1 view .LVU264
+ 170:Core/Src/fan_control.c ****     }
+ 883              		.loc 1 170 9 is_stmt 1 view .LVU264
  884 000e 35F81420 		ldrh	r2, [r5, r4, lsl #1]
  885 0012 36F81410 		ldrh	r1, [r6, r4, lsl #1]
  886 0016 2046     		mov	r0, r4
  887 0018 FFF7FEFF 		bl	FanControl_SetTargetRpm
  888              	.LVL64:
- 157:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
- 889              		.loc 1 157 62 discriminator 3 view .LVU265
+ 169:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
+ 889              		.loc 1 169 62 discriminator 3 view .LVU265
  890 001c 0134     		adds	r4, r4, #1
  891              	.LVL65:
- 157:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
- 892              		.loc 1 157 62 is_stmt 0 discriminator 3 view .LVU266
+ 169:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
+ 892              		.loc 1 169 62 is_stmt 0 discriminator 3 view .LVU266
  893 001e E4B2     		uxtb	r4, r4
  894              	.LVL66:
  895              	.L82:
- 157:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
- 896              		.loc 1 157 28 is_stmt 1 discriminator 1 view .LVU267
+ 169:Core/Src/fan_control.c ****         FanControl_SetTargetRpm(index, target_rpm[index], max_rpm[index]);
+ 896              		.loc 1 169 28 is_stmt 1 discriminator 1 view .LVU267
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 26
+
+
  897 0020 032C     		cmp	r4, #3
  898 0022 F4D9     		bls	.L83
  899              	.LVL67:
  900              	.L80:
- 160:Core/Src/fan_control.c **** 
- 901              		.loc 1 160 1 is_stmt 0 view .LVU268
+ 172:Core/Src/fan_control.c **** 
+ 901              		.loc 1 172 1 is_stmt 0 view .LVU268
  902 0024 70BD     		pop	{r4, r5, r6, pc}
  903              	.LVL68:
  904              	.L85:
@@ -1492,15 +1516,12 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  908              		.cfi_restore 5
  909              		.cfi_restore 6
  910              		.cfi_restore 14
- 160:Core/Src/fan_control.c **** 
- 911              		.loc 1 160 1 view .LVU269
+ 172:Core/Src/fan_control.c **** 
+ 911              		.loc 1 172 1 view .LVU269
  912 0026 7047     		bx	lr
  913              		.cfi_endproc
  914              	.LFE70:
  916              		.section	.text.FanControl_StartRampTest,"ax",%progbits
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 26
-
-
  917              		.align	1
  918              		.global	FanControl_StartRampTest
  919              		.syntax unified
@@ -1509,34 +1530,37 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  923              	FanControl_StartRampTest:
  924              	.LVL69:
  925              	.LFB71:
- 163:Core/Src/fan_control.c ****     g_ramp.active = true;
- 926              		.loc 1 163 1 is_stmt 1 view -0
+ 175:Core/Src/fan_control.c ****     g_ramp.active = true;
+ 926              		.loc 1 175 1 is_stmt 1 view -0
  927              		.cfi_startproc
  928              		@ args = 0, pretend = 0, frame = 0
  929              		@ frame_needed = 0, uses_anonymous_args = 0
  930              		@ link register save eliminated.
- 164:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
- 931              		.loc 1 164 5 view .LVU271
- 164:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
- 932              		.loc 1 164 19 is_stmt 0 view .LVU272
+ 176:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
+ 931              		.loc 1 176 5 view .LVU271
+ 176:Core/Src/fan_control.c ****     g_ramp.current_permille = 0U;
+ 932              		.loc 1 176 19 is_stmt 0 view .LVU272
  933 0000 034B     		ldr	r3, .L89
  934 0002 0122     		movs	r2, #1
  935 0004 1A70     		strb	r2, [r3]
- 165:Core/Src/fan_control.c ****     g_ramp.next_step_ms = now_ms;
- 936              		.loc 1 165 5 is_stmt 1 view .LVU273
- 165:Core/Src/fan_control.c ****     g_ramp.next_step_ms = now_ms;
- 937              		.loc 1 165 29 is_stmt 0 view .LVU274
+ 177:Core/Src/fan_control.c ****     g_ramp.next_step_ms = now_ms;
+ 936              		.loc 1 177 5 is_stmt 1 view .LVU273
+ 177:Core/Src/fan_control.c ****     g_ramp.next_step_ms = now_ms;
+ 937              		.loc 1 177 29 is_stmt 0 view .LVU274
  938 0006 0022     		movs	r2, #0
  939 0008 5A80     		strh	r2, [r3, #2]	@ movhi
- 166:Core/Src/fan_control.c **** }
- 940              		.loc 1 166 5 is_stmt 1 view .LVU275
- 166:Core/Src/fan_control.c **** }
- 941              		.loc 1 166 25 is_stmt 0 view .LVU276
+ 178:Core/Src/fan_control.c **** }
+ 940              		.loc 1 178 5 is_stmt 1 view .LVU275
+ 178:Core/Src/fan_control.c **** }
+ 941              		.loc 1 178 25 is_stmt 0 view .LVU276
  942 000a 5860     		str	r0, [r3, #4]
- 167:Core/Src/fan_control.c **** 
- 943              		.loc 1 167 1 view .LVU277
+ 179:Core/Src/fan_control.c **** 
+ 943              		.loc 1 179 1 view .LVU277
  944 000c 7047     		bx	lr
  945              	.L90:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 27
+
+
  946 000e 00BF     		.align	2
  947              	.L89:
  948 0010 00000000 		.word	g_ramp
@@ -1550,19 +1574,16 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  957              		.thumb_func
  959              	FanControl_IsRampActive:
  960              	.LFB72:
- 170:Core/Src/fan_control.c ****     return g_ramp.active;
- 961              		.loc 1 170 1 is_stmt 1 view -0
+ 182:Core/Src/fan_control.c ****     return g_ramp.active;
+ 961              		.loc 1 182 1 is_stmt 1 view -0
  962              		.cfi_startproc
  963              		@ args = 0, pretend = 0, frame = 0
  964              		@ frame_needed = 0, uses_anonymous_args = 0
  965              		@ link register save eliminated.
- 171:Core/Src/fan_control.c **** }
- 966              		.loc 1 171 5 view .LVU279
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 27
-
-
- 172:Core/Src/fan_control.c **** 
- 967              		.loc 1 172 1 is_stmt 0 view .LVU280
+ 183:Core/Src/fan_control.c **** }
+ 966              		.loc 1 183 5 view .LVU279
+ 184:Core/Src/fan_control.c **** 
+ 967              		.loc 1 184 1 is_stmt 0 view .LVU280
  968 0000 014B     		ldr	r3, .L92
  969 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
  970 0004 7047     		bx	lr
@@ -1580,8 +1601,8 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  983              		.thumb_func
  985              	FanControl_EnterSafeState:
  986              	.LFB73:
- 175:Core/Src/fan_control.c ****     uint8_t index;
- 987              		.loc 1 175 1 is_stmt 1 view -0
+ 187:Core/Src/fan_control.c ****     uint8_t index;
+ 987              		.loc 1 187 1 is_stmt 1 view -0
  988              		.cfi_startproc
  989              		@ args = 0, pretend = 0, frame = 0
  990              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -1590,55 +1611,55 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  993              		.cfi_def_cfa_offset 8
  994              		.cfi_offset 3, -8
  995              		.cfi_offset 14, -4
- 176:Core/Src/fan_control.c **** 
- 996              		.loc 1 176 5 view .LVU282
- 178:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
- 997              		.loc 1 178 5 view .LVU283
- 178:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
- 998              		.loc 1 178 19 is_stmt 0 view .LVU284
+ 188:Core/Src/fan_control.c **** 
+ 996              		.loc 1 188 5 view .LVU282
+ 191:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+ 997              		.loc 1 191 5 view .LVU283
+ 191:Core/Src/fan_control.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+ 998              		.loc 1 191 19 is_stmt 0 view .LVU284
  999 0002 0023     		movs	r3, #0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 28
+
+
  1000 0004 084A     		ldr	r2, .L98
  1001 0006 1370     		strb	r3, [r2]
- 179:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 1002              		.loc 1 179 5 is_stmt 1 view .LVU285
+ 192:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 1002              		.loc 1 192 5 is_stmt 1 view .LVU285
  1003              	.LVL70:
- 179:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 1004              		.loc 1 179 5 is_stmt 0 view .LVU286
+ 192:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 1004              		.loc 1 192 5 is_stmt 0 view .LVU286
  1005 0008 08E0     		b	.L95
  1006              	.LVL71:
  1007              	.L96:
- 180:Core/Src/fan_control.c ****     }
- 1008              		.loc 1 180 9 is_stmt 1 view .LVU287
- 180:Core/Src/fan_control.c ****     }
- 1009              		.loc 1 180 41 is_stmt 0 view .LVU288
+ 193:Core/Src/fan_control.c ****     }
+ 1008              		.loc 1 193 9 is_stmt 1 view .LVU287
+ 193:Core/Src/fan_control.c ****     }
+ 1009              		.loc 1 193 41 is_stmt 0 view .LVU288
  1010 000a C3EBC301 		rsb	r1, r3, r3, lsl #3
  1011 000e 074A     		ldr	r2, .L98+4
  1012 0010 02EB8102 		add	r2, r2, r1, lsl #2
  1013 0014 0021     		movs	r1, #0
  1014 0016 1183     		strh	r1, [r2, #24]	@ movhi
- 179:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 1015              		.loc 1 179 62 is_stmt 1 discriminator 3 view .LVU289
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 28
-
-
+ 192:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 1015              		.loc 1 192 62 is_stmt 1 discriminator 3 view .LVU289
  1016 0018 0133     		adds	r3, r3, #1
  1017              	.LVL72:
- 179:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 1018              		.loc 1 179 62 is_stmt 0 discriminator 3 view .LVU290
+ 192:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 1018              		.loc 1 192 62 is_stmt 0 discriminator 3 view .LVU290
  1019 001a DBB2     		uxtb	r3, r3
  1020              	.LVL73:
  1021              	.L95:
- 179:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
- 1022              		.loc 1 179 28 is_stmt 1 discriminator 1 view .LVU291
+ 192:Core/Src/fan_control.c ****         g_fans[index].status.target_rpm = 0U;
+ 1022              		.loc 1 192 28 is_stmt 1 discriminator 1 view .LVU291
  1023 001c 032B     		cmp	r3, #3
  1024 001e F4D9     		bls	.L96
- 182:Core/Src/fan_control.c **** }
- 1025              		.loc 1 182 5 view .LVU292
+ 195:Core/Src/fan_control.c **** }
+ 1025              		.loc 1 195 5 view .LVU292
  1026 0020 0020     		movs	r0, #0
  1027 0022 FFF7FEFF 		bl	FanControl_SetDutyPermilleAll
  1028              	.LVL74:
- 183:Core/Src/fan_control.c **** 
- 1029              		.loc 1 183 1 is_stmt 0 view .LVU293
+ 196:Core/Src/fan_control.c **** 
+ 1029              		.loc 1 196 1 is_stmt 0 view .LVU293
  1030 0026 08BD     		pop	{r3, pc}
  1031              	.L99:
  1032              		.align	2
@@ -1655,68 +1676,71 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  1044              		.thumb_func
  1046              	FanControl_HasAnyFault:
  1047              	.LFB74:
- 186:Core/Src/fan_control.c ****     uint8_t index;
- 1048              		.loc 1 186 1 is_stmt 1 view -0
+ 199:Core/Src/fan_control.c ****     uint8_t index;
+ 1048              		.loc 1 199 1 is_stmt 1 view -0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 29
+
+
  1049              		.cfi_startproc
  1050              		@ args = 0, pretend = 0, frame = 0
  1051              		@ frame_needed = 0, uses_anonymous_args = 0
  1052              		@ link register save eliminated.
- 187:Core/Src/fan_control.c **** 
- 1053              		.loc 1 187 5 view .LVU295
- 189:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
- 1054              		.loc 1 189 5 view .LVU296
+ 200:Core/Src/fan_control.c **** 
+ 1053              		.loc 1 200 5 view .LVU295
+ 202:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
+ 1054              		.loc 1 202 5 view .LVU296
  1055              	.LVL75:
- 189:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
- 1056              		.loc 1 189 16 is_stmt 0 view .LVU297
+ 202:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
+ 1056              		.loc 1 202 16 is_stmt 0 view .LVU297
  1057 0000 0023     		movs	r3, #0
  1058              	.LVL76:
  1059              	.L101:
- 189:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
- 1060              		.loc 1 189 28 is_stmt 1 discriminator 1 view .LVU298
+ 202:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
+ 1060              		.loc 1 202 28 is_stmt 1 discriminator 1 view .LVU298
  1061 0002 032B     		cmp	r3, #3
  1062 0004 0AD8     		bhi	.L105
- 190:Core/Src/fan_control.c ****             return true;
- 1063              		.loc 1 190 9 view .LVU299
- 190:Core/Src/fan_control.c ****             return true;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 29
-
-
- 1064              		.loc 1 190 33 is_stmt 0 view .LVU300
+ 203:Core/Src/fan_control.c ****             return true;
+ 1063              		.loc 1 203 9 view .LVU299
+ 203:Core/Src/fan_control.c ****             return true;
+ 1064              		.loc 1 203 33 is_stmt 0 view .LVU300
  1065 0006 C3EBC301 		rsb	r1, r3, r3, lsl #3
  1066 000a 064A     		ldr	r2, .L106
  1067 000c 02EB8102 		add	r2, r2, r1, lsl #2
  1068 0010 927C     		ldrb	r2, [r2, #18]	@ zero_extendqisi2
- 190:Core/Src/fan_control.c ****             return true;
- 1069              		.loc 1 190 12 view .LVU301
+ 203:Core/Src/fan_control.c ****             return true;
+ 1069              		.loc 1 203 12 view .LVU301
  1070 0012 032A     		cmp	r2, #3
  1071 0014 04D0     		beq	.L104
- 189:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
- 1072              		.loc 1 189 62 is_stmt 1 discriminator 2 view .LVU302
+ 202:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
+ 1072              		.loc 1 202 62 is_stmt 1 discriminator 2 view .LVU302
  1073 0016 0133     		adds	r3, r3, #1
  1074              	.LVL77:
- 189:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
- 1075              		.loc 1 189 62 is_stmt 0 discriminator 2 view .LVU303
+ 202:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
+ 1075              		.loc 1 202 62 is_stmt 0 discriminator 2 view .LVU303
  1076 0018 DBB2     		uxtb	r3, r3
  1077              	.LVL78:
- 189:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
- 1078              		.loc 1 189 62 discriminator 2 view .LVU304
+ 202:Core/Src/fan_control.c ****         if (g_fans[index].status.state == FAN_STATE_ERROR) {
+ 1078              		.loc 1 202 62 discriminator 2 view .LVU304
  1079 001a F2E7     		b	.L101
  1080              	.LVL79:
  1081              	.L105:
- 195:Core/Src/fan_control.c **** }
- 1082              		.loc 1 195 12 view .LVU305
+ 208:Core/Src/fan_control.c **** }
+ 1082              		.loc 1 208 12 view .LVU305
  1083 001c 0020     		movs	r0, #0
  1084 001e 7047     		bx	lr
  1085              	.L104:
- 191:Core/Src/fan_control.c ****         }
- 1086              		.loc 1 191 20 view .LVU306
+ 204:Core/Src/fan_control.c ****         }
+ 1086              		.loc 1 204 20 view .LVU306
  1087 0020 0120     		movs	r0, #1
- 196:Core/Src/fan_control.c **** 
- 1088              		.loc 1 196 1 view .LVU307
+ 209:Core/Src/fan_control.c **** 
+ 1088              		.loc 1 209 1 view .LVU307
  1089 0022 7047     		bx	lr
  1090              	.L107:
  1091              		.align	2
  1092              	.L106:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 30
+
+
  1093 0024 00000000 		.word	g_fans
  1094              		.cfi_endproc
  1095              	.LFE74:
@@ -1728,19 +1752,16 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  1102              		.thumb_func
  1104              	FanControl_GetStatuses:
  1105              	.LFB75:
- 199:Core/Src/fan_control.c ****     return &g_fans[0].status;
- 1106              		.loc 1 199 1 is_stmt 1 view -0
+ 212:Core/Src/fan_control.c ****     return &g_fans[0].status;
+ 1106              		.loc 1 212 1 is_stmt 1 view -0
  1107              		.cfi_startproc
  1108              		@ args = 0, pretend = 0, frame = 0
  1109              		@ frame_needed = 0, uses_anonymous_args = 0
  1110              		@ link register save eliminated.
- 200:Core/Src/fan_control.c **** }
- 1111              		.loc 1 200 5 view .LVU309
- 201:Core/Src/fan_control.c **** 
- 1112              		.loc 1 201 1 is_stmt 0 view .LVU310
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 30
-
-
+ 213:Core/Src/fan_control.c **** }
+ 1111              		.loc 1 213 5 view .LVU309
+ 214:Core/Src/fan_control.c **** 
+ 1112              		.loc 1 214 1 is_stmt 0 view .LVU310
  1113 0000 0048     		ldr	r0, .L109
  1114 0002 7047     		bx	lr
  1115              	.L110:
@@ -1757,16 +1778,16 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  1127              		.thumb_func
  1129              	FanControl_GetDutyPermille:
  1130              	.LFB76:
- 204:Core/Src/fan_control.c ****     return g_fans[0].duty_permille;
- 1131              		.loc 1 204 1 is_stmt 1 view -0
+ 217:Core/Src/fan_control.c ****     return g_fans[0].duty_permille;
+ 1131              		.loc 1 217 1 is_stmt 1 view -0
  1132              		.cfi_startproc
  1133              		@ args = 0, pretend = 0, frame = 0
  1134              		@ frame_needed = 0, uses_anonymous_args = 0
  1135              		@ link register save eliminated.
- 205:Core/Src/fan_control.c **** }
- 1136              		.loc 1 205 5 view .LVU312
- 206:Core/Src/fan_control.c **** 
- 1137              		.loc 1 206 1 is_stmt 0 view .LVU313
+ 218:Core/Src/fan_control.c **** }
+ 1136              		.loc 1 218 5 view .LVU312
+ 219:Core/Src/fan_control.c **** 
+ 1137              		.loc 1 219 1 is_stmt 0 view .LVU313
  1138 0000 014B     		ldr	r3, .L112
  1139 0002 1889     		ldrh	r0, [r3, #8]
  1140 0004 7047     		bx	lr
@@ -1777,6 +1798,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  1145              		.cfi_endproc
  1146              	.LFE76:
  1148              		.section	.text.FanControl_GetDutyPermilleForFan,"ax",%progbits
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 31
+
+
  1149              		.align	1
  1150              		.global	FanControl_GetDutyPermilleForFan
  1151              		.syntax unified
@@ -1785,41 +1809,38 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  1155              	FanControl_GetDutyPermilleForFan:
  1156              	.LVL80:
  1157              	.LFB77:
- 209:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
- 1158              		.loc 1 209 1 is_stmt 1 view -0
+ 222:Core/Src/fan_control.c ****     if (index >= FAN_CONTROL_CHANNEL_COUNT) {
+ 1158              		.loc 1 222 1 is_stmt 1 view -0
  1159              		.cfi_startproc
  1160              		@ args = 0, pretend = 0, frame = 0
  1161              		@ frame_needed = 0, uses_anonymous_args = 0
  1162              		@ link register save eliminated.
- 210:Core/Src/fan_control.c ****         return 0U;
- 1163              		.loc 1 210 5 view .LVU315
- 210:Core/Src/fan_control.c ****         return 0U;
- 1164              		.loc 1 210 8 is_stmt 0 view .LVU316
+ 223:Core/Src/fan_control.c ****         return 0U;
+ 1163              		.loc 1 223 5 view .LVU315
+ 223:Core/Src/fan_control.c ****         return 0U;
+ 1164              		.loc 1 223 8 is_stmt 0 view .LVU316
  1165 0000 0328     		cmp	r0, #3
  1166 0002 06D8     		bhi	.L116
- 214:Core/Src/fan_control.c **** }
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 31
-
-
- 1167              		.loc 1 214 5 is_stmt 1 view .LVU317
- 214:Core/Src/fan_control.c **** }
- 1168              		.loc 1 214 25 is_stmt 0 view .LVU318
+ 227:Core/Src/fan_control.c **** }
+ 1167              		.loc 1 227 5 is_stmt 1 view .LVU317
+ 227:Core/Src/fan_control.c **** }
+ 1168              		.loc 1 227 25 is_stmt 0 view .LVU318
  1169 0004 C0EBC000 		rsb	r0, r0, r0, lsl #3
  1170              	.LVL81:
- 214:Core/Src/fan_control.c **** }
- 1171              		.loc 1 214 25 view .LVU319
+ 227:Core/Src/fan_control.c **** }
+ 1171              		.loc 1 227 25 view .LVU319
  1172 0008 034B     		ldr	r3, .L117
  1173 000a 03EB8003 		add	r3, r3, r0, lsl #2
  1174 000e 1889     		ldrh	r0, [r3, #8]
  1175 0010 7047     		bx	lr
  1176              	.LVL82:
  1177              	.L116:
- 211:Core/Src/fan_control.c ****     }
- 1178              		.loc 1 211 16 view .LVU320
+ 224:Core/Src/fan_control.c ****     }
+ 1178              		.loc 1 224 16 view .LVU320
  1179 0012 0020     		movs	r0, #0
  1180              	.LVL83:
- 215:Core/Src/fan_control.c **** 
- 1181              		.loc 1 215 1 view .LVU321
+ 228:Core/Src/fan_control.c **** 
+ 1181              		.loc 1 228 1 view .LVU321
  1182 0014 7047     		bx	lr
  1183              	.L118:
  1184 0016 00BF     		.align	2
@@ -1837,6 +1858,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  1199              		.section	.bss.g_ramp,"aw",%nobits
  1200              		.align	2
  1203              	g_ramp:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 32
+
+
  1204 0000 00000000 		.space	8
  1204      00000000 
  1205              		.section	.bss.g_fans,"aw",%nobits
@@ -1858,70 +1882,67 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 1
  1219              		.file 8 "Core/Inc/tachometer.h"
  1220              		.file 9 "Core/Inc/fan_control.h"
  1221              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 32
-
-
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 33
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 33
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 fan_control.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:19     .text.FanControl_ApplyDuty:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:24     .text.FanControl_ApplyDuty:00000000 FanControl_ApplyDuty
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:97     .text.FanControl_ApplyDuty:00000048 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:103    .text.FanControl_DutyToPercent:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:108    .text.FanControl_DutyToPercent:00000000 FanControl_DutyToPercent
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:145    .text.FanControl_DutyToPercent:00000018 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:150    .text.FanControl_UpdateFan:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:155    .text.FanControl_UpdateFan:00000000 FanControl_UpdateFan
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:350    .text.FanControl_UpdateFan:000000ac $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1203   .bss.g_ramp:00000000 g_ramp
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:355    .text.FanControl_SetDutyPermille:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:361    .text.FanControl_SetDutyPermille:00000000 FanControl_SetDutyPermille
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:435    .text.FanControl_SetDutyPermille:00000040 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1209   .bss.g_fans:00000000 g_fans
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:440    .text.FanControl_SetDutyPermilleAll:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:446    .text.FanControl_SetDutyPermilleAll:00000000 FanControl_SetDutyPermilleAll
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:516    .text.FanControl_SetDutyPermilleAll:00000038 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:521    .text.FanControl_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:527    .text.FanControl_Init:00000000 FanControl_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:639    .text.FanControl_Init:00000060 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1194   .rodata.pwm_channels.0:00000000 pwm_channels.0
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:646    .text.FanControl_Task:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:652    .text.FanControl_Task:00000000 FanControl_Task
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:746    .text.FanControl_Task:00000058 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:752    .text.FanControl_SetTargetRpm:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:758    .text.FanControl_SetTargetRpm:00000000 FanControl_SetTargetRpm
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:844    .text.FanControl_SetTargetRpm:00000044 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:849    .text.FanControl_SetTargetRpmArray:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:855    .text.FanControl_SetTargetRpmArray:00000000 FanControl_SetTargetRpmArray
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:917    .text.FanControl_StartRampTest:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:923    .text.FanControl_StartRampTest:00000000 FanControl_StartRampTest
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:948    .text.FanControl_StartRampTest:00000010 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:953    .text.FanControl_IsRampActive:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:959    .text.FanControl_IsRampActive:00000000 FanControl_IsRampActive
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:974    .text.FanControl_IsRampActive:00000008 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:979    .text.FanControl_EnterSafeState:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:985    .text.FanControl_EnterSafeState:00000000 FanControl_EnterSafeState
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1034   .text.FanControl_EnterSafeState:00000028 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1040   .text.FanControl_HasAnyFault:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1046   .text.FanControl_HasAnyFault:00000000 FanControl_HasAnyFault
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1093   .text.FanControl_HasAnyFault:00000024 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1098   .text.FanControl_GetStatuses:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1104   .text.FanControl_GetStatuses:00000000 FanControl_GetStatuses
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1118   .text.FanControl_GetStatuses:00000004 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1123   .text.FanControl_GetDutyPermille:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1129   .text.FanControl_GetDutyPermille:00000000 FanControl_GetDutyPermille
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1144   .text.FanControl_GetDutyPermille:00000008 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1149   .text.FanControl_GetDutyPermilleForFan:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1155   .text.FanControl_GetDutyPermilleForFan:00000000 FanControl_GetDutyPermilleForFan
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1186   .text.FanControl_GetDutyPermilleForFan:00000018 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1191   .rodata.pwm_channels.0:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1200   .bss.g_ramp:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s:1206   .bss.g_fans:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:19     .text.FanControl_ApplyDuty:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:24     .text.FanControl_ApplyDuty:00000000 FanControl_ApplyDuty
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:97     .text.FanControl_ApplyDuty:00000048 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:103    .text.FanControl_DutyToPercent:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:108    .text.FanControl_DutyToPercent:00000000 FanControl_DutyToPercent
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:145    .text.FanControl_DutyToPercent:00000018 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:150    .text.FanControl_UpdateFan:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:155    .text.FanControl_UpdateFan:00000000 FanControl_UpdateFan
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:350    .text.FanControl_UpdateFan:000000ac $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1203   .bss.g_ramp:00000000 g_ramp
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:355    .text.FanControl_SetDutyPermille:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:361    .text.FanControl_SetDutyPermille:00000000 FanControl_SetDutyPermille
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:435    .text.FanControl_SetDutyPermille:00000040 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1209   .bss.g_fans:00000000 g_fans
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:440    .text.FanControl_SetDutyPermilleAll:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:446    .text.FanControl_SetDutyPermilleAll:00000000 FanControl_SetDutyPermilleAll
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:516    .text.FanControl_SetDutyPermilleAll:00000038 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:521    .text.FanControl_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:527    .text.FanControl_Init:00000000 FanControl_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:639    .text.FanControl_Init:00000060 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1194   .rodata.pwm_channels.0:00000000 pwm_channels.0
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:646    .text.FanControl_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:652    .text.FanControl_Task:00000000 FanControl_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:746    .text.FanControl_Task:00000058 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:752    .text.FanControl_SetTargetRpm:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:758    .text.FanControl_SetTargetRpm:00000000 FanControl_SetTargetRpm
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:844    .text.FanControl_SetTargetRpm:00000044 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:849    .text.FanControl_SetTargetRpmArray:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:855    .text.FanControl_SetTargetRpmArray:00000000 FanControl_SetTargetRpmArray
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:917    .text.FanControl_StartRampTest:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:923    .text.FanControl_StartRampTest:00000000 FanControl_StartRampTest
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:948    .text.FanControl_StartRampTest:00000010 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:953    .text.FanControl_IsRampActive:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:959    .text.FanControl_IsRampActive:00000000 FanControl_IsRampActive
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:974    .text.FanControl_IsRampActive:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:979    .text.FanControl_EnterSafeState:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:985    .text.FanControl_EnterSafeState:00000000 FanControl_EnterSafeState
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1034   .text.FanControl_EnterSafeState:00000028 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1040   .text.FanControl_HasAnyFault:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1046   .text.FanControl_HasAnyFault:00000000 FanControl_HasAnyFault
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1093   .text.FanControl_HasAnyFault:00000024 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1098   .text.FanControl_GetStatuses:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1104   .text.FanControl_GetStatuses:00000000 FanControl_GetStatuses
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1118   .text.FanControl_GetStatuses:00000004 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1123   .text.FanControl_GetDutyPermille:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1129   .text.FanControl_GetDutyPermille:00000000 FanControl_GetDutyPermille
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1144   .text.FanControl_GetDutyPermille:00000008 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1149   .text.FanControl_GetDutyPermilleForFan:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1155   .text.FanControl_GetDutyPermilleForFan:00000000 FanControl_GetDutyPermilleForFan
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1186   .text.FanControl_GetDutyPermilleForFan:00000018 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1191   .rodata.pwm_channels.0:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1200   .bss.g_ramp:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s:1206   .bss.g_fans:00000000 $d
 
 UNDEFINED SYMBOLS
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccz8w5Mx.s 			page 34
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccWIgLOA.s 			page 34
 
 
 Tachometer_GetReading

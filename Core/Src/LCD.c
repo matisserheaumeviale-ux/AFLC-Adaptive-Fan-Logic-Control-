@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+// Mapping physique des broches LCD sur GPIOB.
 #define RS_Pin GPIO_PIN_9
 #define RW_Pin GPIO_PIN_10
 #define EN_Pin GPIO_PIN_11
@@ -23,6 +24,8 @@
 #define LCD_EN_HIGH() (GPIOB->BSRR = EN_Pin)
 #define LCD_EN_LOW()  (GPIOB->BRR  = EN_Pin)
 
+// Delai logiciel tres simple.
+// Correct pour un petit projet labo, moins ideal qu'un timer.
 #define LCD_DELAY_LOOP_PER_MS 8000U
 
 static void LCD_DelayMs(uint32_t ms){
@@ -34,6 +37,7 @@ static void LCD_DelayShort(void){
 }
 
 static void LCD_EnablePulse(void){
+  // Le LCD valide les 4 bits sur le front EN.
   LCD_EN_HIGH();
   LCD_DelayShort();
   LCD_EN_LOW();
@@ -41,6 +45,7 @@ static void LCD_EnablePulse(void){
 }
 
 static void LCD_Send4Bits(uint8_t data){
+  // Mode 4 bits : on pousse seulement le nibble faible.
   GPIOB->BRR = LCD_DATA_MASK;
   GPIOB->BSRR = ((uint32_t)(data & 0x0FU) << 12);
 
@@ -48,6 +53,7 @@ static void LCD_Send4Bits(uint8_t data){
 }
 
 void LCD_SendCommand(uint8_t data){
+  // RS=0 -> commande.
   LCD_RS_LOW();
   LCD_RW_LOW();
 
@@ -56,6 +62,7 @@ void LCD_SendCommand(uint8_t data){
 }
 
 void LCD_SendChar(char data){
+  // RS=1 -> donnee utilisateur.
   LCD_RS_HIGH();
   LCD_RW_LOW();
 
@@ -74,6 +81,7 @@ void LCD_SendString(const char *str){
 void LCD_SetCursor(uint8_t col, uint8_t row){
   static const uint8_t RowAddress[4] = {0x80, 0xC0, 0x94, 0xD4};
 
+  // Garde-fous simples.
   if(row > 3U) return;
   if(col > 19U) return;
 
@@ -92,6 +100,7 @@ void LCD_Printf(const char *fmt, ...){
   (void)vsnprintf(buffer, sizeof(buffer), fmt, args);
   va_end(args);
 
+  // Ecrit sur l'ecran complet avec retour de ligne simple.
   LCD_SetCursor(0, 0);
   for(size_t i = 0; (buffer[i] != '\0') && (row < 4U); i++){
     if(buffer[i] == '\n'){
@@ -115,6 +124,7 @@ void LCD_ClearLine(uint8_t row){
   if(row > 3U) return;
 
   LCD_SetCursor(0, row);
+  // Efface exactement 20 caracteres.
   for(uint8_t i = 0; i < 20U; i++) LCD_SendChar(' ');
   LCD_SetCursor(0, row);
 }
@@ -127,7 +137,9 @@ void LCD_ScrollText(const char *text){
   if(text == NULL) return;
 
   len = strlen(text);
-  stream_len = len + 40U; // 20 espaces avant + texte + 20 espaces apres
+  // 20 espaces avant + texte + 20 espaces apres.
+  // Comme ca le texte entre et sort proprement.
+  stream_len = len + 40U;
   if(len == 0U){
     LCD_ClearLine(0);
     return;
@@ -160,6 +172,7 @@ void LCD_ScrollText(const char *text){
 }
 
 void LCD_Init(void){
+  // Sequence standard HD44780 en mode 4 bits.
   LCD_DelayMs(50U);
   
   LCD_SendCommand(0x33);

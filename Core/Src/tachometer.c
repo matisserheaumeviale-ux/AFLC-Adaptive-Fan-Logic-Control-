@@ -1,10 +1,12 @@
 #include "tachometer.h"
 
+// TIM2 capture les periodes des signaux tach.
 #define TACH_TIM_TICK_HZ            125000UL
 #define TACH_PULSES_PER_REVOLUTION  2UL
 #define TACH_TIMEOUT_MS             1200UL
 #define TACH_FILTER_SAMPLES         4U
 
+// Etat d'un canal tachymetre.
 typedef struct {
     volatile uint32_t last_capture;
     volatile uint32_t period_ticks;
@@ -27,6 +29,7 @@ void Tachometer_Init(void)
 {
     uint8_t index;
 
+    // Reset complet des 4 canaux.
     for (index = 0U; index < TACHOMETER_CHANNEL_COUNT; index++) {
         g_tach[index].first_capture = 1U;
         g_tach[index].pending_period = 0U;
@@ -50,6 +53,7 @@ void Tachometer_OnCapture(TIM_HandleTypeDef *htim)
         return;
     }
 
+    // On convertit le channel HAL en index 0..3.
     channel_index = Tachometer_ChannelFromHal(htim);
     if ((channel_index < 0) || (channel_index >= (int32_t)TACHOMETER_CHANNEL_COUNT)) {
         return;
@@ -59,6 +63,7 @@ void Tachometer_OnCapture(TIM_HandleTypeDef *htim)
     tim_channel = (uint32_t)(TIM_CHANNEL_1 + ((uint32_t)channel_index * 4UL));
     now_capture = HAL_TIM_ReadCapturedValue(htim, tim_channel);
 
+    // Premiere capture : on memorise seulement le point de depart.
     if (channel->first_capture != 0U) {
         channel->last_capture = now_capture;
         channel->last_edge_ms = HAL_GetTick();
@@ -71,6 +76,7 @@ void Tachometer_OnCapture(TIM_HandleTypeDef *htim)
     if (now_capture >= channel->last_capture) {
         period_ticks = now_capture - channel->last_capture;
     } else {
+        // Gestion du overflow 16 bits du timer.
         period_ticks = (0xFFFFUL - channel->last_capture) + now_capture + 1UL;
     }
 
@@ -100,10 +106,13 @@ void Tachometer_Task(uint32_t now_ms)
             continue;
         }
 
+        // Une nouvelle periode a ete mesuree.
         if (channel->pending_period != 0U) {
             uint32_t rpm;
 
             channel->pending_period = 0U;
+
+            // rpm = frequence * 60 / pulses_par_tour
             rpm = ((TACH_TIM_TICK_HZ * 60UL) / channel->period_ticks) / TACH_PULSES_PER_REVOLUTION;
             if (rpm > 65535UL) {
                 rpm = 65535UL;
@@ -116,6 +125,7 @@ void Tachometer_Task(uint32_t now_ms)
                 channel->sample_count++;
             }
 
+            // Petit filtre moyenne glissante.
             channel->reading.rpm_filtered = Tachometer_ComputeAverage(channel);
             channel->reading.signal_present = true;
             channel->reading.timeout = false;
@@ -165,6 +175,7 @@ static void Tachometer_ResetSamples(TachometerChannel_t *channel)
 {
     uint8_t sample;
 
+    // Vide la fenetre du filtre.
     channel->sample_count = 0U;
     channel->sample_index = 0U;
 
@@ -182,6 +193,7 @@ static uint16_t Tachometer_ComputeAverage(const TachometerChannel_t *channel)
         return 0U;
     }
 
+    // Moyenne simple. Suffisant pour lisser un peu le RPM.
     for (sample = 0U; sample < channel->sample_count; sample++) {
         total += channel->samples[sample];
     }

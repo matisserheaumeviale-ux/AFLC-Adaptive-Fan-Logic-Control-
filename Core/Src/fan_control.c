@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 
+// PWM configure sur TIM3.
 #define FAN_PWM_PERIOD             319UL
 #define FAN_DUTY_MAX_PERMILLE      1000U
 #define FAN_RUNNING_MIN_RPM        200U
@@ -9,6 +10,7 @@
 #define FAN_RAMP_STEP_PERMILLE     50U
 #define FAN_RAMP_STEP_MS           250UL
 
+// Etat interne d'un ventilateur.
 typedef struct {
     TIM_HandleTypeDef *htim_pwm;
     uint32_t pwm_channel;
@@ -19,6 +21,7 @@ typedef struct {
     FanStatus_t status;
 } FanChannel_t;
 
+// Controle de la rampe de test.
 typedef struct {
     bool active;
     uint16_t current_permille;
@@ -42,6 +45,7 @@ void FanControl_Init(TIM_HandleTypeDef *htim_pwm)
     };
     uint8_t index;
 
+    // On initialise les 4 sorties de la meme facon.
     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
         g_fans[index].htim_pwm = htim_pwm;
         g_fans[index].pwm_channel = pwm_channels[index];
@@ -58,6 +62,7 @@ void FanControl_Init(TIM_HandleTypeDef *htim_pwm)
         FanControl_ApplyDuty(&g_fans[index]);
     }
 
+    // La rampe est inactive au depart.
     g_ramp.active = false;
     g_ramp.current_permille = 0U;
     g_ramp.next_step_ms = 0UL;
@@ -68,6 +73,8 @@ void FanControl_Task(uint32_t now_ms)
 {
     uint8_t index;
 
+    // Test de rampe progressif.
+    // Non bloquant. Avance par petits pas.
     if (g_ramp.active && (now_ms >= g_ramp.next_step_ms)) {
         FanControl_SetDutyPermilleAll(g_ramp.current_permille);
         if (g_ramp.current_permille >= FAN_DUTY_MAX_PERMILLE) {
@@ -93,6 +100,7 @@ void FanControl_SetDutyPermille(uint8_t index, uint16_t duty_permille)
         duty_permille = FAN_DUTY_MAX_PERMILLE;
     }
 
+    // Une nouvelle commande remet le chrono de demarrage.
     g_fans[index].duty_permille = duty_permille;
     g_fans[index].command_ms = HAL_GetTick();
     if (duty_permille == 0U) {
@@ -134,7 +142,11 @@ void FanControl_SetTargetRpm(uint8_t index, uint16_t target_rpm, uint16_t max_rp
         return;
     }
 
+    // Conversion simple RPM cible -> duty PWM.
     duty_permille = ((uint32_t)target_rpm * 1000UL) / max_rpm;
+
+    // On impose un plancher pratique.
+    // Trop bas et le fan ne demarre pas.
     if (duty_permille < 150UL) {
         duty_permille = 150UL;
     }
@@ -175,6 +187,7 @@ void FanControl_EnterSafeState(void)
 {
     uint8_t index;
 
+    // Safe state = tout arreter proprement.
     g_ramp.active = false;
     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
         g_fans[index].status.target_rpm = 0U;
@@ -222,6 +235,7 @@ static void FanControl_ApplyDuty(FanChannel_t *fan)
         return;
     }
 
+    // Convertit le pour-mille en valeur de compare timer.
     compare = ((FAN_PWM_PERIOD + 1UL) * fan->duty_permille) / FAN_DUTY_MAX_PERMILLE;
     if (compare > FAN_PWM_PERIOD) {
         compare = FAN_PWM_PERIOD;
@@ -244,6 +258,7 @@ static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_
     fan->status.alert = FAN_ALERT_NONE;
     fan->status.action = FAN_ACTION_IDLE;
 
+    // Duty a zero = fan considere OFF.
     if (fan->duty_permille == 0U) {
         fan->status.state = FAN_STATE_OFF;
         fan->status.action = FAN_ACTION_NONE;
@@ -253,9 +268,12 @@ static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_
         return;
     }
 
+    // Cas normal : on voit un signal tach stable.
     if (tach->signal_present && (tach->rpm_filtered >= FAN_RUNNING_MIN_RPM)) {
         fan->status.state = FAN_STATE_RUNNING;
         fan->ever_detected = true;
+
+        // On determine la tendance pour l'affichage.
         if (tach->rpm_filtered > (uint16_t)(fan->last_rpm + 50U)) {
             fan->status.action = g_ramp.active ? FAN_ACTION_RAMP : FAN_ACTION_ACCEL;
         } else if ((fan->last_rpm > 50U) && (tach->rpm_filtered + 50U < fan->last_rpm)) {
@@ -263,9 +281,11 @@ static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_
         } else {
             fan->status.action = FAN_ACTION_IDLE;
         }
+    // Delai normal apres une commande PWM.
     } else if ((now_ms - fan->command_ms) <= FAN_STARTUP_TIMEOUT_MS) {
         fan->status.state = FAN_STATE_STARTING;
         fan->status.action = FAN_ACTION_DETECT;
+    // Apres timeout, on declare une erreur.
     } else {
         fan->status.state = FAN_STATE_ERROR;
         fan->status.action = FAN_ACTION_DETECT;
@@ -279,6 +299,7 @@ static uint8_t FanControl_DutyToPercent(uint16_t duty_permille)
 {
     uint32_t percent;
 
+    // Arrondi simple du pour-mille vers le pourcentage.
     percent = (duty_permille + 5U) / 10U;
     if (percent > 100U) {
         percent = 100U;
