@@ -1,5 +1,7 @@
 #include "fan_control.h"
 
+#include "main.h"
+
 #include <stddef.h>
 
 // PWM configure sur TIM3.
@@ -14,6 +16,8 @@
 typedef struct {
     TIM_HandleTypeDef *htim_pwm;
     uint32_t pwm_channel;
+    GPIO_TypeDef *pwm_port;
+    uint16_t pwm_pin;
     uint16_t duty_permille;
     uint16_t last_rpm;
     uint32_t command_ms;
@@ -34,6 +38,8 @@ static RampControl_t g_ramp;
 static void FanControl_ApplyDuty(FanChannel_t *fan);
 static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_ms);
 static uint8_t FanControl_DutyToPercent(uint16_t duty_permille);
+static void FanControl_SetPinAsPwm(const FanChannel_t *fan);
+static void FanControl_SetPinAsOutput(const FanChannel_t *fan, GPIO_PinState level);
 
 void FanControl_Init(TIM_HandleTypeDef *htim_pwm)
 {
@@ -43,12 +49,26 @@ void FanControl_Init(TIM_HandleTypeDef *htim_pwm)
         TIM_CHANNEL_3,
         TIM_CHANNEL_4
     };
+    static GPIO_TypeDef *const pwm_ports[FAN_CONTROL_CHANNEL_COUNT] = {
+        FAN1_PWM_GPIO_Port,
+        FAN2_PWM_GPIO_Port,
+        FAN3_PWM_GPIO_Port,
+        FAN4_PWM_GPIO_Port
+    };
+    static const uint16_t pwm_pins[FAN_CONTROL_CHANNEL_COUNT] = {
+        FAN1_PWM_Pin,
+        FAN2_PWM_Pin,
+        FAN3_PWM_Pin,
+        FAN4_PWM_Pin
+    };
     uint8_t index;
 
     // On initialise les 4 sorties de la meme facon.
     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
         g_fans[index].htim_pwm = htim_pwm;
         g_fans[index].pwm_channel = pwm_channels[index];
+        g_fans[index].pwm_port = pwm_ports[index];
+        g_fans[index].pwm_pin = pwm_pins[index];
         g_fans[index].duty_permille = 0U;
         g_fans[index].last_rpm = 0U;
         g_fans[index].command_ms = HAL_GetTick();
@@ -231,16 +251,30 @@ static void FanControl_ApplyDuty(FanChannel_t *fan)
 {
     uint32_t compare;
 
-    if ((fan == NULL) || (fan->htim_pwm == NULL)) {
+    if ((fan == NULL) || (fan->htim_pwm == NULL) || (fan->pwm_port == NULL)) {
         return;
     }
 
-    // Convertit le pour-mille en valeur de compare timer.
-    compare = ((FAN_PWM_PERIOD + 1UL) * fan->duty_permille) / FAN_DUTY_MAX_PERMILLE;
+    // Le signal PWM des ventilateurs 4-fils est interprete actif-bas.
+    // 0 % = ligne forcee haut, 100 % = ligne forcee bas.
+    if (fan->duty_permille == 0U) {
+        FanControl_SetPinAsOutput(fan, GPIO_PIN_SET);
+        return;
+    }
+
+    if (fan->duty_permille >= FAN_DUTY_MAX_PERMILLE) {
+        FanControl_SetPinAsOutput(fan, GPIO_PIN_RESET);
+        return;
+    }
+
+    FanControl_SetPinAsPwm(fan);
+
+    // PWM1 actif-haut : on inverse le duty pour obtenir un temps bas
+    // proportionnel a la vitesse demandee.
+    compare = ((FAN_PWM_PERIOD + 1UL) * (FAN_DUTY_MAX_PERMILLE - fan->duty_permille)) / FAN_DUTY_MAX_PERMILLE;
     if (compare > FAN_PWM_PERIOD) {
         compare = FAN_PWM_PERIOD;
     }
-
     __HAL_TIM_SET_COMPARE(fan->htim_pwm, fan->pwm_channel, compare);
 }
 
@@ -306,4 +340,26 @@ static uint8_t FanControl_DutyToPercent(uint16_t duty_permille)
     }
 
     return (uint8_t)percent;
+}
+
+static void FanControl_SetPinAsPwm(const FanChannel_t *fan)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    GPIO_InitStruct.Pin = fan->pwm_pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(fan->pwm_port, &GPIO_InitStruct);
+}
+
+static void FanControl_SetPinAsOutput(const FanChannel_t *fan, GPIO_PinState level)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    HAL_GPIO_WritePin(fan->pwm_port, fan->pwm_pin, level);
+    GPIO_InitStruct.Pin = fan->pwm_pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(fan->pwm_port, &GPIO_InitStruct);
 }

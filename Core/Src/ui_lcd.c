@@ -29,6 +29,7 @@ typedef struct {
     uint8_t passed_mask;
     uint8_t fail_mask;
     uint8_t complete;
+    uint8_t debug_overlay;
     const Profil_Result_t *profiles;
     const TemperatureSnapshot_t *temps;
     const AFLCalcul_Output_t *targets;
@@ -44,7 +45,9 @@ static void UI_LCD_Render(void);
 static void UI_LCD_RenderProfileScreen(const char *header);
 static void UI_LCD_RenderStartupTest(void);
 static void UI_LCD_RenderRuntime(void);
+static void UI_LCD_RenderFanDebug(void);
 static uint8_t UI_LCD_GetProfilePage(void);
+static const char *UI_LCD_StateShort(FanState_t state);
 
 void UI_LCD_Init(void)
 {
@@ -58,6 +61,7 @@ void UI_LCD_Init(void)
     g_ui.page_started_ms = HAL_GetTick();
     g_ui.page_index = 0U;
     g_ui.dirty = 1U;
+    g_ui.debug_overlay = 0U;
 }
 
 void UI_LCD_Task(uint32_t now_ms)
@@ -68,7 +72,7 @@ void UI_LCD_Task(uint32_t now_ms)
     }
 
     // On alterne entre page 1 et page 2 pour afficher 4 fans sur 20x4.
-    if ((g_ui.screen == UI_SCREEN_PROFILES_READY) || (g_ui.screen == UI_SCREEN_WAIT_CONFIRM) || (g_ui.screen == UI_SCREEN_RUNTIME)) {
+    if ((g_ui.screen == UI_SCREEN_PROFILES_READY) || (g_ui.screen == UI_SCREEN_WAIT_CONFIRM) || (g_ui.screen == UI_SCREEN_RUNTIME) || (g_ui.debug_overlay != 0U)) {
         if ((now_ms - g_ui.page_started_ms) >= UI_LCD_PROFILE_PAGE_MS) {
             g_ui.page_started_ms = now_ms;
             g_ui.page_index ^= 1U;
@@ -136,6 +140,14 @@ void UI_LCD_ShowSafeState(uint8_t fail_mask)
     g_ui.dirty = 1U;
 }
 
+void UI_LCD_ToggleFanDebug(void)
+{
+    g_ui.debug_overlay ^= 1U;
+    g_ui.page_started_ms = HAL_GetTick();
+    g_ui.page_index = 0U;
+    g_ui.dirty = 1U;
+}
+
 static void UI_LCD_ClearCache(void)
 {
     uint8_t row;
@@ -174,6 +186,11 @@ static void UI_LCD_WriteLine(uint8_t row, const char *text)
 static void UI_LCD_Render(void)
 {
     // Routeur principal d'ecran.
+    if (g_ui.debug_overlay != 0U) {
+        UI_LCD_RenderFanDebug();
+        return;
+    }
+
     switch (g_ui.screen) {
         case UI_SCREEN_PROFILES_READY:
             UI_LCD_RenderProfileScreen("Profiles Ready");
@@ -309,7 +326,52 @@ static void UI_LCD_RenderRuntime(void)
     }
 }
 
+static void UI_LCD_RenderFanDebug(void)
+{
+    uint8_t page = UI_LCD_GetProfilePage();
+    uint8_t first_index = (uint8_t)(page * 2U);
+    uint8_t row;
+
+    UI_LCD_WriteLine(0U, "Fan Debug");
+
+    for (row = 0U; row < 2U; row++) {
+        char line[21];
+        uint8_t fan_index = (uint8_t)(first_index + row);
+
+        if ((g_ui.fans != NULL) && (fan_index < FAN_CONTROL_CHANNEL_COUNT)) {
+            snprintf(line,
+                     sizeof(line),
+                     "F%u %s P%3u T%4u",
+                     (unsigned int)(fan_index + 1U),
+                     UI_LCD_StateShort(g_ui.fans[fan_index].state),
+                     (unsigned int)g_ui.fans[fan_index].percent,
+                     (unsigned int)g_ui.fans[fan_index].rpm);
+        } else {
+            snprintf(line, sizeof(line), "F%u ----", (unsigned int)(fan_index + 1U));
+        }
+
+        UI_LCD_WriteLine((uint8_t)(row + 1U), line);
+    }
+
+    UI_LCD_WriteLine(3U, page == 0U ? "F1/F2  ?=exit" : "F3/F4  ?=exit");
+}
+
 static uint8_t UI_LCD_GetProfilePage(void)
 {
     return g_ui.page_index;
+}
+
+static const char *UI_LCD_StateShort(FanState_t state)
+{
+    switch (state) {
+        case FAN_STATE_OFF:
+            return "OFF";
+        case FAN_STATE_STARTING:
+            return "STA";
+        case FAN_STATE_RUNNING:
+            return "RUN";
+        case FAN_STATE_ERROR:
+        default:
+            return "ERR";
+    }
 }
