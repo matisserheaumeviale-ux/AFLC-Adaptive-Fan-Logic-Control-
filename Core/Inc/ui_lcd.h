@@ -22,3 +22,4 @@ void UI_LCD_ShowRuntime(const Profil_Result_t *profiles,
                         const AFLCalcul_Output_t *targets,
                         const FanStatus_t fans[FAN_CONTROL_CHANNEL_COUNT]);
 void UI_LCD_ShowSafeState(uint8_t fail_mask);
+void UI_LCD_ToggleFanDebug(void);

@@ -24,7 +24,8 @@ build/uart_cmd.o: Core/Src/uart_cmd.c Core/Inc/uart_cmd.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h Core/Inc/tim.h \
  Core/Inc/main.h Core/Inc/led_status.h Core/Inc/printf-scanf.h \
- Core/Inc/main.h Core/Inc/usart.h
+ Core/Inc/main.h Core/Inc/ui_lcd.h Core/Inc/AFLCalcul.h Core/Inc/Profil.h \
+ Core/Inc/temperature_stub.h Core/Inc/usart.h
 Core/Inc/uart_cmd.h:
 Core/Inc/button.h:
 Core/Inc/fan_control.h:
@@ -59,4 +60,8 @@ Core/Inc/main.h:
 Core/Inc/led_status.h:
 Core/Inc/printf-scanf.h:
 Core/Inc/main.h:
+Core/Inc/ui_lcd.h:
+Core/Inc/AFLCalcul.h:
+Core/Inc/Profil.h:
+Core/Inc/temperature_stub.h:
 Core/Inc/usart.h:

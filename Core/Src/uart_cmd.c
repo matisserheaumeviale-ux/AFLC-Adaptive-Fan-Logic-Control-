@@ -5,6 +5,7 @@
 #include "led_status.h"
 #include "printf-scanf.h"
 #include "tachometer.h"
+#include "ui_lcd.h"
 #include "usart.h"
 
 #include <stdio.h>
@@ -56,6 +57,11 @@ void UART_Cmd_Task(void)
         case 'Z':
             FanControl_StartRampTest(HAL_GetTick());
             printf("Ramp test started: 0%% to 100%% over 5s\r\n");
+            break;
+
+        case '?':
+            UI_LCD_ToggleFanDebug();
+            printf("LCD fan debug toggled\r\n");
             break;
 
         case 'a':
@@ -111,6 +117,7 @@ static void UART_Cmd_PrintHelp(void)
     printf("  s : system status\r\n");
     printf("  t : tach/rpm status\r\n");
     printf("  c : confirm startup\r\n");
+    printf("  ? : toggle LCD fan debug\r\n");
     printf("  0..9 : set all fans to 0%%..90%%\r\n");
     printf("  a : set all fans to 100%%\r\n");
     printf("  z : non-blocking ramp test\r\n");

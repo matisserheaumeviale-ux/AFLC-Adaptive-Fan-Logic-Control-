@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 1
   44 000c 9A70     		strb	r2, [r3, #2]
   13:Core/Src/temperature_stub.c ****     g_temperatures.values_c[3] = 37U;
   45              		.loc 1 13 5 is_stmt 1 view .LVU7
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s 			page 2
 
 
   46              		.loc 1 13 32 is_stmt 0 view .LVU8
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 1
   23:Core/Src/temperature_stub.c ****     g_temperatures.values_c[2] = (uint8_t)(34U + phase);
   93              		.loc 1 23 5 is_stmt 1 view .LVU20
   94              		.loc 1 23 34 is_stmt 0 view .LVU21
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s 			page 3
 
 
   95 001a 2230     		adds	r0, r0, #34
@@ -178,24 +178,24 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 1
  147              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
  148              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
  149              		.file 4 "Core/Inc/temperature_stub.h"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s 			page 4
 
 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s 			page 5
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 temperature_stub.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:19     .text.TemperatureStub_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:25     .text.TemperatureStub_Init:00000000 TemperatureStub_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:54     .text.TemperatureStub_Init:00000014 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:143    .bss.g_temperatures:00000000 g_temperatures
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:59     .text.TemperatureStub_Task:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:65     .text.TemperatureStub_Task:00000000 TemperatureStub_Task
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:109    .text.TemperatureStub_Task:00000024 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:115    .text.TemperatureStub_GetSnapshot:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:121    .text.TemperatureStub_GetSnapshot:00000000 TemperatureStub_GetSnapshot
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:135    .text.TemperatureStub_GetSnapshot:00000004 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccb2xQBf.s:140    .bss.g_temperatures:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:19     .text.TemperatureStub_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:25     .text.TemperatureStub_Init:00000000 TemperatureStub_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:54     .text.TemperatureStub_Init:00000014 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:143    .bss.g_temperatures:00000000 g_temperatures
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:59     .text.TemperatureStub_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:65     .text.TemperatureStub_Task:00000000 TemperatureStub_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:109    .text.TemperatureStub_Task:00000024 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:115    .text.TemperatureStub_GetSnapshot:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:121    .text.TemperatureStub_GetSnapshot:00000000 TemperatureStub_GetSnapshot
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:135    .text.TemperatureStub_GetSnapshot:00000004 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccDSRnTW.s:140    .bss.g_temperatures:00000000 $d
 
 NO UNDEFINED SYMBOLS
