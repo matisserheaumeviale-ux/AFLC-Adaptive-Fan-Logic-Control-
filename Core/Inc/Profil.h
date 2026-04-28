@@ -3,6 +3,21 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/*
+ * Module Profil
+ * -------------
+ * Ce module prepare les parametres de base utilises par la regulation.
+ *
+ * Chaque ventilateur a ici un "profil" avec :
+ * - une zone de temperature
+ * - un RPM minimum
+ * - un RPM nominal
+ * - un RPM maximum
+ *
+ * Le resultat est stocke dans une structure simple relue ensuite
+ * par AFLCalcul.c et l'interface LCD.
+ */
+
 // Le systeme gere 4 ventilateurs.
 #define PROFIL_FAN_COUNT 4U
 
@@ -37,12 +52,15 @@ typedef struct {
 } Profil_Result_t;
 
 // Prepare l'etat interne.
+// A appeler une fois au boot.
 void Profil_Init(void);
 
 // Construit tous les profils par defaut.
+// Cette fonction remplit la structure globale resultat.
 void Profil_CalculateAll(void);
 
 // Retourne le resultat courant.
+// Le pointeur reste gere par le module.
 const Profil_Result_t *Profil_GetResult(void);
 
 // Retourne un nom court pour affichage UART/LCD.

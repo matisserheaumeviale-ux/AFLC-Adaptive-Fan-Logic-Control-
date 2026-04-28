@@ -1,5 +1,15 @@
 #include "tachometer.h"
 
+/*
+ * tachometer.c
+ * ------------
+ * Convertit les impulsions tachymetre en RPM exploitables.
+ *
+ * Strategie :
+ * - l'interruption capture la periode
+ * - la tache periodique calcule le RPM et applique un filtrage
+ */
+
 // TIM2 capture les periodes des signaux tach.
 #define TACH_TIM_TICK_HZ            125000UL
 #define TACH_PULSES_PER_REVOLUTION  2UL
@@ -113,6 +123,7 @@ void Tachometer_Task(uint32_t now_ms)
             channel->pending_period = 0U;
 
             // rpm = frequence * 60 / pulses_par_tour
+            // Ici on divise par 2 car le ventilateur fournit 2 impulsions par tour.
             rpm = ((TACH_TIM_TICK_HZ * 60UL) / channel->period_ticks) / TACH_PULSES_PER_REVOLUTION;
             if (rpm > 65535UL) {
                 rpm = 65535UL;
@@ -194,6 +205,7 @@ static uint16_t Tachometer_ComputeAverage(const TachometerChannel_t *channel)
     }
 
     // Moyenne simple. Suffisant pour lisser un peu le RPM.
+    // Ce filtre simple est souvent assez bon pour l'affichage et la regulation.
     for (sample = 0U; sample < channel->sample_count; sample++) {
         total += channel->samples[sample];
     }

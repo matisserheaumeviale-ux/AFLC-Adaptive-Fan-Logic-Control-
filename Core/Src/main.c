@@ -35,6 +35,18 @@
 #include "ui_lcd.h"
 /* USER CODE END Includes */
 
+/*
+ * main.c
+ * ------
+ * Fichier chef d'orchestre du projet.
+ *
+ * Il contient :
+ * - l'initialisation generale
+ * - la boucle infinie
+ * - le scheduler cooperatif
+ * - la machine a etats principale AFLC
+ */
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 // Machine a etats de l'application.
@@ -125,6 +137,7 @@ static void BootTrace(const char *text)
     len++;
   }
 
+  // Helper volontairement simple pour tracer le boot sur l'UART.
   (void)HAL_UART_Transmit(&huart1, (uint8_t *)text, (uint16_t)len, 100U);
 }
 
@@ -207,6 +220,7 @@ int main(void)
   {
     // Scheduler cooperatif tres simple.
     // Chaque bloc teste son prochain deadline.
+    // On evite ainsi un RTOS pour garder le projet lisible.
     uint32_t now_ms = HAL_GetTick();
 
     UART_Cmd_Task();
@@ -304,6 +318,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 static void MX_AFLC_StartPeripherals(void)
 {
+  // Demarre les blocs deja configures par CubeMX.
+
   // TIM2 = input capture tach.
   if (HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1) != HAL_OK)
   {
@@ -345,6 +361,7 @@ static void AFLC_AppTask(uint32_t now_ms)
 {
   // Machine a etats principale.
   // Une seule source de verite pour le flux de demarrage.
+  // Toute la progression de l'application passe ici.
   switch (g_app.state)
   {
     case AFLC_APP_BOOT:
@@ -443,6 +460,7 @@ static void AFLC_AppTask(uint32_t now_ms)
 static void AFLC_AppEnterState(AflcAppState_t next_state, uint32_t now_ms)
 {
   // Changement d'etat centralise.
+  // Cela evite de disperser LEDs, LCD et timestamps un peu partout.
   g_app.state = next_state;
   g_app.state_entered_ms = now_ms;
 
@@ -500,6 +518,7 @@ static void AFLC_RuntimeStep(void)
   // 1. Lire le RPM reel
   // 2. Calculer la cible
   // 3. Convertir la cible en PWM
+  // C'est la chaine principale de regulation.
   AFLCalcul_Compute(g_app.profiles, g_app.temperatures, &g_app.tach_snapshot, &g_app.control_output);
   AFLC_BuildMaxRpmArray(max_rpm);
   FanControl_SetTargetRpmArray(g_app.control_output.target_rpm, max_rpm);
@@ -512,6 +531,7 @@ static void AFLC_UpdateStartupPassMask(void)
   Tachometer_GetSnapshot(&g_app.tach_snapshot);
 
   // Un bit par fan.
+  // bit 0 -> fan 1, bit 1 -> fan 2, etc.
   for (index = 0U; index < PROFIL_FAN_COUNT; index++)
   {
     if (g_app.tach_snapshot.fans[index].rpm_filtered >= STARTUP_TEST_PASS_RPM)
@@ -530,6 +550,7 @@ static void AFLC_BuildMaxRpmArray(uint16_t max_rpm[PROFIL_FAN_COUNT])
     return;
   }
 
+  // FanControl attend un tableau simple de max RPM.
   // On extrait seulement le max_rpm de chaque profil.
   for (index = 0U; index < PROFIL_FAN_COUNT; index++)
   {

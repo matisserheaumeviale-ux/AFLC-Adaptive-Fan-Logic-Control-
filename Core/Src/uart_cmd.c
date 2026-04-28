@@ -10,6 +10,15 @@
 
 #include <stdio.h>
 
+/*
+ * uart_cmd.c
+ * ----------
+ * Console serie ultra simple pour test et debug.
+ *
+ * Une commande = un caractere.
+ * Cela permet de valider rapidement la logique sans interface lourde.
+ */
+
 static void UART_Cmd_PrintHelp(void);
 static void UART_Cmd_PrintSystemStatus(void);
 static void UART_Cmd_PrintTachStatus(void);
@@ -31,6 +40,8 @@ void UART_Cmd_Task(void)
 
     LedStatus_NotifyCommActivity(HAL_GetTick());
 
+    // Les commandes sont volontairement minimalistes pour rester faciles
+    // a taper depuis un terminal serie.
     switch (rx) {
         case 'h':
         case 'H':

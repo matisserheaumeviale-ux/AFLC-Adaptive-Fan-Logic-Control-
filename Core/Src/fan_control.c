@@ -4,6 +4,18 @@
 
 #include <stddef.h>
 
+/*
+ * fan_control.c
+ * -------------
+ * Couche de commande et de diagnostic des ventilateurs.
+ *
+ * Ce module :
+ * - applique le PWM
+ * - convertit RPM cible -> duty
+ * - observe le retour tach
+ * - en deduit l'etat logique du ventilateur
+ */
+
 // PWM configure sur TIM3.
 #define FAN_PWM_PERIOD             319UL
 #define FAN_DUTY_MAX_PERMILLE      1000U
@@ -257,6 +269,7 @@ static void FanControl_ApplyDuty(FanChannel_t *fan)
 
     // Le signal PWM des ventilateurs 4-fils est interprete actif-bas.
     // 0 % = ligne forcee haut, 100 % = ligne forcee bas.
+    // On adapte donc le pilotage electrique a cette convention.
     if (fan->duty_permille == 0U) {
         FanControl_SetPinAsOutput(fan, GPIO_PIN_SET);
         return;
@@ -291,6 +304,9 @@ static void FanControl_UpdateFan(FanChannel_t *fan, uint8_t index, uint32_t now_
     fan->status.rpm = tach->rpm_filtered;
     fan->status.alert = FAN_ALERT_NONE;
     fan->status.action = FAN_ACTION_IDLE;
+
+    // Ici on qualifie l'etat reel du ventilateur.
+    // On ne decide pas encore la cible, on observe la reponse.
 
     // Duty a zero = fan considere OFF.
     if (fan->duty_permille == 0U) {
@@ -346,6 +362,7 @@ static void FanControl_SetPinAsPwm(const FanChannel_t *fan)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
+    // Rend a TIM3 la maitrise de la broche.
     GPIO_InitStruct.Pin = fan->pwm_pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -356,6 +373,7 @@ static void FanControl_SetPinAsOutput(const FanChannel_t *fan, GPIO_PinState lev
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
+    // Utilise pour imposer un niveau fixe en 0 % ou 100 %.
     HAL_GPIO_WritePin(fan->pwm_port, fan->pwm_pin, level);
     GPIO_InitStruct.Pin = fan->pwm_pin;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;

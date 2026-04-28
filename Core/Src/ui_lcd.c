@@ -5,6 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/*
+ * ui_lcd.c
+ * --------
+ * Couche de presentation du projet sur LCD.
+ *
+ * LCD.c sait parler au materiel.
+ * ui_lcd.c sait quoi afficher selon l'etat de l'application.
+ */
+
 // On limite le rafraichissement pour garder un LCD stable.
 #define UI_LCD_REFRESH_MS     250UL
 #define UI_LCD_PROFILE_PAGE_MS 1500UL
@@ -72,6 +81,7 @@ void UI_LCD_Task(uint32_t now_ms)
     }
 
     // On alterne entre page 1 et page 2 pour afficher 4 fans sur 20x4.
+    // Le LCD n'a pas assez de place pour tout a la fois.
     if ((g_ui.screen == UI_SCREEN_PROFILES_READY) || (g_ui.screen == UI_SCREEN_WAIT_CONFIRM) || (g_ui.screen == UI_SCREEN_RUNTIME) || (g_ui.debug_overlay != 0U)) {
         if ((now_ms - g_ui.page_started_ms) >= UI_LCD_PROFILE_PAGE_MS) {
             g_ui.page_started_ms = now_ms;
@@ -178,6 +188,7 @@ static void UI_LCD_WriteLine(uint8_t row, const char *text)
     memcpy(fixed, text, len);
 
     if (strncmp(g_ui.cache[row], fixed, 20U) != 0) {
+        // On evite de reecrire une ligne identique pour limiter le clignotement.
         LCD_WriteAt(0, row, fixed);
         memcpy(g_ui.cache[row], fixed, sizeof(fixed));
     }
@@ -306,6 +317,7 @@ static void UI_LCD_RenderRuntime(void)
         uint8_t fan_index = (uint8_t)(first_index + row);
 
         if ((g_ui.profiles != NULL) && (g_ui.temps != NULL) && (g_ui.targets != NULL) && (g_ui.fans != NULL) && (fan_index < FAN_CONTROL_CHANNEL_COUNT)) {
+            // Ligne 1/2 : reel contre cible.
             snprintf(line,
                      sizeof(line),
                      "F%u %s %u/%u",
@@ -315,6 +327,7 @@ static void UI_LCD_RenderRuntime(void)
                      (unsigned int)g_ui.targets->target_rpm[fan_index]);
             UI_LCD_WriteLine(row, line);
 
+            // Ligne 3/4 : contexte thermique et effort PWM.
             snprintf(line,
                      sizeof(line),
                      "T%u=%uC D=%u%%",
@@ -358,6 +371,7 @@ static void UI_LCD_RenderFanDebug(void)
 
 static uint8_t UI_LCD_GetProfilePage(void)
 {
+    // 0 = F1/F2, 1 = F3/F4.
     return g_ui.page_index;
 }
 

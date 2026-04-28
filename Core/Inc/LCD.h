@@ -3,6 +3,15 @@
 #include "stm32f1xx_hal.h"
 #include <stdint.h>
 
+/*
+ * Module LCD
+ * ----------
+ * Driver bas niveau d'un LCD type HD44780 en mode 4 bits.
+ *
+ * Ce module s'occupe du cablage, des delais et de l'envoi des commandes.
+ * Il ne sait rien de la logique AFLC.
+ */
+
 // API minimale pour l'ecran LCD 20x4.
 void LCD_Init(void);
 void LCD_Clear(void);

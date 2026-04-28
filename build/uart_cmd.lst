@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
   36      67676C65 
   36      204C4344 
   36      2066616E 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 2
 
 
   37              		.align	2
@@ -101,114 +101,125 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
   10:Core/Src/uart_cmd.c **** 
   11:Core/Src/uart_cmd.c **** #include <stdio.h>
   12:Core/Src/uart_cmd.c **** 
-  13:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintHelp(void);
-  14:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintSystemStatus(void);
-  15:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintTachStatus(void);
-  16:Core/Src/uart_cmd.c **** 
-  17:Core/Src/uart_cmd.c **** void UART_Cmd_Init(void)
-  18:Core/Src/uart_cmd.c **** {
-  19:Core/Src/uart_cmd.c ****     // Au boot, on montre tout de suite les commandes.
-  20:Core/Src/uart_cmd.c ****     UART_Cmd_PrintHelp();
-  21:Core/Src/uart_cmd.c **** }
-  22:Core/Src/uart_cmd.c **** 
-  23:Core/Src/uart_cmd.c **** void UART_Cmd_Task(void)
-  24:Core/Src/uart_cmd.c **** {
-  25:Core/Src/uart_cmd.c ****     uint8_t rx;
-  26:Core/Src/uart_cmd.c **** 
-  27:Core/Src/uart_cmd.c ****     // Lecture non bloquante.
-  28:Core/Src/uart_cmd.c ****     if (HAL_UART_Receive(&huart1, &rx, 1U, 0U) != HAL_OK) {
-  29:Core/Src/uart_cmd.c ****         return;
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 3
+  13:Core/Src/uart_cmd.c **** /*
+  14:Core/Src/uart_cmd.c ****  * uart_cmd.c
+  15:Core/Src/uart_cmd.c ****  * ----------
+  16:Core/Src/uart_cmd.c ****  * Console serie ultra simple pour test et debug.
+  17:Core/Src/uart_cmd.c ****  *
+  18:Core/Src/uart_cmd.c ****  * Une commande = un caractere.
+  19:Core/Src/uart_cmd.c ****  * Cela permet de valider rapidement la logique sans interface lourde.
+  20:Core/Src/uart_cmd.c ****  */
+  21:Core/Src/uart_cmd.c **** 
+  22:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintHelp(void);
+  23:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintSystemStatus(void);
+  24:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintTachStatus(void);
+  25:Core/Src/uart_cmd.c **** 
+  26:Core/Src/uart_cmd.c **** void UART_Cmd_Init(void)
+  27:Core/Src/uart_cmd.c **** {
+  28:Core/Src/uart_cmd.c ****     // Au boot, on montre tout de suite les commandes.
+  29:Core/Src/uart_cmd.c ****     UART_Cmd_PrintHelp();
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 3
 
 
-  30:Core/Src/uart_cmd.c ****     }
+  30:Core/Src/uart_cmd.c **** }
   31:Core/Src/uart_cmd.c **** 
-  32:Core/Src/uart_cmd.c ****     LedStatus_NotifyCommActivity(HAL_GetTick());
-  33:Core/Src/uart_cmd.c **** 
-  34:Core/Src/uart_cmd.c ****     switch (rx) {
-  35:Core/Src/uart_cmd.c ****         case 'h':
-  36:Core/Src/uart_cmd.c ****         case 'H':
-  37:Core/Src/uart_cmd.c ****             UART_Cmd_PrintHelp();
-  38:Core/Src/uart_cmd.c ****             break;
-  39:Core/Src/uart_cmd.c **** 
-  40:Core/Src/uart_cmd.c ****         case 's':
-  41:Core/Src/uart_cmd.c ****         case 'S':
-  42:Core/Src/uart_cmd.c ****             UART_Cmd_PrintSystemStatus();
-  43:Core/Src/uart_cmd.c ****             break;
-  44:Core/Src/uart_cmd.c **** 
-  45:Core/Src/uart_cmd.c ****         case 't':
-  46:Core/Src/uart_cmd.c ****         case 'T':
-  47:Core/Src/uart_cmd.c ****             UART_Cmd_PrintTachStatus();
-  48:Core/Src/uart_cmd.c ****             break;
-  49:Core/Src/uart_cmd.c **** 
-  50:Core/Src/uart_cmd.c ****         case 'c':
-  51:Core/Src/uart_cmd.c ****         case 'C':
-  52:Core/Src/uart_cmd.c ****             Button_NotifyConfirmCommand();
-  53:Core/Src/uart_cmd.c ****             printf("Confirm event latched\r\n");
+  32:Core/Src/uart_cmd.c **** void UART_Cmd_Task(void)
+  33:Core/Src/uart_cmd.c **** {
+  34:Core/Src/uart_cmd.c ****     uint8_t rx;
+  35:Core/Src/uart_cmd.c **** 
+  36:Core/Src/uart_cmd.c ****     // Lecture non bloquante.
+  37:Core/Src/uart_cmd.c ****     if (HAL_UART_Receive(&huart1, &rx, 1U, 0U) != HAL_OK) {
+  38:Core/Src/uart_cmd.c ****         return;
+  39:Core/Src/uart_cmd.c ****     }
+  40:Core/Src/uart_cmd.c **** 
+  41:Core/Src/uart_cmd.c ****     LedStatus_NotifyCommActivity(HAL_GetTick());
+  42:Core/Src/uart_cmd.c **** 
+  43:Core/Src/uart_cmd.c ****     // Les commandes sont volontairement minimalistes pour rester faciles
+  44:Core/Src/uart_cmd.c ****     // a taper depuis un terminal serie.
+  45:Core/Src/uart_cmd.c ****     switch (rx) {
+  46:Core/Src/uart_cmd.c ****         case 'h':
+  47:Core/Src/uart_cmd.c ****         case 'H':
+  48:Core/Src/uart_cmd.c ****             UART_Cmd_PrintHelp();
+  49:Core/Src/uart_cmd.c ****             break;
+  50:Core/Src/uart_cmd.c **** 
+  51:Core/Src/uart_cmd.c ****         case 's':
+  52:Core/Src/uart_cmd.c ****         case 'S':
+  53:Core/Src/uart_cmd.c ****             UART_Cmd_PrintSystemStatus();
   54:Core/Src/uart_cmd.c ****             break;
   55:Core/Src/uart_cmd.c **** 
-  56:Core/Src/uart_cmd.c ****         case 'z':
-  57:Core/Src/uart_cmd.c ****         case 'Z':
-  58:Core/Src/uart_cmd.c ****             FanControl_StartRampTest(HAL_GetTick());
-  59:Core/Src/uart_cmd.c ****             printf("Ramp test started: 0%% to 100%% over 5s\r\n");
-  60:Core/Src/uart_cmd.c ****             break;
-  61:Core/Src/uart_cmd.c **** 
-  62:Core/Src/uart_cmd.c ****         case '?':
-  63:Core/Src/uart_cmd.c ****             UI_LCD_ToggleFanDebug();
-  64:Core/Src/uart_cmd.c ****             printf("LCD fan debug toggled\r\n");
+  56:Core/Src/uart_cmd.c ****         case 't':
+  57:Core/Src/uart_cmd.c ****         case 'T':
+  58:Core/Src/uart_cmd.c ****             UART_Cmd_PrintTachStatus();
+  59:Core/Src/uart_cmd.c ****             break;
+  60:Core/Src/uart_cmd.c **** 
+  61:Core/Src/uart_cmd.c ****         case 'c':
+  62:Core/Src/uart_cmd.c ****         case 'C':
+  63:Core/Src/uart_cmd.c ****             Button_NotifyConfirmCommand();
+  64:Core/Src/uart_cmd.c ****             printf("Confirm event latched\r\n");
   65:Core/Src/uart_cmd.c ****             break;
   66:Core/Src/uart_cmd.c **** 
-  67:Core/Src/uart_cmd.c ****         case 'a':
-  68:Core/Src/uart_cmd.c ****         case 'A':
-  69:Core/Src/uart_cmd.c ****             FanControl_SetDutyPermilleAll(1000U);
-  70:Core/Src/uart_cmd.c ****             printf("Duty set to 100%% on all fans\r\n");
+  67:Core/Src/uart_cmd.c ****         case 'z':
+  68:Core/Src/uart_cmd.c ****         case 'Z':
+  69:Core/Src/uart_cmd.c ****             FanControl_StartRampTest(HAL_GetTick());
+  70:Core/Src/uart_cmd.c ****             printf("Ramp test started: 0%% to 100%% over 5s\r\n");
   71:Core/Src/uart_cmd.c ****             break;
   72:Core/Src/uart_cmd.c **** 
-  73:Core/Src/uart_cmd.c ****         case '0':
-  74:Core/Src/uart_cmd.c ****             FanControl_SetDutyPermilleAll(0U);
-  75:Core/Src/uart_cmd.c ****             printf("Duty set to 0%% on all fans\r\n");
+  73:Core/Src/uart_cmd.c ****         case '?':
+  74:Core/Src/uart_cmd.c ****             UI_LCD_ToggleFanDebug();
+  75:Core/Src/uart_cmd.c ****             printf("LCD fan debug toggled\r\n");
   76:Core/Src/uart_cmd.c ****             break;
   77:Core/Src/uart_cmd.c **** 
-  78:Core/Src/uart_cmd.c ****         default:
-  79:Core/Src/uart_cmd.c ****             if ((rx >= '1') && (rx <= '9')) {
-  80:Core/Src/uart_cmd.c ****                 // Exemple :
-  81:Core/Src/uart_cmd.c ****                 // '5' -> 500 pour-mille -> 50 %
-  82:Core/Src/uart_cmd.c ****                 uint16_t duty_permille = (uint16_t)(rx - '0') * 100U;
-  83:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
-  84:Core/Src/uart_cmd.c ****                 printf("Duty set to %u%% on all fans\r\n", (unsigned int)(rx - '0') * 10U);
-  85:Core/Src/uart_cmd.c ****             } else {
-  86:Core/Src/uart_cmd.c ****                 printf("Unknown command '%c' - send 'h' for help\r\n", rx);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 4
+  78:Core/Src/uart_cmd.c ****         case 'a':
+  79:Core/Src/uart_cmd.c ****         case 'A':
+  80:Core/Src/uart_cmd.c ****             FanControl_SetDutyPermilleAll(1000U);
+  81:Core/Src/uart_cmd.c ****             printf("Duty set to 100%% on all fans\r\n");
+  82:Core/Src/uart_cmd.c ****             break;
+  83:Core/Src/uart_cmd.c **** 
+  84:Core/Src/uart_cmd.c ****         case '0':
+  85:Core/Src/uart_cmd.c ****             FanControl_SetDutyPermilleAll(0U);
+  86:Core/Src/uart_cmd.c ****             printf("Duty set to 0%% on all fans\r\n");
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 4
 
 
-  87:Core/Src/uart_cmd.c ****             }
-  88:Core/Src/uart_cmd.c ****             break;
-  89:Core/Src/uart_cmd.c ****     }
-  90:Core/Src/uart_cmd.c **** }
-  91:Core/Src/uart_cmd.c **** 
-  92:Core/Src/uart_cmd.c **** int __io_putchar(int ch)
-  93:Core/Src/uart_cmd.c **** {
-  94:Core/Src/uart_cmd.c ****     uint8_t byte = (uint8_t)ch;
-  95:Core/Src/uart_cmd.c **** 
-  96:Core/Src/uart_cmd.c ****     // Redirige printf vers USART1.
-  97:Core/Src/uart_cmd.c ****     (void)HAL_UART_Transmit(&huart1, &byte, 1U, HAL_MAX_DELAY);
-  98:Core/Src/uart_cmd.c ****     return ch;
-  99:Core/Src/uart_cmd.c **** }
- 100:Core/Src/uart_cmd.c **** 
- 101:Core/Src/uart_cmd.c **** int __io_getchar(void)
- 102:Core/Src/uart_cmd.c **** {
- 103:Core/Src/uart_cmd.c ****     uint8_t byte;
- 104:Core/Src/uart_cmd.c **** 
- 105:Core/Src/uart_cmd.c ****     if (HAL_UART_Receive(&huart1, &byte, 1U, 0U) == HAL_OK) {
- 106:Core/Src/uart_cmd.c ****         return (int)byte;
- 107:Core/Src/uart_cmd.c ****     }
- 108:Core/Src/uart_cmd.c **** 
- 109:Core/Src/uart_cmd.c ****     return -1;
+  87:Core/Src/uart_cmd.c ****             break;
+  88:Core/Src/uart_cmd.c **** 
+  89:Core/Src/uart_cmd.c ****         default:
+  90:Core/Src/uart_cmd.c ****             if ((rx >= '1') && (rx <= '9')) {
+  91:Core/Src/uart_cmd.c ****                 // Exemple :
+  92:Core/Src/uart_cmd.c ****                 // '5' -> 500 pour-mille -> 50 %
+  93:Core/Src/uart_cmd.c ****                 uint16_t duty_permille = (uint16_t)(rx - '0') * 100U;
+  94:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
+  95:Core/Src/uart_cmd.c ****                 printf("Duty set to %u%% on all fans\r\n", (unsigned int)(rx - '0') * 10U);
+  96:Core/Src/uart_cmd.c ****             } else {
+  97:Core/Src/uart_cmd.c ****                 printf("Unknown command '%c' - send 'h' for help\r\n", rx);
+  98:Core/Src/uart_cmd.c ****             }
+  99:Core/Src/uart_cmd.c ****             break;
+ 100:Core/Src/uart_cmd.c ****     }
+ 101:Core/Src/uart_cmd.c **** }
+ 102:Core/Src/uart_cmd.c **** 
+ 103:Core/Src/uart_cmd.c **** int __io_putchar(int ch)
+ 104:Core/Src/uart_cmd.c **** {
+ 105:Core/Src/uart_cmd.c ****     uint8_t byte = (uint8_t)ch;
+ 106:Core/Src/uart_cmd.c **** 
+ 107:Core/Src/uart_cmd.c ****     // Redirige printf vers USART1.
+ 108:Core/Src/uart_cmd.c ****     (void)HAL_UART_Transmit(&huart1, &byte, 1U, HAL_MAX_DELAY);
+ 109:Core/Src/uart_cmd.c ****     return ch;
  110:Core/Src/uart_cmd.c **** }
  111:Core/Src/uart_cmd.c **** 
- 112:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintHelp(void)
+ 112:Core/Src/uart_cmd.c **** int __io_getchar(void)
  113:Core/Src/uart_cmd.c **** {
-  54              		.loc 1 113 1 view -0
+ 114:Core/Src/uart_cmd.c ****     uint8_t byte;
+ 115:Core/Src/uart_cmd.c **** 
+ 116:Core/Src/uart_cmd.c ****     if (HAL_UART_Receive(&huart1, &byte, 1U, 0U) == HAL_OK) {
+ 117:Core/Src/uart_cmd.c ****         return (int)byte;
+ 118:Core/Src/uart_cmd.c ****     }
+ 119:Core/Src/uart_cmd.c **** 
+ 120:Core/Src/uart_cmd.c ****     return -1;
+ 121:Core/Src/uart_cmd.c **** }
+ 122:Core/Src/uart_cmd.c **** 
+ 123:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintHelp(void)
+ 124:Core/Src/uart_cmd.c **** {
+  54              		.loc 1 124 1 view -0
   55              		.cfi_startproc
   56              		@ args = 0, pretend = 0, frame = 0
   57              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -217,57 +228,57 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
   60              		.cfi_def_cfa_offset 8
   61              		.cfi_offset 3, -8
   62              		.cfi_offset 14, -4
- 114:Core/Src/uart_cmd.c ****     // Menu minimal.
- 115:Core/Src/uart_cmd.c ****     printf("\r\nCommands:\r\n");
-  63              		.loc 1 115 5 view .LVU1
+ 125:Core/Src/uart_cmd.c ****     // Menu minimal.
+ 126:Core/Src/uart_cmd.c ****     printf("\r\nCommands:\r\n");
+  63              		.loc 1 126 5 view .LVU1
   64 0002 0E48     		ldr	r0, .L3
   65 0004 FFF7FEFF 		bl	puts
   66              	.LVL0:
- 116:Core/Src/uart_cmd.c ****     printf("  h : help\r\n");
-  67              		.loc 1 116 5 view .LVU2
+ 127:Core/Src/uart_cmd.c ****     printf("  h : help\r\n");
+  67              		.loc 1 127 5 view .LVU2
   68 0008 0D48     		ldr	r0, .L3+4
   69 000a FFF7FEFF 		bl	puts
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 5
+
+
   70              	.LVL1:
- 117:Core/Src/uart_cmd.c ****     printf("  s : system status\r\n");
-  71              		.loc 1 117 5 view .LVU3
+ 128:Core/Src/uart_cmd.c ****     printf("  s : system status\r\n");
+  71              		.loc 1 128 5 view .LVU3
   72 000e 0D48     		ldr	r0, .L3+8
   73 0010 FFF7FEFF 		bl	puts
   74              	.LVL2:
- 118:Core/Src/uart_cmd.c ****     printf("  t : tach/rpm status\r\n");
-  75              		.loc 1 118 5 view .LVU4
+ 129:Core/Src/uart_cmd.c ****     printf("  t : tach/rpm status\r\n");
+  75              		.loc 1 129 5 view .LVU4
   76 0014 0C48     		ldr	r0, .L3+12
   77 0016 FFF7FEFF 		bl	puts
   78              	.LVL3:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 5
-
-
- 119:Core/Src/uart_cmd.c ****     printf("  c : confirm startup\r\n");
-  79              		.loc 1 119 5 view .LVU5
+ 130:Core/Src/uart_cmd.c ****     printf("  c : confirm startup\r\n");
+  79              		.loc 1 130 5 view .LVU5
   80 001a 0C48     		ldr	r0, .L3+16
   81 001c FFF7FEFF 		bl	puts
   82              	.LVL4:
- 120:Core/Src/uart_cmd.c ****     printf("  ? : toggle LCD fan debug\r\n");
-  83              		.loc 1 120 5 view .LVU6
+ 131:Core/Src/uart_cmd.c ****     printf("  ? : toggle LCD fan debug\r\n");
+  83              		.loc 1 131 5 view .LVU6
   84 0020 0B48     		ldr	r0, .L3+20
   85 0022 FFF7FEFF 		bl	puts
   86              	.LVL5:
- 121:Core/Src/uart_cmd.c ****     printf("  0..9 : set all fans to 0%%..90%%\r\n");
-  87              		.loc 1 121 5 view .LVU7
+ 132:Core/Src/uart_cmd.c ****     printf("  0..9 : set all fans to 0%%..90%%\r\n");
+  87              		.loc 1 132 5 view .LVU7
   88 0026 0B48     		ldr	r0, .L3+24
   89 0028 FFF7FEFF 		bl	printf
   90              	.LVL6:
- 122:Core/Src/uart_cmd.c ****     printf("  a : set all fans to 100%%\r\n");
-  91              		.loc 1 122 5 view .LVU8
+ 133:Core/Src/uart_cmd.c ****     printf("  a : set all fans to 100%%\r\n");
+  91              		.loc 1 133 5 view .LVU8
   92 002c 0A48     		ldr	r0, .L3+28
   93 002e FFF7FEFF 		bl	printf
   94              	.LVL7:
- 123:Core/Src/uart_cmd.c ****     printf("  z : non-blocking ramp test\r\n");
-  95              		.loc 1 123 5 view .LVU9
+ 134:Core/Src/uart_cmd.c ****     printf("  z : non-blocking ramp test\r\n");
+  95              		.loc 1 134 5 view .LVU9
   96 0032 0A48     		ldr	r0, .L3+32
   97 0034 FFF7FEFF 		bl	puts
   98              	.LVL8:
- 124:Core/Src/uart_cmd.c **** }
-  99              		.loc 1 124 1 is_stmt 0 view .LVU10
+ 135:Core/Src/uart_cmd.c **** }
+  99              		.loc 1 135 1 is_stmt 0 view .LVU10
  100 0038 08BD     		pop	{r3, pc}
  101              	.L4:
  102 003a 00BF     		.align	2
@@ -287,6 +298,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  117              		.align	2
  118              	.LC9:
  119 0000 59455300 		.ascii	"YES\000"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 6
+
+
  120              		.align	2
  121              	.LC10:
  122 0004 4E4F00   		.ascii	"NO\000"
@@ -298,9 +312,6 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  128 000c 4F464600 		.ascii	"OFF\000"
  129              		.align	2
  130              	.LC13:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 6
-
-
  131 0010 53797374 		.ascii	"System status | Duty=%u.%u%% | Fault=%s | Ramp=%s\015"
  131      656D2073 
  131      74617475 
@@ -321,10 +332,10 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  140              		.thumb_func
  142              	UART_Cmd_PrintSystemStatus:
  143              	.LFB73:
- 125:Core/Src/uart_cmd.c **** 
- 126:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintSystemStatus(void)
- 127:Core/Src/uart_cmd.c **** {
- 144              		.loc 1 127 1 is_stmt 1 view -0
+ 136:Core/Src/uart_cmd.c **** 
+ 137:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintSystemStatus(void)
+ 138:Core/Src/uart_cmd.c **** {
+ 144              		.loc 1 138 1 is_stmt 1 view -0
  145              		.cfi_startproc
  146              		@ args = 0, pretend = 0, frame = 0
  147              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -339,28 +350,28 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  156 0002 83B0     		sub	sp, sp, #12
  157              	.LCFI2:
  158              		.cfi_def_cfa_offset 32
- 128:Core/Src/uart_cmd.c ****     const FanStatus_t *fans = FanControl_GetStatuses();
- 159              		.loc 1 128 5 view .LVU12
- 160              		.loc 1 128 31 is_stmt 0 view .LVU13
+ 139:Core/Src/uart_cmd.c ****     const FanStatus_t *fans = FanControl_GetStatuses();
+ 159              		.loc 1 139 5 view .LVU12
+ 160              		.loc 1 139 31 is_stmt 0 view .LVU13
  161 0004 FFF7FEFF 		bl	FanControl_GetStatuses
  162              	.LVL9:
  163 0008 0546     		mov	r5, r0
  164              	.LVL10:
- 129:Core/Src/uart_cmd.c ****     uint16_t duty_permille = FanControl_GetDutyPermille();
- 165              		.loc 1 129 5 is_stmt 1 view .LVU14
- 166              		.loc 1 129 30 is_stmt 0 view .LVU15
+ 140:Core/Src/uart_cmd.c ****     uint16_t duty_permille = FanControl_GetDutyPermille();
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 7
+
+
+ 165              		.loc 1 140 5 is_stmt 1 view .LVU14
+ 166              		.loc 1 140 30 is_stmt 0 view .LVU15
  167 000a FFF7FEFF 		bl	FanControl_GetDutyPermille
  168              	.LVL11:
- 130:Core/Src/uart_cmd.c ****     uint8_t index;
- 169              		.loc 1 130 5 is_stmt 1 view .LVU16
- 131:Core/Src/uart_cmd.c **** 
- 132:Core/Src/uart_cmd.c ****     // Premiere ligne = vue globale.
- 133:Core/Src/uart_cmd.c ****     printf("System status | Duty=%u.%u%% | Fault=%s | Ramp=%s\r\n",
- 170              		.loc 1 133 5 view .LVU17
+ 141:Core/Src/uart_cmd.c ****     uint8_t index;
+ 169              		.loc 1 141 5 is_stmt 1 view .LVU16
+ 142:Core/Src/uart_cmd.c **** 
+ 143:Core/Src/uart_cmd.c ****     // Premiere ligne = vue globale.
+ 144:Core/Src/uart_cmd.c ****     printf("System status | Duty=%u.%u%% | Fault=%s | Ramp=%s\r\n",
+ 170              		.loc 1 144 5 view .LVU17
  171 000e 1D49     		ldr	r1, .L13
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 7
-
-
  172 0010 A1FB0031 		umull	r3, r1, r1, r0
  173 0014 CB08     		lsrs	r3, r1, #3
  174 0016 C1F3CF02 		ubfx	r2, r1, #3, #16
@@ -368,35 +379,35 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  176 001c 03EB8303 		add	r3, r3, r3, lsl #2
  177 0020 A0EB4300 		sub	r0, r0, r3, lsl #1
  178              	.LVL12:
- 179              		.loc 1 133 5 is_stmt 0 view .LVU18
+ 179              		.loc 1 144 5 is_stmt 0 view .LVU18
  180 0024 84B2     		uxth	r4, r0
- 134:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 135:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille % 10U),
- 136:Core/Src/uart_cmd.c ****            FanControl_HasAnyFault() ? "YES" : "NO",
- 181              		.loc 1 136 12 view .LVU19
+ 145:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 146:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille % 10U),
+ 147:Core/Src/uart_cmd.c ****            FanControl_HasAnyFault() ? "YES" : "NO",
+ 181              		.loc 1 147 12 view .LVU19
  182 0026 FFF7FEFF 		bl	FanControl_HasAnyFault
  183              	.LVL13:
- 133:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 184              		.loc 1 133 5 view .LVU20
+ 144:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 184              		.loc 1 144 5 view .LVU20
  185 002a 70B1     		cbz	r0, .L10
- 133:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 186              		.loc 1 133 5 discriminator 1 view .LVU21
+ 144:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 186              		.loc 1 144 5 discriminator 1 view .LVU21
  187 002c 164B     		ldr	r3, .L13+4
  188 002e 1F46     		mov	r7, r3
  189              	.L6:
- 137:Core/Src/uart_cmd.c ****            FanControl_IsRampActive() ? "ON" : "OFF");
- 190              		.loc 1 137 12 view .LVU22
+ 148:Core/Src/uart_cmd.c ****            FanControl_IsRampActive() ? "ON" : "OFF");
+ 190              		.loc 1 148 12 view .LVU22
  191 0030 FFF7FEFF 		bl	FanControl_IsRampActive
  192              	.LVL14:
- 133:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 193              		.loc 1 133 5 discriminator 4 view .LVU23
+ 144:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 193              		.loc 1 144 5 discriminator 4 view .LVU23
  194 0034 60B1     		cbz	r0, .L11
- 133:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 195              		.loc 1 133 5 discriminator 5 view .LVU24
+ 144:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 195              		.loc 1 144 5 discriminator 5 view .LVU24
  196 0036 154B     		ldr	r3, .L13+8
  197              	.L7:
- 133:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 198              		.loc 1 133 5 discriminator 8 view .LVU25
+ 144:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 198              		.loc 1 144 5 discriminator 8 view .LVU25
  199 0038 0093     		str	r3, [sp]
  200 003a 3B46     		mov	r3, r7
  201 003c 2246     		mov	r2, r4
@@ -404,72 +415,75 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  203 0040 1348     		ldr	r0, .L13+12
  204 0042 FFF7FEFF 		bl	printf
  205              	.LVL15:
- 138:Core/Src/uart_cmd.c **** 
- 139:Core/Src/uart_cmd.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
- 206              		.loc 1 139 5 is_stmt 1 view .LVU26
- 207              		.loc 1 139 16 is_stmt 0 view .LVU27
+ 149:Core/Src/uart_cmd.c **** 
+ 150:Core/Src/uart_cmd.c ****     for (index = 0U; index < FAN_CONTROL_CHANNEL_COUNT; index++) {
+ 206              		.loc 1 150 5 is_stmt 1 view .LVU26
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 8
+
+
+ 207              		.loc 1 150 16 is_stmt 0 view .LVU27
  208 0046 0021     		movs	r1, #0
- 209              		.loc 1 139 5 view .LVU28
+ 209              		.loc 1 150 5 view .LVU28
  210 0048 17E0     		b	.L8
  211              	.LVL16:
  212              	.L10:
- 133:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 213              		.loc 1 133 5 discriminator 2 view .LVU29
+ 144:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 213              		.loc 1 144 5 discriminator 2 view .LVU29
  214 004a 124B     		ldr	r3, .L13+16
  215 004c 1F46     		mov	r7, r3
  216 004e EFE7     		b	.L6
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 8
-
-
  217              	.L11:
- 133:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
- 218              		.loc 1 133 5 discriminator 6 view .LVU30
+ 144:Core/Src/uart_cmd.c ****            (unsigned int)(duty_permille / 10U),
+ 218              		.loc 1 144 5 discriminator 6 view .LVU30
  219 0050 114B     		ldr	r3, .L13+20
  220 0052 F1E7     		b	.L7
  221              	.LVL17:
  222              	.L9:
- 140:Core/Src/uart_cmd.c ****         printf("F%u state=%u rpm=%u duty=%u%% alert=%u\r\n",
- 223              		.loc 1 140 9 is_stmt 1 view .LVU31
- 141:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 142:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].state,
- 224              		.loc 1 142 34 is_stmt 0 view .LVU32
+ 151:Core/Src/uart_cmd.c ****         printf("F%u state=%u rpm=%u duty=%u%% alert=%u\r\n",
+ 223              		.loc 1 151 9 is_stmt 1 view .LVU31
+ 152:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 153:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].state,
+ 224              		.loc 1 153 34 is_stmt 0 view .LVU32
  225 0054 01EB8103 		add	r3, r1, r1, lsl #2
  226 0058 05EB4304 		add	r4, r5, r3, lsl #1
- 227              		.loc 1 142 41 view .LVU33
+ 227              		.loc 1 153 41 view .LVU33
  228 005c 15F81320 		ldrb	r2, [r5, r3, lsl #1]	@ zero_extendqisi2
- 143:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].rpm,
- 229              		.loc 1 143 41 view .LVU34
+ 154:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].rpm,
+ 229              		.loc 1 154 41 view .LVU34
  230 0060 A388     		ldrh	r3, [r4, #4]
- 144:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].percent,
- 231              		.loc 1 144 41 view .LVU35
+ 155:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].percent,
+ 231              		.loc 1 155 41 view .LVU35
  232 0062 207A     		ldrb	r0, [r4, #8]	@ zero_extendqisi2
- 145:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].alert);
- 233              		.loc 1 145 41 view .LVU36
+ 156:Core/Src/uart_cmd.c ****                (unsigned int)fans[index].alert);
+ 233              		.loc 1 156 41 view .LVU36
  234 0064 94F802C0 		ldrb	ip, [r4, #2]	@ zero_extendqisi2
- 140:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 235              		.loc 1 140 9 view .LVU37
+ 151:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 235              		.loc 1 151 9 view .LVU37
  236 0068 4C1C     		adds	r4, r1, #1
  237 006a CDF804C0 		str	ip, [sp, #4]
  238 006e 0090     		str	r0, [sp]
  239 0070 2146     		mov	r1, r4
  240              	.LVL18:
- 140:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 241              		.loc 1 140 9 view .LVU38
+ 151:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 241              		.loc 1 151 9 view .LVU38
  242 0072 0A48     		ldr	r0, .L13+24
  243 0074 FFF7FEFF 		bl	printf
  244              	.LVL19:
- 139:Core/Src/uart_cmd.c ****         printf("F%u state=%u rpm=%u duty=%u%% alert=%u\r\n",
- 245              		.loc 1 139 62 is_stmt 1 discriminator 3 view .LVU39
+ 150:Core/Src/uart_cmd.c ****         printf("F%u state=%u rpm=%u duty=%u%% alert=%u\r\n",
+ 245              		.loc 1 150 62 is_stmt 1 discriminator 3 view .LVU39
  246 0078 E1B2     		uxtb	r1, r4
  247              	.LVL20:
  248              	.L8:
- 139:Core/Src/uart_cmd.c ****         printf("F%u state=%u rpm=%u duty=%u%% alert=%u\r\n",
- 249              		.loc 1 139 28 discriminator 1 view .LVU40
+ 150:Core/Src/uart_cmd.c ****         printf("F%u state=%u rpm=%u duty=%u%% alert=%u\r\n",
+ 249              		.loc 1 150 28 discriminator 1 view .LVU40
  250 007a 0329     		cmp	r1, #3
  251 007c EAD9     		bls	.L9
- 146:Core/Src/uart_cmd.c ****     }
- 147:Core/Src/uart_cmd.c **** }
- 252              		.loc 1 147 1 is_stmt 0 view .LVU41
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 9
+
+
+ 157:Core/Src/uart_cmd.c ****     }
+ 158:Core/Src/uart_cmd.c **** }
+ 252              		.loc 1 158 1 is_stmt 0 view .LVU41
  253 007e 03B0     		add	sp, sp, #12
  254              	.LCFI3:
  255              		.cfi_def_cfa_offset 20
@@ -477,10 +491,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  257 0080 F0BD     		pop	{r4, r5, r6, r7, pc}
  258              	.LVL21:
  259              	.L14:
- 260              		.loc 1 147 1 view .LVU42
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 9
-
-
+ 260              		.loc 1 158 1 view .LVU42
  261 0082 00BF     		.align	2
  262              	.L13:
  263 0084 CDCCCCCC 		.word	-858993459
@@ -508,10 +519,10 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  282              		.thumb_func
  284              	UART_Cmd_PrintTachStatus:
  285              	.LFB74:
- 148:Core/Src/uart_cmd.c **** 
- 149:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintTachStatus(void)
- 150:Core/Src/uart_cmd.c **** {
- 286              		.loc 1 150 1 is_stmt 1 view -0
+ 159:Core/Src/uart_cmd.c **** 
+ 160:Core/Src/uart_cmd.c **** static void UART_Cmd_PrintTachStatus(void)
+ 161:Core/Src/uart_cmd.c **** {
+ 286              		.loc 1 161 1 is_stmt 1 view -0
  287              		.cfi_startproc
  288              		@ args = 0, pretend = 0, frame = 0
  289              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -523,110 +534,110 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  295 0002 82B0     		sub	sp, sp, #8
  296              	.LCFI5:
  297              		.cfi_def_cfa_offset 16
- 151:Core/Src/uart_cmd.c ****     uint8_t index;
- 298              		.loc 1 151 5 view .LVU44
- 152:Core/Src/uart_cmd.c **** 
- 153:Core/Src/uart_cmd.c ****     // Une ligne par tach.
- 154:Core/Src/uart_cmd.c ****     for (index = 0U; index < TACHOMETER_CHANNEL_COUNT; index++) {
- 299              		.loc 1 154 5 view .LVU45
+ 162:Core/Src/uart_cmd.c ****     uint8_t index;
+ 298              		.loc 1 162 5 view .LVU44
+ 163:Core/Src/uart_cmd.c **** 
+ 164:Core/Src/uart_cmd.c ****     // Une ligne par tach.
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 10
+
+
+ 165:Core/Src/uart_cmd.c ****     for (index = 0U; index < TACHOMETER_CHANNEL_COUNT; index++) {
+ 299              		.loc 1 165 5 view .LVU45
  300              	.LVL22:
- 301              		.loc 1 154 16 is_stmt 0 view .LVU46
+ 301              		.loc 1 165 16 is_stmt 0 view .LVU46
  302 0004 0024     		movs	r4, #0
- 303              		.loc 1 154 5 view .LVU47
+ 303              		.loc 1 165 5 view .LVU47
  304 0006 07E0     		b	.L16
  305              	.LVL23:
  306              	.L19:
  307              	.LBB2:
- 155:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 10
-
-
- 156:Core/Src/uart_cmd.c **** 
- 157:Core/Src/uart_cmd.c ****         if (tach == NULL) {
- 158:Core/Src/uart_cmd.c ****             continue;
- 159:Core/Src/uart_cmd.c ****         }
- 160:Core/Src/uart_cmd.c **** 
- 161:Core/Src/uart_cmd.c ****         printf("T%u inst=%u rpm filt=%u rpm signal=%u timeout=%u\r\n",
- 308              		.loc 1 161 9 discriminator 8 view .LVU48
+ 166:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
+ 167:Core/Src/uart_cmd.c **** 
+ 168:Core/Src/uart_cmd.c ****         if (tach == NULL) {
+ 169:Core/Src/uart_cmd.c ****             continue;
+ 170:Core/Src/uart_cmd.c ****         }
+ 171:Core/Src/uart_cmd.c **** 
+ 172:Core/Src/uart_cmd.c ****         printf("T%u inst=%u rpm filt=%u rpm signal=%u timeout=%u\r\n",
+ 308              		.loc 1 172 9 discriminator 8 view .LVU48
  309 0008 CDF804C0 		str	ip, [sp, #4]
  310 000c 0090     		str	r0, [sp]
  311 000e 0E48     		ldr	r0, .L25
  312 0010 FFF7FEFF 		bl	printf
  313              	.LVL24:
  314              	.L17:
- 315              		.loc 1 161 9 discriminator 8 view .LVU49
+ 315              		.loc 1 172 9 discriminator 8 view .LVU49
  316              	.LBE2:
- 154:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
- 317              		.loc 1 154 61 is_stmt 1 discriminator 2 view .LVU50
+ 165:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
+ 317              		.loc 1 165 61 is_stmt 1 discriminator 2 view .LVU50
  318 0014 0134     		adds	r4, r4, #1
  319              	.LVL25:
- 154:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
- 320              		.loc 1 154 61 is_stmt 0 discriminator 2 view .LVU51
+ 165:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
+ 320              		.loc 1 165 61 is_stmt 0 discriminator 2 view .LVU51
  321 0016 E4B2     		uxtb	r4, r4
  322              	.LVL26:
  323              	.L16:
- 154:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
- 324              		.loc 1 154 28 is_stmt 1 discriminator 1 view .LVU52
+ 165:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
+ 324              		.loc 1 165 28 is_stmt 1 discriminator 1 view .LVU52
  325 0018 032C     		cmp	r4, #3
  326 001a 13D8     		bhi	.L24
  327              	.LBB3:
- 155:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
- 328              		.loc 1 155 9 view .LVU53
- 155:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
- 329              		.loc 1 155 43 is_stmt 0 view .LVU54
+ 166:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
+ 328              		.loc 1 166 9 view .LVU53
+ 166:Core/Src/uart_cmd.c ****         const TachometerReading_t *tach = Tachometer_GetReading(index);
+ 329              		.loc 1 166 43 is_stmt 0 view .LVU54
  330 001c 2046     		mov	r0, r4
  331 001e FFF7FEFF 		bl	Tachometer_GetReading
  332              	.LVL27:
- 157:Core/Src/uart_cmd.c ****             continue;
- 333              		.loc 1 157 9 is_stmt 1 view .LVU55
- 157:Core/Src/uart_cmd.c ****             continue;
- 334              		.loc 1 157 12 is_stmt 0 view .LVU56
+ 168:Core/Src/uart_cmd.c ****             continue;
+ 333              		.loc 1 168 9 is_stmt 1 view .LVU55
+ 168:Core/Src/uart_cmd.c ****             continue;
+ 334              		.loc 1 168 12 is_stmt 0 view .LVU56
  335 0022 8446     		mov	ip, r0
  336 0024 0028     		cmp	r0, #0
  337 0026 F5D0     		beq	.L17
- 338              		.loc 1 161 9 is_stmt 1 view .LVU57
+ 338              		.loc 1 172 9 is_stmt 1 view .LVU57
  339 0028 611C     		adds	r1, r4, #1
- 162:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 163:Core/Src/uart_cmd.c ****                (unsigned int)tach->rpm_instant,
- 340              		.loc 1 163 34 is_stmt 0 view .LVU58
+ 173:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 11
+
+
+ 174:Core/Src/uart_cmd.c ****                (unsigned int)tach->rpm_instant,
+ 340              		.loc 1 174 34 is_stmt 0 view .LVU58
  341 002a 0288     		ldrh	r2, [r0]
- 164:Core/Src/uart_cmd.c ****                (unsigned int)tach->rpm_filtered,
- 342              		.loc 1 164 34 view .LVU59
+ 175:Core/Src/uart_cmd.c ****                (unsigned int)tach->rpm_filtered,
+ 342              		.loc 1 175 34 view .LVU59
  343 002c 4388     		ldrh	r3, [r0, #2]
- 165:Core/Src/uart_cmd.c ****                tach->signal_present ? 1U : 0U,
- 344              		.loc 1 165 20 view .LVU60
+ 176:Core/Src/uart_cmd.c ****                tach->signal_present ? 1U : 0U,
+ 344              		.loc 1 176 20 view .LVU60
  345 002e 0079     		ldrb	r0, [r0, #4]	@ zero_extendqisi2
  346              	.LVL28:
- 161:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 11
-
-
- 347              		.loc 1 161 9 view .LVU61
+ 172:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 347              		.loc 1 172 9 view .LVU61
  348 0030 00B1     		cbz	r0, .L18
- 161:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 349              		.loc 1 161 9 discriminator 1 view .LVU62
+ 172:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 349              		.loc 1 172 9 discriminator 1 view .LVU62
  350 0032 0120     		movs	r0, #1
  351              	.L18:
- 166:Core/Src/uart_cmd.c ****                tach->timeout ? 1U : 0U);
- 352              		.loc 1 166 20 view .LVU63
+ 177:Core/Src/uart_cmd.c ****                tach->timeout ? 1U : 0U);
+ 352              		.loc 1 177 20 view .LVU63
  353 0034 9CF805C0 		ldrb	ip, [ip, #5]	@ zero_extendqisi2
  354              	.LVL29:
- 161:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 355              		.loc 1 161 9 discriminator 4 view .LVU64
+ 172:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 355              		.loc 1 172 9 discriminator 4 view .LVU64
  356 0038 BCF1000F 		cmp	ip, #0
  357 003c E4D0     		beq	.L19
- 161:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 358              		.loc 1 161 9 discriminator 5 view .LVU65
+ 172:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 358              		.loc 1 172 9 discriminator 5 view .LVU65
  359 003e 4FF0010C 		mov	ip, #1
  360 0042 E1E7     		b	.L19
  361              	.LVL30:
  362              	.L24:
- 161:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
- 363              		.loc 1 161 9 discriminator 5 view .LVU66
+ 172:Core/Src/uart_cmd.c ****                (unsigned int)(index + 1U),
+ 363              		.loc 1 172 9 discriminator 5 view .LVU66
  364              	.LBE3:
- 167:Core/Src/uart_cmd.c ****     }
- 168:Core/Src/uart_cmd.c **** }
- 365              		.loc 1 168 1 view .LVU67
+ 178:Core/Src/uart_cmd.c ****     }
+ 179:Core/Src/uart_cmd.c **** }
+ 365              		.loc 1 179 1 view .LVU67
  366 0044 02B0     		add	sp, sp, #8
  367              	.LCFI6:
  368              		.cfi_def_cfa_offset 8
@@ -634,7 +645,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  370 0046 10BD     		pop	{r4, pc}
  371              	.LVL31:
  372              	.L26:
- 373              		.loc 1 168 1 view .LVU68
+ 373              		.loc 1 179 1 view .LVU68
  374              		.align	2
  375              	.L25:
  376 0048 00000000 		.word	.LC15
@@ -647,9 +658,12 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  384              		.thumb
  385              		.thumb_func
  387              	UART_Cmd_Init:
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 12
+
+
  388              	.LFB68:
-  18:Core/Src/uart_cmd.c ****     // Au boot, on montre tout de suite les commandes.
- 389              		.loc 1 18 1 is_stmt 1 view -0
+  27:Core/Src/uart_cmd.c ****     // Au boot, on montre tout de suite les commandes.
+ 389              		.loc 1 27 1 is_stmt 1 view -0
  390              		.cfi_startproc
  391              		@ args = 0, pretend = 0, frame = 0
  392              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -658,15 +672,12 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  395              		.cfi_def_cfa_offset 8
  396              		.cfi_offset 3, -8
  397              		.cfi_offset 14, -4
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 12
-
-
-  20:Core/Src/uart_cmd.c **** }
- 398              		.loc 1 20 5 view .LVU70
+  29:Core/Src/uart_cmd.c **** }
+ 398              		.loc 1 29 5 view .LVU70
  399 0002 FFF7FEFF 		bl	UART_Cmd_PrintHelp
  400              	.LVL32:
-  21:Core/Src/uart_cmd.c **** 
- 401              		.loc 1 21 1 is_stmt 0 view .LVU71
+  30:Core/Src/uart_cmd.c **** 
+ 401              		.loc 1 30 1 is_stmt 0 view .LVU71
  402 0006 08BD     		pop	{r3, pc}
  403              		.cfi_endproc
  404              	.LFE68:
@@ -707,6 +718,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  421      30252520 
  421      6F6E2061 
  422 009a 0000     		.align	2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 13
+
+
  423              	.LC21:
  424 009c 44757479 		.ascii	"Duty set to %u%% on all fans\015\012\000"
  424      20736574 
@@ -718,9 +732,6 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  427 00bc 556E6B6E 		.ascii	"Unknown command '%c' - send 'h' for help\015\012\000"
  427      6F776E20 
  427      636F6D6D 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 13
-
-
  427      616E6420 
  427      27256327 
  428              		.section	.text.UART_Cmd_Task,"ax",%progbits
@@ -731,8 +742,8 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  433              		.thumb_func
  435              	UART_Cmd_Task:
  436              	.LFB69:
-  24:Core/Src/uart_cmd.c ****     uint8_t rx;
- 437              		.loc 1 24 1 is_stmt 1 view -0
+  33:Core/Src/uart_cmd.c ****     uint8_t rx;
+ 437              		.loc 1 33 1 is_stmt 1 view -0
  438              		.cfi_startproc
  439              		@ args = 0, pretend = 0, frame = 8
  440              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -743,46 +754,46 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  445 0002 83B0     		sub	sp, sp, #12
  446              	.LCFI9:
  447              		.cfi_def_cfa_offset 16
-  25:Core/Src/uart_cmd.c **** 
- 448              		.loc 1 25 5 view .LVU73
-  28:Core/Src/uart_cmd.c ****         return;
- 449              		.loc 1 28 5 view .LVU74
-  28:Core/Src/uart_cmd.c ****         return;
- 450              		.loc 1 28 9 is_stmt 0 view .LVU75
+  34:Core/Src/uart_cmd.c **** 
+ 448              		.loc 1 34 5 view .LVU73
+  37:Core/Src/uart_cmd.c ****         return;
+ 449              		.loc 1 37 5 view .LVU74
+  37:Core/Src/uart_cmd.c ****         return;
+ 450              		.loc 1 37 9 is_stmt 0 view .LVU75
  451 0004 0023     		movs	r3, #0
  452 0006 0122     		movs	r2, #1
  453 0008 0DF10701 		add	r1, sp, #7
  454 000c 3A48     		ldr	r0, .L49
  455 000e FFF7FEFF 		bl	HAL_UART_Receive
  456              	.LVL33:
-  28:Core/Src/uart_cmd.c ****         return;
- 457              		.loc 1 28 8 discriminator 1 view .LVU76
+  37:Core/Src/uart_cmd.c ****         return;
+ 457              		.loc 1 37 8 discriminator 1 view .LVU76
  458 0012 08B1     		cbz	r0, .L47
  459              	.L29:
-  90:Core/Src/uart_cmd.c **** 
- 460              		.loc 1 90 1 view .LVU77
+ 101:Core/Src/uart_cmd.c **** 
+ 460              		.loc 1 101 1 view .LVU77
  461 0014 03B0     		add	sp, sp, #12
  462              	.LCFI10:
  463              		.cfi_remember_state
  464              		.cfi_def_cfa_offset 4
  465              		@ sp needed
  466 0016 00BD     		pop	{pc}
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 14
+
+
  467              	.L47:
  468              	.LCFI11:
  469              		.cfi_restore_state
-  32:Core/Src/uart_cmd.c **** 
- 470              		.loc 1 32 5 is_stmt 1 view .LVU78
+  41:Core/Src/uart_cmd.c **** 
+ 470              		.loc 1 41 5 is_stmt 1 view .LVU78
  471 0018 FFF7FEFF 		bl	HAL_GetTick
  472              	.LVL34:
-  32:Core/Src/uart_cmd.c **** 
- 473              		.loc 1 32 5 is_stmt 0 discriminator 1 view .LVU79
+  41:Core/Src/uart_cmd.c **** 
+ 473              		.loc 1 41 5 is_stmt 0 discriminator 1 view .LVU79
  474 001c FFF7FEFF 		bl	LedStatus_NotifyCommActivity
  475              	.LVL35:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 14
-
-
-  34:Core/Src/uart_cmd.c ****         case 'h':
- 476              		.loc 1 34 5 is_stmt 1 view .LVU80
+  45:Core/Src/uart_cmd.c ****         case 'h':
+ 476              		.loc 1 45 5 is_stmt 1 view .LVU80
  477 0020 9DF80710 		ldrb	r1, [sp, #7]	@ zero_extendqisi2
  478 0024 5429     		cmp	r1, #84
  479 0026 36D0     		beq	.L32
@@ -794,21 +805,21 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  485 0032 3BD0     		beq	.L36
  486 0034 3F29     		cmp	r1, #63
  487 0036 40D1     		bne	.L38
-  63:Core/Src/uart_cmd.c ****             printf("LCD fan debug toggled\r\n");
- 488              		.loc 1 63 13 view .LVU81
+  74:Core/Src/uart_cmd.c ****             printf("LCD fan debug toggled\r\n");
+ 488              		.loc 1 74 13 view .LVU81
  489 0038 FFF7FEFF 		bl	UI_LCD_ToggleFanDebug
  490              	.LVL36:
-  64:Core/Src/uart_cmd.c ****             break;
- 491              		.loc 1 64 13 view .LVU82
+  75:Core/Src/uart_cmd.c ****             break;
+ 491              		.loc 1 75 13 view .LVU82
  492 003c 2F48     		ldr	r0, .L49+4
  493 003e FFF7FEFF 		bl	puts
  494              	.LVL37:
-  65:Core/Src/uart_cmd.c **** 
- 495              		.loc 1 65 13 view .LVU83
+  76:Core/Src/uart_cmd.c **** 
+ 495              		.loc 1 76 13 view .LVU83
  496 0042 E7E7     		b	.L29
  497              	.L35:
-  34:Core/Src/uart_cmd.c ****         case 'h':
- 498              		.loc 1 34 5 is_stmt 0 view .LVU84
+  45:Core/Src/uart_cmd.c ****         case 'h':
+ 498              		.loc 1 45 5 is_stmt 0 view .LVU84
  499 0044 4829     		cmp	r1, #72
  500 0046 23D0     		beq	.L39
  501 0048 5329     		cmp	r1, #83
@@ -816,21 +827,24 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  503 004c 4329     		cmp	r1, #67
  504 004e 34D1     		bne	.L38
  505              	.L41:
-  52:Core/Src/uart_cmd.c ****             printf("Confirm event latched\r\n");
- 506              		.loc 1 52 13 is_stmt 1 view .LVU85
+  63:Core/Src/uart_cmd.c ****             printf("Confirm event latched\r\n");
+ 506              		.loc 1 63 13 is_stmt 1 view .LVU85
  507 0050 FFF7FEFF 		bl	Button_NotifyConfirmCommand
  508              	.LVL38:
-  53:Core/Src/uart_cmd.c ****             break;
- 509              		.loc 1 53 13 view .LVU86
+  64:Core/Src/uart_cmd.c ****             break;
+ 509              		.loc 1 64 13 view .LVU86
  510 0054 2A48     		ldr	r0, .L49+8
  511 0056 FFF7FEFF 		bl	puts
  512              	.LVL39:
-  54:Core/Src/uart_cmd.c **** 
- 513              		.loc 1 54 13 view .LVU87
+  65:Core/Src/uart_cmd.c **** 
+ 513              		.loc 1 65 13 view .LVU87
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 15
+
+
  514 005a DBE7     		b	.L29
  515              	.L33:
-  34:Core/Src/uart_cmd.c ****         case 'h':
- 516              		.loc 1 34 5 is_stmt 0 view .LVU88
+  45:Core/Src/uart_cmd.c ****         case 'h':
+ 516              		.loc 1 45 5 is_stmt 0 view .LVU88
  517 005c 6829     		cmp	r1, #104
  518 005e 17D0     		beq	.L39
  519 0060 08D9     		bls	.L48
@@ -838,22 +852,19 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  521 0064 17D0     		beq	.L32
  522 0066 7A29     		cmp	r1, #122
  523 0068 0AD0     		beq	.L43
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 15
-
-
  524 006a 7329     		cmp	r1, #115
  525 006c 25D1     		bne	.L38
  526              	.L40:
-  42:Core/Src/uart_cmd.c ****             break;
- 527              		.loc 1 42 13 is_stmt 1 view .LVU89
+  53:Core/Src/uart_cmd.c ****             break;
+ 527              		.loc 1 53 13 is_stmt 1 view .LVU89
  528 006e FFF7FEFF 		bl	UART_Cmd_PrintSystemStatus
  529              	.LVL40:
-  43:Core/Src/uart_cmd.c **** 
- 530              		.loc 1 43 13 view .LVU90
+  54:Core/Src/uart_cmd.c **** 
+ 530              		.loc 1 54 13 view .LVU90
  531 0072 CFE7     		b	.L29
  532              	.L48:
-  34:Core/Src/uart_cmd.c ****         case 'h':
- 533              		.loc 1 34 5 is_stmt 0 view .LVU91
+  45:Core/Src/uart_cmd.c ****         case 'h':
+ 533              		.loc 1 45 5 is_stmt 0 view .LVU91
  534 0074 6129     		cmp	r1, #97
  535 0076 11D0     		beq	.L34
  536 0078 6329     		cmp	r1, #99
@@ -861,109 +872,109 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  538 007c 5A29     		cmp	r1, #90
  539 007e 1CD1     		bne	.L38
  540              	.L43:
-  58:Core/Src/uart_cmd.c ****             printf("Ramp test started: 0%% to 100%% over 5s\r\n");
- 541              		.loc 1 58 13 is_stmt 1 view .LVU92
+  69:Core/Src/uart_cmd.c ****             printf("Ramp test started: 0%% to 100%% over 5s\r\n");
+ 541              		.loc 1 69 13 is_stmt 1 view .LVU92
  542 0080 FFF7FEFF 		bl	HAL_GetTick
  543              	.LVL41:
-  58:Core/Src/uart_cmd.c ****             printf("Ramp test started: 0%% to 100%% over 5s\r\n");
- 544              		.loc 1 58 13 is_stmt 0 discriminator 1 view .LVU93
+  69:Core/Src/uart_cmd.c ****             printf("Ramp test started: 0%% to 100%% over 5s\r\n");
+ 544              		.loc 1 69 13 is_stmt 0 discriminator 1 view .LVU93
  545 0084 FFF7FEFF 		bl	FanControl_StartRampTest
  546              	.LVL42:
-  59:Core/Src/uart_cmd.c ****             break;
- 547              		.loc 1 59 13 is_stmt 1 view .LVU94
+  70:Core/Src/uart_cmd.c ****             break;
+ 547              		.loc 1 70 13 is_stmt 1 view .LVU94
  548 0088 1E48     		ldr	r0, .L49+12
  549 008a FFF7FEFF 		bl	printf
  550              	.LVL43:
-  60:Core/Src/uart_cmd.c **** 
- 551              		.loc 1 60 13 view .LVU95
+  71:Core/Src/uart_cmd.c **** 
+ 551              		.loc 1 71 13 view .LVU95
  552 008e C1E7     		b	.L29
  553              	.L39:
-  37:Core/Src/uart_cmd.c ****             break;
- 554              		.loc 1 37 13 view .LVU96
+  48:Core/Src/uart_cmd.c ****             break;
+ 554              		.loc 1 48 13 view .LVU96
  555 0090 FFF7FEFF 		bl	UART_Cmd_PrintHelp
  556              	.LVL44:
-  38:Core/Src/uart_cmd.c **** 
- 557              		.loc 1 38 13 view .LVU97
+  49:Core/Src/uart_cmd.c **** 
+ 557              		.loc 1 49 13 view .LVU97
  558 0094 BEE7     		b	.L29
  559              	.L32:
-  47:Core/Src/uart_cmd.c ****             break;
- 560              		.loc 1 47 13 view .LVU98
+  58:Core/Src/uart_cmd.c ****             break;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 16
+
+
+ 560              		.loc 1 58 13 view .LVU98
  561 0096 FFF7FEFF 		bl	UART_Cmd_PrintTachStatus
  562              	.LVL45:
-  48:Core/Src/uart_cmd.c **** 
- 563              		.loc 1 48 13 view .LVU99
+  59:Core/Src/uart_cmd.c **** 
+ 563              		.loc 1 59 13 view .LVU99
  564 009a BBE7     		b	.L29
  565              	.L34:
-  69:Core/Src/uart_cmd.c ****             printf("Duty set to 100%% on all fans\r\n");
- 566              		.loc 1 69 13 view .LVU100
+  80:Core/Src/uart_cmd.c ****             printf("Duty set to 100%% on all fans\r\n");
+ 566              		.loc 1 80 13 view .LVU100
  567 009c 4FF47A70 		mov	r0, #1000
  568 00a0 FFF7FEFF 		bl	FanControl_SetDutyPermilleAll
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 16
-
-
  569              	.LVL46:
-  70:Core/Src/uart_cmd.c ****             break;
- 570              		.loc 1 70 13 view .LVU101
+  81:Core/Src/uart_cmd.c ****             break;
+ 570              		.loc 1 81 13 view .LVU101
  571 00a4 1848     		ldr	r0, .L49+16
  572 00a6 FFF7FEFF 		bl	printf
  573              	.LVL47:
-  71:Core/Src/uart_cmd.c **** 
- 574              		.loc 1 71 13 view .LVU102
+  82:Core/Src/uart_cmd.c **** 
+ 574              		.loc 1 82 13 view .LVU102
  575 00aa B3E7     		b	.L29
  576              	.L36:
-  74:Core/Src/uart_cmd.c ****             printf("Duty set to 0%% on all fans\r\n");
- 577              		.loc 1 74 13 view .LVU103
+  85:Core/Src/uart_cmd.c ****             printf("Duty set to 0%% on all fans\r\n");
+ 577              		.loc 1 85 13 view .LVU103
  578 00ac 0020     		movs	r0, #0
  579 00ae FFF7FEFF 		bl	FanControl_SetDutyPermilleAll
  580              	.LVL48:
-  75:Core/Src/uart_cmd.c ****             break;
- 581              		.loc 1 75 13 view .LVU104
+  86:Core/Src/uart_cmd.c ****             break;
+ 581              		.loc 1 86 13 view .LVU104
  582 00b2 1648     		ldr	r0, .L49+20
  583 00b4 FFF7FEFF 		bl	printf
  584              	.LVL49:
-  76:Core/Src/uart_cmd.c **** 
- 585              		.loc 1 76 13 view .LVU105
+  87:Core/Src/uart_cmd.c **** 
+ 585              		.loc 1 87 13 view .LVU105
  586 00b8 ACE7     		b	.L29
  587              	.L38:
-  79:Core/Src/uart_cmd.c ****                 // Exemple :
- 588              		.loc 1 79 13 view .LVU106
-  79:Core/Src/uart_cmd.c ****                 // Exemple :
- 589              		.loc 1 79 29 is_stmt 0 view .LVU107
+  90:Core/Src/uart_cmd.c ****                 // Exemple :
+ 588              		.loc 1 90 13 view .LVU106
+  90:Core/Src/uart_cmd.c ****                 // Exemple :
+ 589              		.loc 1 90 29 is_stmt 0 view .LVU107
  590 00ba A1F13103 		sub	r3, r1, #49
  591 00be DBB2     		uxtb	r3, r3
-  79:Core/Src/uart_cmd.c ****                 // Exemple :
- 592              		.loc 1 79 16 view .LVU108
+  90:Core/Src/uart_cmd.c ****                 // Exemple :
+ 592              		.loc 1 90 16 view .LVU108
  593 00c0 082B     		cmp	r3, #8
  594 00c2 14D8     		bhi	.L45
  595              	.LBB4:
-  82:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
- 596              		.loc 1 82 17 is_stmt 1 view .LVU109
-  82:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
- 597              		.loc 1 82 63 is_stmt 0 view .LVU110
+  93:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
+ 596              		.loc 1 93 17 is_stmt 1 view .LVU109
+  93:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
+ 597              		.loc 1 93 63 is_stmt 0 view .LVU110
  598 00c4 A1F13003 		sub	r3, r1, #48
  599 00c8 9BB2     		uxth	r3, r3
-  82:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
- 600              		.loc 1 82 26 view .LVU111
+  93:Core/Src/uart_cmd.c ****                 FanControl_SetDutyPermilleAll(duty_permille);
+ 600              		.loc 1 93 26 view .LVU111
  601 00ca 03EB8303 		add	r3, r3, r3, lsl #2
  602 00ce 03EB8300 		add	r0, r3, r3, lsl #2
  603 00d2 8000     		lsls	r0, r0, #2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 17
+
+
  604 00d4 80B2     		uxth	r0, r0
  605              	.LVL50:
-  83:Core/Src/uart_cmd.c ****                 printf("Duty set to %u%% on all fans\r\n", (unsigned int)(rx - '0') * 10U);
- 606              		.loc 1 83 17 is_stmt 1 view .LVU112
+  94:Core/Src/uart_cmd.c ****                 printf("Duty set to %u%% on all fans\r\n", (unsigned int)(rx - '0') * 10U);
+ 606              		.loc 1 94 17 is_stmt 1 view .LVU112
  607 00d6 FFF7FEFF 		bl	FanControl_SetDutyPermilleAll
  608              	.LVL51:
-  84:Core/Src/uart_cmd.c ****             } else {
- 609              		.loc 1 84 17 view .LVU113
-  84:Core/Src/uart_cmd.c ****             } else {
- 610              		.loc 1 84 78 is_stmt 0 view .LVU114
+  95:Core/Src/uart_cmd.c ****             } else {
+ 609              		.loc 1 95 17 view .LVU113
+  95:Core/Src/uart_cmd.c ****             } else {
+ 610              		.loc 1 95 78 is_stmt 0 view .LVU114
  611 00da 9DF80710 		ldrb	r1, [sp, #7]	@ zero_extendqisi2
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 17
-
-
  612 00de 3039     		subs	r1, r1, #48
-  84:Core/Src/uart_cmd.c ****             } else {
- 613              		.loc 1 84 17 view .LVU115
+  95:Core/Src/uart_cmd.c ****             } else {
+ 613              		.loc 1 95 17 view .LVU115
  614 00e0 01EB8101 		add	r1, r1, r1, lsl #2
  615 00e4 4900     		lsls	r1, r1, #1
  616 00e6 0A48     		ldr	r0, .L49+24
@@ -973,8 +984,8 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  620 00ec 92E7     		b	.L29
  621              	.LVL53:
  622              	.L45:
-  86:Core/Src/uart_cmd.c ****             }
- 623              		.loc 1 86 17 is_stmt 1 view .LVU116
+  97:Core/Src/uart_cmd.c ****             }
+ 623              		.loc 1 97 17 is_stmt 1 view .LVU116
  624 00ee 0948     		ldr	r0, .L49+28
  625 00f0 FFF7FEFF 		bl	printf
  626              	.LVL54:
@@ -1001,13 +1012,16 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  649              	__io_putchar:
  650              	.LVL55:
  651              	.LFB70:
-  93:Core/Src/uart_cmd.c ****     uint8_t byte = (uint8_t)ch;
- 652              		.loc 1 93 1 view -0
+ 104:Core/Src/uart_cmd.c ****     uint8_t byte = (uint8_t)ch;
+ 652              		.loc 1 104 1 view -0
  653              		.cfi_startproc
  654              		@ args = 0, pretend = 0, frame = 8
  655              		@ frame_needed = 0, uses_anonymous_args = 0
-  93:Core/Src/uart_cmd.c ****     uint8_t byte = (uint8_t)ch;
- 656              		.loc 1 93 1 is_stmt 0 view .LVU118
+ 104:Core/Src/uart_cmd.c ****     uint8_t byte = (uint8_t)ch;
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 18
+
+
+ 656              		.loc 1 104 1 is_stmt 0 view .LVU118
  657 0000 10B5     		push	{r4, lr}
  658              	.LCFI12:
  659              		.cfi_def_cfa_offset 8
@@ -1017,31 +1031,28 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  663              	.LCFI13:
  664              		.cfi_def_cfa_offset 16
  665 0004 0446     		mov	r4, r0
-  94:Core/Src/uart_cmd.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 18
-
-
- 666              		.loc 1 94 5 is_stmt 1 view .LVU119
-  94:Core/Src/uart_cmd.c **** 
- 667              		.loc 1 94 13 is_stmt 0 view .LVU120
+ 105:Core/Src/uart_cmd.c **** 
+ 666              		.loc 1 105 5 is_stmt 1 view .LVU119
+ 105:Core/Src/uart_cmd.c **** 
+ 667              		.loc 1 105 13 is_stmt 0 view .LVU120
  668 0006 8DF80700 		strb	r0, [sp, #7]
-  97:Core/Src/uart_cmd.c ****     return ch;
- 669              		.loc 1 97 5 is_stmt 1 view .LVU121
-  97:Core/Src/uart_cmd.c ****     return ch;
- 670              		.loc 1 97 11 is_stmt 0 view .LVU122
+ 108:Core/Src/uart_cmd.c ****     return ch;
+ 669              		.loc 1 108 5 is_stmt 1 view .LVU121
+ 108:Core/Src/uart_cmd.c ****     return ch;
+ 670              		.loc 1 108 11 is_stmt 0 view .LVU122
  671 000a 4FF0FF33 		mov	r3, #-1
  672 000e 0122     		movs	r2, #1
  673 0010 0DF10701 		add	r1, sp, #7
  674 0014 0248     		ldr	r0, .L53
  675              	.LVL56:
-  97:Core/Src/uart_cmd.c ****     return ch;
- 676              		.loc 1 97 11 view .LVU123
+ 108:Core/Src/uart_cmd.c ****     return ch;
+ 676              		.loc 1 108 11 view .LVU123
  677 0016 FFF7FEFF 		bl	HAL_UART_Transmit
  678              	.LVL57:
-  98:Core/Src/uart_cmd.c **** }
- 679              		.loc 1 98 5 is_stmt 1 view .LVU124
-  99:Core/Src/uart_cmd.c **** 
- 680              		.loc 1 99 1 is_stmt 0 view .LVU125
+ 109:Core/Src/uart_cmd.c **** }
+ 679              		.loc 1 109 5 is_stmt 1 view .LVU124
+ 110:Core/Src/uart_cmd.c **** 
+ 680              		.loc 1 110 1 is_stmt 0 view .LVU125
  681 001a 2046     		mov	r0, r4
  682 001c 02B0     		add	sp, sp, #8
  683              	.LCFI14:
@@ -1050,8 +1061,8 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  686 001e 10BD     		pop	{r4, pc}
  687              	.LVL58:
  688              	.L54:
-  99:Core/Src/uart_cmd.c **** 
- 689              		.loc 1 99 1 view .LVU126
+ 110:Core/Src/uart_cmd.c **** 
+ 689              		.loc 1 110 1 view .LVU126
  690              		.align	2
  691              	.L53:
  692 0020 00000000 		.word	huart1
@@ -1065,8 +1076,11 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  701              		.thumb_func
  703              	__io_getchar:
  704              	.LFB71:
- 102:Core/Src/uart_cmd.c ****     uint8_t byte;
- 705              		.loc 1 102 1 is_stmt 1 view -0
+ 113:Core/Src/uart_cmd.c ****     uint8_t byte;
+ 705              		.loc 1 113 1 is_stmt 1 view -0
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 19
+
+
  706              		.cfi_startproc
  707              		@ args = 0, pretend = 0, frame = 8
  708              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -1077,32 +1091,29 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  713 0002 83B0     		sub	sp, sp, #12
  714              	.LCFI16:
  715              		.cfi_def_cfa_offset 16
- 103:Core/Src/uart_cmd.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 19
-
-
- 716              		.loc 1 103 5 view .LVU128
- 105:Core/Src/uart_cmd.c ****         return (int)byte;
- 717              		.loc 1 105 5 view .LVU129
- 105:Core/Src/uart_cmd.c ****         return (int)byte;
- 718              		.loc 1 105 9 is_stmt 0 view .LVU130
+ 114:Core/Src/uart_cmd.c **** 
+ 716              		.loc 1 114 5 view .LVU128
+ 116:Core/Src/uart_cmd.c ****         return (int)byte;
+ 717              		.loc 1 116 5 view .LVU129
+ 116:Core/Src/uart_cmd.c ****         return (int)byte;
+ 718              		.loc 1 116 9 is_stmt 0 view .LVU130
  719 0004 0023     		movs	r3, #0
  720 0006 0122     		movs	r2, #1
  721 0008 0DF10701 		add	r1, sp, #7
  722 000c 0548     		ldr	r0, .L59
  723 000e FFF7FEFF 		bl	HAL_UART_Receive
  724              	.LVL59:
- 105:Core/Src/uart_cmd.c ****         return (int)byte;
- 725              		.loc 1 105 8 discriminator 1 view .LVU131
+ 116:Core/Src/uart_cmd.c ****         return (int)byte;
+ 725              		.loc 1 116 8 discriminator 1 view .LVU131
  726 0012 18B9     		cbnz	r0, .L57
- 106:Core/Src/uart_cmd.c ****     }
- 727              		.loc 1 106 9 is_stmt 1 view .LVU132
- 106:Core/Src/uart_cmd.c ****     }
- 728              		.loc 1 106 16 is_stmt 0 view .LVU133
+ 117:Core/Src/uart_cmd.c ****     }
+ 727              		.loc 1 117 9 is_stmt 1 view .LVU132
+ 117:Core/Src/uart_cmd.c ****     }
+ 728              		.loc 1 117 16 is_stmt 0 view .LVU133
  729 0014 9DF80700 		ldrb	r0, [sp, #7]	@ zero_extendqisi2
  730              	.L55:
- 110:Core/Src/uart_cmd.c **** 
- 731              		.loc 1 110 1 view .LVU134
+ 121:Core/Src/uart_cmd.c **** 
+ 731              		.loc 1 121 1 view .LVU134
  732 0018 03B0     		add	sp, sp, #12
  733              	.LCFI17:
  734              		.cfi_remember_state
@@ -1112,8 +1123,8 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  738              	.L57:
  739              	.LCFI18:
  740              		.cfi_restore_state
- 109:Core/Src/uart_cmd.c **** }
- 741              		.loc 1 109 12 view .LVU135
+ 120:Core/Src/uart_cmd.c **** }
+ 741              		.loc 1 120 12 view .LVU135
  742 001c 4FF0FF30 		mov	r0, #-1
  743 0020 FAE7     		b	.L55
  744              	.L60:
@@ -1127,6 +1138,9 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  753              		.file 2 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/machine/_defa
  754              		.file 3 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/sys/_stdint.h
  755              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 20
+
+
  756              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
  757              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
  758              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h"
@@ -1138,39 +1152,36 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 1
  764              		.file 13 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
  765              		.file 14 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/stdio.h"
  766              		.file 15 "Core/Inc/printf-scanf.h"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 20
-
-
  767              		.file 16 "<built-in>"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s 			page 21
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s 			page 21
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 uart_cmd.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:19     .rodata.UART_Cmd_PrintHelp.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:47     .text.UART_Cmd_PrintHelp:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:52     .text.UART_Cmd_PrintHelp:00000000 UART_Cmd_PrintHelp
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:104    .text.UART_Cmd_PrintHelp:0000003c $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:117    .rodata.UART_Cmd_PrintSystemStatus.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:137    .text.UART_Cmd_PrintSystemStatus:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:142    .text.UART_Cmd_PrintSystemStatus:00000000 UART_Cmd_PrintSystemStatus
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:263    .text.UART_Cmd_PrintSystemStatus:00000084 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:274    .rodata.UART_Cmd_PrintTachStatus.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:279    .text.UART_Cmd_PrintTachStatus:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:284    .text.UART_Cmd_PrintTachStatus:00000000 UART_Cmd_PrintTachStatus
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:376    .text.UART_Cmd_PrintTachStatus:00000048 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:381    .text.UART_Cmd_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:387    .text.UART_Cmd_Init:00000000 UART_Cmd_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:407    .rodata.UART_Cmd_Task.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:429    .text.UART_Cmd_Task:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:435    .text.UART_Cmd_Task:00000000 UART_Cmd_Task
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:631    .text.UART_Cmd_Task:000000f8 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:643    .text.__io_putchar:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:649    .text.__io_putchar:00000000 __io_putchar
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:692    .text.__io_putchar:00000020 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:697    .text.__io_getchar:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:703    .text.__io_getchar:00000000 __io_getchar
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccnA4kIy.s:747    .text.__io_getchar:00000024 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:19     .rodata.UART_Cmd_PrintHelp.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:47     .text.UART_Cmd_PrintHelp:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:52     .text.UART_Cmd_PrintHelp:00000000 UART_Cmd_PrintHelp
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:104    .text.UART_Cmd_PrintHelp:0000003c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:117    .rodata.UART_Cmd_PrintSystemStatus.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:137    .text.UART_Cmd_PrintSystemStatus:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:142    .text.UART_Cmd_PrintSystemStatus:00000000 UART_Cmd_PrintSystemStatus
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:263    .text.UART_Cmd_PrintSystemStatus:00000084 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:274    .rodata.UART_Cmd_PrintTachStatus.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:279    .text.UART_Cmd_PrintTachStatus:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:284    .text.UART_Cmd_PrintTachStatus:00000000 UART_Cmd_PrintTachStatus
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:376    .text.UART_Cmd_PrintTachStatus:00000048 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:381    .text.UART_Cmd_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:387    .text.UART_Cmd_Init:00000000 UART_Cmd_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:407    .rodata.UART_Cmd_Task.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:429    .text.UART_Cmd_Task:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:435    .text.UART_Cmd_Task:00000000 UART_Cmd_Task
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:631    .text.UART_Cmd_Task:000000f8 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:643    .text.__io_putchar:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:649    .text.__io_putchar:00000000 __io_putchar
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:692    .text.__io_putchar:00000020 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:697    .text.__io_getchar:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:703    .text.__io_getchar:00000000 __io_getchar
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccx40Vis.s:747    .text.__io_getchar:00000024 $d
 
 UNDEFINED SYMBOLS
 puts

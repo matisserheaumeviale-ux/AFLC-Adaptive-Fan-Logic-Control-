@@ -2,6 +2,16 @@
 
 #include <stdbool.h>
 
+/*
+ * Module button
+ * -------------
+ * Pour l'instant, ce module sert surtout de "latch" logiciel.
+ *
+ * Dans ce projet, la confirmation utilisateur vient de l'UART.
+ * Plus tard, on pourra remplacer cela par une vraie lecture GPIO
+ * sans changer le reste de l'application.
+ */
+
 // Initialise le mini module bouton.
 void Button_Init(void);
 

@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
   30:Core/Src/LCD_UI.c ****         case FAN_ACTION_ACCEL:    return "+++";
   31:Core/Src/LCD_UI.c ****         case FAN_ACTION_DETECT:   return "@@@";
   32:Core/Src/LCD_UI.c ****         case FAN_ACTION_DECEL:    return "---";
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 2
 
 
   33:Core/Src/LCD_UI.c ****         case FAN_ACTION_IDLE:     return "===";
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
   87:Core/Src/LCD_UI.c **** void UI_DrawFanLine(uint8_t row, uint8_t fan_index, const FanStatus_t *fan){
   88:Core/Src/LCD_UI.c ****     char line[21];
   89:Core/Src/LCD_UI.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 3
 
 
   90:Core/Src/LCD_UI.c ****     if((fan == NULL) || (row > 3U)) return;
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
   30              		@ frame_needed = 0, uses_anonymous_args = 0
  141:Core/Src/LCD_UI.c ****     char fixed[21];
   31              		.loc 1 141 5 view .LVU1
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 4
 
 
  142:Core/Src/LCD_UI.c ****     size_t len;
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
   76              		.loc 1 150 7 is_stmt 0 view .LVU16
   77 002c 1428     		cmp	r0, #20
   78 002e 00D9     		bls	.L5
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 5
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 5
 
 
  151:Core/Src/LCD_UI.c ****         len = 20U;
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  123 0070 BCE80F00 		ldmia	ip!, {r0, r1, r2, r3}
  124 0074 7051     		str	r0, [r6, r5]	@ unaligned
  125 0076 CEF80410 		str	r1, [lr, #4]	@ unaligned
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 6
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 6
 
 
  126 007a CEF80820 		str	r2, [lr, #8]	@ unaligned
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  175 0018 4572722E 		.ascii	"Err.\000"
  175      00
  176              		.section	.text.UI_FanStateToStr,"ax",%progbits
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 7
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 7
 
 
  177              		.align	1
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  222              		.loc 1 18 5 view .LVU43
  223 001a 7047     		bx	lr
  224              	.LVL19:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 8
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 8
 
 
  225              	.L20:
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  277 0002 0ED0     		beq	.L26
  278 0004 07D8     		bhi	.L25
  279 0006 0128     		cmp	r0, #1
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 9
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 9
 
 
  280 0008 0DD0     		beq	.L27
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
   33:Core/Src/LCD_UI.c ****         case FAN_ACTION_RAMP:     return "^^^";
  323              		.loc 1 33 42 view .LVU59
  324 002a 0748     		ldr	r0, .L32+20
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 10
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 10
 
 
  325              	.LVL32:
@@ -598,7 +598,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  376              	.LVL36:
   47:Core/Src/LCD_UI.c **** 
  377              		.loc 1 47 1 is_stmt 0 view .LVU65
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 11
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 11
 
 
  378 000c 7047     		bx	lr
@@ -658,7 +658,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  426 0000 0328     		cmp	r0, #3
  427 0002 26D0     		beq	.L42
  428 0004 09D9     		bls	.L52
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 12
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 12
 
 
  429 0006 0428     		cmp	r0, #4
@@ -718,7 +718,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  470              	.LVL47:
  471              	.L53:
   55:Core/Src/LCD_UI.c ****         case FAN_ACTION_ACCEL:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 13
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 13
 
 
  472              		.loc 1 55 5 view .LVU87
@@ -778,7 +778,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  515              	.LVL53:
  516              	.L47:
   63:Core/Src/LCD_UI.c ****         case FAN_ACTION_RAMP:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 14
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 14
 
 
  517              		.loc 1 63 13 is_stmt 1 view .LVU99
@@ -838,7 +838,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  561 00ac 00000000 		.word	.LC12
  562 00b0 04000000 		.word	.LC13
  563              		.cfi_endproc
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 15
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 15
 
 
  564              	.LFE71:
@@ -898,7 +898,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  608 0012 7047     		bx	lr
  609              	.L62:
  610              		.align	2
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 16
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 16
 
 
  611              	.L61:
@@ -958,7 +958,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  657              		.loc 1 119 5 view .LVU127
  122:Core/Src/LCD_UI.c ****     rpm = (fan->rpm > 9999U) ? 9999U : fan->rpm;
  658              		.loc 1 122 5 view .LVU128
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 17
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 17
 
 
  122:Core/Src/LCD_UI.c ****     rpm = (fan->rpm > 9999U) ? 9999U : fan->rpm;
@@ -1018,7 +1018,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  698              	.L66:
  132:Core/Src/LCD_UI.c ****                    (unsigned int)fan_index,
  699              		.loc 1 132 5 is_stmt 1 view .LVU144
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 18
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 18
 
 
  132:Core/Src/LCD_UI.c ****                    (unsigned int)fan_index,
@@ -1078,7 +1078,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  744              	.LVL82:
  745 0066 E6E7     		b	.L66
  746              	.L70:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 19
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 19
 
 
  747              		.align	2
@@ -1138,7 +1138,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  797              	.LVL83:
  798              	.LFB74:
   87:Core/Src/LCD_UI.c ****     char line[21];
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 20
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 20
 
 
  799              		.loc 1 87 76 is_stmt 1 view -0
@@ -1198,7 +1198,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  844              	.LVL88:
  845 0020 F4E7     		b	.L74
  846              	.LVL89:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 21
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 21
 
 
  847              	.L79:
@@ -1258,7 +1258,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  895              		@ sp needed
  896 000e 10BD     		pop	{r4, pc}
  897              	.LVL92:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 22
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 22
 
 
  898              	.L91:
@@ -1318,7 +1318,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  945              	.LCFI18:
  946              		.cfi_def_cfa_offset 16
  947              		.cfi_offset 3, -16
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 23
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 23
 
 
  948              		.cfi_offset 4, -12
@@ -1378,7 +1378,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  991              	.LFE76:
  993              		.section	.rodata.str1.4,"aMS",%progbits,1
  994              		.align	2
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 24
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 24
 
 
  995              	.LC15:
@@ -1432,57 +1432,57 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 1
  1049              		.file 8 "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/arm-none-eabi/include/stdio.h"
  1050              		.file 9 "Core/Inc/LCD.h"
  1051              		.file 10 "<built-in>"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s 			page 25
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s 			page 25
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 LCD_UI.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:19     .text.UI_WriteLineCached:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:24     .text.UI_WriteLineCached:00000000 UI_WriteLineCached
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:158    .text.UI_WriteLineCached:000000a0 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1027   .bss.g_line_valid:00000000 g_line_valid
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1033   .bss.g_line_cache:00000000 g_line_cache
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:164    .rodata.UI_FanStateToStr.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:177    .text.UI_FanStateToStr:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:183    .text.UI_FanStateToStr:00000000 UI_FanStateToStr
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:234    .text.UI_FanStateToStr:00000020 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:242    .rodata.UI_FanActionToStr.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:261    .text.UI_FanActionToStr:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:267    .text.UI_FanActionToStr:00000000 UI_FanActionToStr
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:338    .text.UI_FanActionToStr:00000034 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:348    .rodata.UI_FanAlertToStr.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:355    .text.UI_FanAlertToStr:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:361    .text.UI_FanAlertToStr:00000000 UI_FanAlertToStr
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:396    .text.UI_FanAlertToStr:00000018 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:402    .rodata.UI_GetAnimatedAction.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:409    .text.UI_GetAnimatedAction:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:415    .text.UI_GetAnimatedAction:00000000 UI_GetAnimatedAction
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:552    .text.UI_GetAnimatedAction:00000088 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1039   .bss.g_ui_anim:00000000 g_ui_anim
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1019   .rodata.accel_frames.1:00000000 accel_frames.1
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1004   .rodata.decel_frames.0:00000000 decel_frames.0
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:567    .text.UI_GetAnimatedAlert:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:573    .text.UI_GetAnimatedAlert:00000000 UI_GetAnimatedAlert
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:612    .text.UI_GetAnimatedAlert:00000014 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:619    .rodata.UI_FormatFanLine.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:623    .text.UI_FormatFanLine:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:628    .text.UI_FormatFanLine:00000000 UI_FormatFanLine
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:749    .text.UI_FormatFanLine:00000068 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:754    .text.UI_AnimUpdate:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:760    .text.UI_AnimUpdate:00000000 UI_AnimUpdate
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:785    .text.UI_AnimUpdate:00000014 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:790    .text.UI_DrawFanLine:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:796    .text.UI_DrawFanLine:00000000 UI_DrawFanLine
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:858    .text.UI_DrawFanLineAnimated:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:864    .text.UI_DrawFanLineAnimated:00000000 UI_DrawFanLineAnimated
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:926    .text.UI_DrawAllFans:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:932    .text.UI_DrawAllFans:00000000 UI_DrawAllFans
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:994    .rodata.str1.4:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1001   .rodata.decel_frames.0:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1016   .rodata.accel_frames.1:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1024   .bss.g_line_valid:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1030   .bss.g_line_cache:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cc8WYtRz.s:1036   .bss.g_ui_anim:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:19     .text.UI_WriteLineCached:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:24     .text.UI_WriteLineCached:00000000 UI_WriteLineCached
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:158    .text.UI_WriteLineCached:000000a0 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1027   .bss.g_line_valid:00000000 g_line_valid
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1033   .bss.g_line_cache:00000000 g_line_cache
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:164    .rodata.UI_FanStateToStr.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:177    .text.UI_FanStateToStr:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:183    .text.UI_FanStateToStr:00000000 UI_FanStateToStr
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:234    .text.UI_FanStateToStr:00000020 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:242    .rodata.UI_FanActionToStr.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:261    .text.UI_FanActionToStr:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:267    .text.UI_FanActionToStr:00000000 UI_FanActionToStr
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:338    .text.UI_FanActionToStr:00000034 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:348    .rodata.UI_FanAlertToStr.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:355    .text.UI_FanAlertToStr:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:361    .text.UI_FanAlertToStr:00000000 UI_FanAlertToStr
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:396    .text.UI_FanAlertToStr:00000018 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:402    .rodata.UI_GetAnimatedAction.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:409    .text.UI_GetAnimatedAction:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:415    .text.UI_GetAnimatedAction:00000000 UI_GetAnimatedAction
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:552    .text.UI_GetAnimatedAction:00000088 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1039   .bss.g_ui_anim:00000000 g_ui_anim
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1019   .rodata.accel_frames.1:00000000 accel_frames.1
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1004   .rodata.decel_frames.0:00000000 decel_frames.0
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:567    .text.UI_GetAnimatedAlert:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:573    .text.UI_GetAnimatedAlert:00000000 UI_GetAnimatedAlert
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:612    .text.UI_GetAnimatedAlert:00000014 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:619    .rodata.UI_FormatFanLine.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:623    .text.UI_FormatFanLine:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:628    .text.UI_FormatFanLine:00000000 UI_FormatFanLine
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:749    .text.UI_FormatFanLine:00000068 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:754    .text.UI_AnimUpdate:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:760    .text.UI_AnimUpdate:00000000 UI_AnimUpdate
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:785    .text.UI_AnimUpdate:00000014 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:790    .text.UI_DrawFanLine:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:796    .text.UI_DrawFanLine:00000000 UI_DrawFanLine
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:858    .text.UI_DrawFanLineAnimated:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:864    .text.UI_DrawFanLineAnimated:00000000 UI_DrawFanLineAnimated
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:926    .text.UI_DrawAllFans:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:932    .text.UI_DrawAllFans:00000000 UI_DrawAllFans
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:994    .rodata.str1.4:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1001   .rodata.decel_frames.0:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1016   .rodata.accel_frames.1:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1024   .bss.g_line_valid:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1030   .bss.g_line_cache:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccYsAUCl.s:1036   .bss.g_ui_anim:00000000 $d
 
 UNDEFINED SYMBOLS
 strlen
