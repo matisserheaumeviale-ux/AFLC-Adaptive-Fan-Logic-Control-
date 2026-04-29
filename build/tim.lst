@@ -1,4 +1,4 @@
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
   30:Core/Src/tim.c **** /* TIM2 init function */
   31:Core/Src/tim.c **** void MX_TIM2_Init(void)
   32:Core/Src/tim.c **** {
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 2
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 2
 
 
   27              		.loc 1 32 1 view -0
@@ -118,7 +118,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
   66 0026 8360     		str	r3, [r0, #8]
   48:Core/Src/tim.c ****   htim2.Init.Period = 65535;
   67              		.loc 1 48 3 is_stmt 1 view .LVU13
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 3
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 3
 
 
   68              		.loc 1 48 21 is_stmt 0 view .LVU14
@@ -178,7 +178,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  106              		.loc 1 64 3 is_stmt 1 view .LVU30
  107              		.loc 1 64 37 is_stmt 0 view .LVU31
  108 0052 0023     		movs	r3, #0
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 4
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 4
 
 
  109 0054 0493     		str	r3, [sp, #16]
@@ -238,7 +238,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  149 007c 1448     		ldr	r0, .L19
  150 007e FFF7FEFF 		bl	HAL_TIM_IC_ConfigChannel
  151              	.LVL5:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 5
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 5
 
 
  152              		.loc 1 78 6 discriminator 1 view .LVU50
@@ -298,7 +298,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  189              	.L12:
   58:Core/Src/tim.c ****   }
  190              		.loc 1 58 5 view .LVU59
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 6
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 6
 
 
  191 00a6 FFF7FEFF 		bl	Error_Handler
@@ -358,7 +358,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  241              	.LFB67:
   95:Core/Src/tim.c **** /* TIM3 init function */
   96:Core/Src/tim.c **** void MX_TIM3_Init(void)
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 7
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 7
 
 
   97:Core/Src/tim.c **** {
@@ -400,7 +400,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  133:Core/Src/tim.c ****     Error_Handler();
  134:Core/Src/tim.c ****   }
  135:Core/Src/tim.c ****   sConfigOC.OCMode = TIM_OCMODE_PWM1;
- 136:Core/Src/tim.c ****   sConfigOC.Pulse = 319;
+ 136:Core/Src/tim.c ****   sConfigOC.Pulse = 160;
  137:Core/Src/tim.c ****   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
  138:Core/Src/tim.c ****   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
  139:Core/Src/tim.c ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -418,7 +418,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  151:Core/Src/tim.c ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
  152:Core/Src/tim.c ****   {
  153:Core/Src/tim.c ****     Error_Handler();
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 8
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 8
 
 
  154:Core/Src/tim.c ****   }
@@ -478,7 +478,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  183:Core/Src/tim.c ****     GPIO_InitStruct.Pull = GPIO_NOPULL;
  184:Core/Src/tim.c ****     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
  185:Core/Src/tim.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 9
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 9
 
 
  186:Core/Src/tim.c ****     /* TIM2 interrupt Init */
@@ -538,7 +538,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  297              		.loc 1 172 5 view .LVU81
  298 0034 019A     		ldr	r2, [sp, #4]
  299              	.LBE2:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 10
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 10
 
 
  172:Core/Src/tim.c **** 
@@ -598,7 +598,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  339 0064 DAE7     		b	.L21
  340              	.LVL23:
  341              	.L26:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 11
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 11
 
 
  199:Core/Src/tim.c ****   /* USER CODE BEGIN TIM3_MspInit 1 */
@@ -658,7 +658,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  390              	.LCFI9:
  391              		.cfi_def_cfa_offset 32
  207:Core/Src/tim.c **** 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 12
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 12
 
 
  208:Core/Src/tim.c ****   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -718,7 +718,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  415              	.LVL26:
  416              	.L32:
  417              	.LCFI11:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 13
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 13
 
 
  418              		.cfi_restore_state
@@ -778,7 +778,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  225:Core/Src/tim.c ****     /**TIM3 GPIO Configuration
  456              		.loc 1 225 5 view .LVU128
  457 0040 A369     		ldr	r3, [r4, #24]
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 14
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 14
 
 
  458 0042 43F00803 		orr	r3, r3, #8
@@ -838,7 +838,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  507              	.LCFI13:
  508              		.cfi_def_cfa_offset 64
  103:Core/Src/tim.c ****   TIM_MasterConfigTypeDef sMasterConfig = {0};
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 15
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 15
 
 
  509              		.loc 1 103 3 view .LVU137
@@ -898,7 +898,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  547              		.loc 1 115 3 is_stmt 1 view .LVU153
  115:Core/Src/tim.c ****   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
  548              		.loc 1 115 32 is_stmt 0 view .LVU154
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 16
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 16
 
 
  549 0032 8023     		movs	r3, #128
@@ -912,7 +912,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  116:Core/Src/tim.c ****   {
  555              		.loc 1 116 6 discriminator 1 view .LVU157
  556 003a 0028     		cmp	r0, #0
- 557 003c 3AD1     		bne	.L45
+ 557 003c 39D1     		bne	.L45
  558              	.L36:
  120:Core/Src/tim.c ****   if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
  559              		.loc 1 120 3 is_stmt 1 view .LVU158
@@ -931,7 +931,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  121:Core/Src/tim.c ****   {
  569              		.loc 1 121 6 discriminator 1 view .LVU162
  570 004c 0028     		cmp	r0, #0
- 571 004e 34D1     		bne	.L46
+ 571 004e 33D1     		bne	.L46
  572              	.L37:
  125:Core/Src/tim.c ****   {
  573              		.loc 1 125 3 is_stmt 1 view .LVU163
@@ -943,7 +943,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  125:Core/Src/tim.c ****   {
  578              		.loc 1 125 6 discriminator 1 view .LVU165
  579 0056 0028     		cmp	r0, #0
- 580 0058 32D1     		bne	.L47
+ 580 0058 31D1     		bne	.L47
  581              	.L38:
  129:Core/Src/tim.c ****   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
  582              		.loc 1 129 3 is_stmt 1 view .LVU166
@@ -958,7 +958,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  588 005e 0993     		str	r3, [sp, #36]
  131:Core/Src/tim.c ****   {
  589              		.loc 1 131 3 is_stmt 1 view .LVU170
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 17
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 17
 
 
  131:Core/Src/tim.c ****   {
@@ -969,11 +969,11 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  594              	.LVL33:
  131:Core/Src/tim.c ****   {
  595              		.loc 1 131 6 discriminator 1 view .LVU172
- 596 0068 68BB     		cbnz	r0, .L48
+ 596 0068 60BB     		cbnz	r0, .L48
  597              	.L39:
- 135:Core/Src/tim.c ****   sConfigOC.Pulse = 319;
+ 135:Core/Src/tim.c ****   sConfigOC.Pulse = 160;
  598              		.loc 1 135 3 is_stmt 1 view .LVU173
- 135:Core/Src/tim.c ****   sConfigOC.Pulse = 319;
+ 135:Core/Src/tim.c ****   sConfigOC.Pulse = 160;
  599              		.loc 1 135 20 is_stmt 0 view .LVU174
  600 006a 6023     		movs	r3, #96
  601 006c 0193     		str	r3, [sp, #4]
@@ -981,44 +981,44 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  602              		.loc 1 136 3 is_stmt 1 view .LVU175
  136:Core/Src/tim.c ****   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
  603              		.loc 1 136 19 is_stmt 0 view .LVU176
- 604 006e 40F23F13 		movw	r3, #319
- 605 0072 0293     		str	r3, [sp, #8]
+ 604 006e A023     		movs	r3, #160
+ 605 0070 0293     		str	r3, [sp, #8]
  137:Core/Src/tim.c ****   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
  606              		.loc 1 137 3 is_stmt 1 view .LVU177
  137:Core/Src/tim.c ****   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
  607              		.loc 1 137 24 is_stmt 0 view .LVU178
- 608 0074 0022     		movs	r2, #0
- 609 0076 0392     		str	r2, [sp, #12]
+ 608 0072 0022     		movs	r2, #0
+ 609 0074 0392     		str	r2, [sp, #12]
  138:Core/Src/tim.c ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
  610              		.loc 1 138 3 is_stmt 1 view .LVU179
  138:Core/Src/tim.c ****   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
  611              		.loc 1 138 24 is_stmt 0 view .LVU180
- 612 0078 0592     		str	r2, [sp, #20]
+ 612 0076 0592     		str	r2, [sp, #20]
  139:Core/Src/tim.c ****   {
  613              		.loc 1 139 3 is_stmt 1 view .LVU181
  139:Core/Src/tim.c ****   {
  614              		.loc 1 139 7 is_stmt 0 view .LVU182
- 615 007a 01A9     		add	r1, sp, #4
- 616 007c 1948     		ldr	r0, .L53
- 617 007e FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 615 0078 01A9     		add	r1, sp, #4
+ 616 007a 1A48     		ldr	r0, .L53
+ 617 007c FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
  618              	.LVL34:
  139:Core/Src/tim.c ****   {
  619              		.loc 1 139 6 discriminator 1 view .LVU183
- 620 0082 18BB     		cbnz	r0, .L49
+ 620 0080 18BB     		cbnz	r0, .L49
  621              	.L40:
  143:Core/Src/tim.c ****   {
  622              		.loc 1 143 3 is_stmt 1 view .LVU184
  143:Core/Src/tim.c ****   {
  623              		.loc 1 143 7 is_stmt 0 view .LVU185
- 624 0084 0422     		movs	r2, #4
- 625 0086 0DEB0201 		add	r1, sp, r2
- 626 008a 1648     		ldr	r0, .L53
- 627 008c FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 624 0082 0422     		movs	r2, #4
+ 625 0084 0DEB0201 		add	r1, sp, r2
+ 626 0088 1648     		ldr	r0, .L53
+ 627 008a FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
  628              	.LVL35:
  143:Core/Src/tim.c ****   {
  629              		.loc 1 143 6 discriminator 1 view .LVU186
- 630 0090 F8B9     		cbnz	r0, .L50
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 18
+ 630 008e F8B9     		cbnz	r0, .L50
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 18
 
 
  631              	.L41:
@@ -1026,96 +1026,96 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  632              		.loc 1 147 3 is_stmt 1 view .LVU187
  147:Core/Src/tim.c ****   {
  633              		.loc 1 147 7 is_stmt 0 view .LVU188
- 634 0092 0822     		movs	r2, #8
- 635 0094 01A9     		add	r1, sp, #4
- 636 0096 1348     		ldr	r0, .L53
- 637 0098 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 634 0090 0822     		movs	r2, #8
+ 635 0092 01A9     		add	r1, sp, #4
+ 636 0094 1348     		ldr	r0, .L53
+ 637 0096 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
  638              	.LVL36:
  147:Core/Src/tim.c ****   {
  639              		.loc 1 147 6 discriminator 1 view .LVU189
- 640 009c E0B9     		cbnz	r0, .L51
+ 640 009a E0B9     		cbnz	r0, .L51
  641              	.L42:
  151:Core/Src/tim.c ****   {
  642              		.loc 1 151 3 is_stmt 1 view .LVU190
  151:Core/Src/tim.c ****   {
  643              		.loc 1 151 7 is_stmt 0 view .LVU191
- 644 009e 0C22     		movs	r2, #12
- 645 00a0 01A9     		add	r1, sp, #4
- 646 00a2 1048     		ldr	r0, .L53
- 647 00a4 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
+ 644 009c 0C22     		movs	r2, #12
+ 645 009e 01A9     		add	r1, sp, #4
+ 646 00a0 1048     		ldr	r0, .L53
+ 647 00a2 FFF7FEFF 		bl	HAL_TIM_PWM_ConfigChannel
  648              	.LVL37:
  151:Core/Src/tim.c ****   {
  649              		.loc 1 151 6 discriminator 1 view .LVU192
- 650 00a8 C8B9     		cbnz	r0, .L52
+ 650 00a6 C8B9     		cbnz	r0, .L52
  651              	.L43:
  158:Core/Src/tim.c **** 
  652              		.loc 1 158 3 is_stmt 1 view .LVU193
- 653 00aa 0E48     		ldr	r0, .L53
- 654 00ac FFF7FEFF 		bl	HAL_TIM_MspPostInit
+ 653 00a8 0E48     		ldr	r0, .L53
+ 654 00aa FFF7FEFF 		bl	HAL_TIM_MspPostInit
  655              	.LVL38:
  160:Core/Src/tim.c **** 
  656              		.loc 1 160 1 is_stmt 0 view .LVU194
- 657 00b0 0FB0     		add	sp, sp, #60
+ 657 00ae 0FB0     		add	sp, sp, #60
  658              	.LCFI14:
  659              		.cfi_remember_state
  660              		.cfi_def_cfa_offset 4
  661              		@ sp needed
- 662 00b2 00BD     		pop	{pc}
+ 662 00b0 00BD     		pop	{pc}
  663              	.L45:
  664              	.LCFI15:
  665              		.cfi_restore_state
  118:Core/Src/tim.c ****   }
  666              		.loc 1 118 5 is_stmt 1 view .LVU195
- 667 00b4 FFF7FEFF 		bl	Error_Handler
+ 667 00b2 FFF7FEFF 		bl	Error_Handler
  668              	.LVL39:
- 669 00b8 C1E7     		b	.L36
+ 669 00b6 C2E7     		b	.L36
  670              	.L46:
  123:Core/Src/tim.c ****   }
  671              		.loc 1 123 5 view .LVU196
- 672 00ba FFF7FEFF 		bl	Error_Handler
+ 672 00b8 FFF7FEFF 		bl	Error_Handler
  673              	.LVL40:
- 674 00be C7E7     		b	.L37
+ 674 00bc C8E7     		b	.L37
  675              	.L47:
  127:Core/Src/tim.c ****   }
  676              		.loc 1 127 5 view .LVU197
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 19
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 19
 
 
- 677 00c0 FFF7FEFF 		bl	Error_Handler
+ 677 00be FFF7FEFF 		bl	Error_Handler
  678              	.LVL41:
- 679 00c4 C9E7     		b	.L38
+ 679 00c2 CAE7     		b	.L38
  680              	.L48:
  133:Core/Src/tim.c ****   }
  681              		.loc 1 133 5 view .LVU198
- 682 00c6 FFF7FEFF 		bl	Error_Handler
+ 682 00c4 FFF7FEFF 		bl	Error_Handler
  683              	.LVL42:
- 684 00ca CEE7     		b	.L39
+ 684 00c8 CFE7     		b	.L39
  685              	.L49:
  141:Core/Src/tim.c ****   }
  686              		.loc 1 141 5 view .LVU199
- 687 00cc FFF7FEFF 		bl	Error_Handler
+ 687 00ca FFF7FEFF 		bl	Error_Handler
  688              	.LVL43:
- 689 00d0 D8E7     		b	.L40
+ 689 00ce D8E7     		b	.L40
  690              	.L50:
  145:Core/Src/tim.c ****   }
  691              		.loc 1 145 5 view .LVU200
- 692 00d2 FFF7FEFF 		bl	Error_Handler
+ 692 00d0 FFF7FEFF 		bl	Error_Handler
  693              	.LVL44:
- 694 00d6 DCE7     		b	.L41
+ 694 00d4 DCE7     		b	.L41
  695              	.L51:
  149:Core/Src/tim.c ****   }
  696              		.loc 1 149 5 view .LVU201
- 697 00d8 FFF7FEFF 		bl	Error_Handler
+ 697 00d6 FFF7FEFF 		bl	Error_Handler
  698              	.LVL45:
- 699 00dc DFE7     		b	.L42
+ 699 00da DFE7     		b	.L42
  700              	.L52:
  153:Core/Src/tim.c ****   }
  701              		.loc 1 153 5 view .LVU202
- 702 00de FFF7FEFF 		bl	Error_Handler
+ 702 00dc FFF7FEFF 		bl	Error_Handler
  703              	.LVL46:
- 704 00e2 E2E7     		b	.L43
+ 704 00e0 E2E7     		b	.L43
  705              	.L54:
- 706              		.align	2
+ 706 00e2 00BF     		.align	2
  707              	.L53:
  708 00e4 00000000 		.word	htim3
  709 00e8 00040040 		.word	1073742848
@@ -1138,7 +1138,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  725              		@ args = 0, pretend = 0, frame = 0
  726              		@ frame_needed = 0, uses_anonymous_args = 0
  727              		.loc 1 241 1 is_stmt 0 view .LVU204
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 20
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 20
 
 
  728 0000 08B5     		push	{r3, lr}
@@ -1198,7 +1198,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  747 0010 08BD     		pop	{r3, pc}
  748              	.LVL49:
  749              	.L59:
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 21
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 21
 
 
  249:Core/Src/tim.c **** 
@@ -1258,7 +1258,7 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  798      00000000 
  798      00000000 
  798      00000000 
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 22
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 22
 
 
  799              		.text
@@ -1274,30 +1274,30 @@ ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 1
  809              		.file 10 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h"
  810              		.file 11 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h"
  811              		.file 12 "Core/Inc/main.h"
-ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s 			page 23
+ARM GAS  /var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s 			page 23
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 tim.c
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:19     .text.MX_TIM2_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:25     .text.MX_TIM2_Init:00000000 MX_TIM2_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:228    .text.MX_TIM2_Init:000000d0 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:797    .bss.htim2:00000000 htim2
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:233    .text.HAL_TIM_Base_MspInit:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:239    .text.HAL_TIM_Base_MspInit:00000000 HAL_TIM_Base_MspInit
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:363    .text.HAL_TIM_Base_MspInit:0000007c $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:370    .text.HAL_TIM_MspPostInit:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:376    .text.HAL_TIM_MspPostInit:00000000 HAL_TIM_MspPostInit
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:482    .text.HAL_TIM_MspPostInit:00000060 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:490    .text.MX_TIM3_Init:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:496    .text.MX_TIM3_Init:00000000 MX_TIM3_Init
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:708    .text.MX_TIM3_Init:000000e4 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:790    .bss.htim3:00000000 htim3
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:714    .text.HAL_TIM_Base_MspDeInit:00000000 $t
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:720    .text.HAL_TIM_Base_MspDeInit:00000000 HAL_TIM_Base_MspDeInit
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:779    .text.HAL_TIM_Base_MspDeInit:0000003c $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:787    .bss.htim3:00000000 $d
-/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//ccG9Dqj3.s:794    .bss.htim2:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:19     .text.MX_TIM2_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:25     .text.MX_TIM2_Init:00000000 MX_TIM2_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:228    .text.MX_TIM2_Init:000000d0 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:797    .bss.htim2:00000000 htim2
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:233    .text.HAL_TIM_Base_MspInit:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:239    .text.HAL_TIM_Base_MspInit:00000000 HAL_TIM_Base_MspInit
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:363    .text.HAL_TIM_Base_MspInit:0000007c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:370    .text.HAL_TIM_MspPostInit:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:376    .text.HAL_TIM_MspPostInit:00000000 HAL_TIM_MspPostInit
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:482    .text.HAL_TIM_MspPostInit:00000060 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:490    .text.MX_TIM3_Init:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:496    .text.MX_TIM3_Init:00000000 MX_TIM3_Init
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:708    .text.MX_TIM3_Init:000000e4 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:790    .bss.htim3:00000000 htim3
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:714    .text.HAL_TIM_Base_MspDeInit:00000000 $t
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:720    .text.HAL_TIM_Base_MspDeInit:00000000 HAL_TIM_Base_MspDeInit
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:779    .text.HAL_TIM_Base_MspDeInit:0000003c $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:787    .bss.htim3:00000000 $d
+/var/folders/t9/y_chwk8j4cv2jjx6x9_h4twc0000gn/T//cczI8e00.s:794    .bss.htim2:00000000 $d
 
 UNDEFINED SYMBOLS
 HAL_TIM_Base_Init
